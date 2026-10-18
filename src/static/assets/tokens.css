@@ -62,16 +62,16 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-bs-theme="light"]) {
-    --ty-cc1-bg: #1F0D05;
-    --ty-cc1-text: #EDE6E3;
-    --ty-cc1-heading: #F2ECEA;
+    --ty-cc1-bg: #1F1F1F;
+    --ty-cc1-text: #D6D6D6;
+    --ty-cc1-heading: #FFFFFF;
     --ty-cc1-link: #F6672A;
     --ty-cc1-link-hover: #F8834E;
-    --ty-cc2-bg: #2A1207;
-    --ty-cc2-text: #EDE6E3;
-    --ty-cc2-heading: #F2ECEA;
+    --ty-cc2-bg: #292929;
+    --ty-cc2-text: #D6D6D6;
+    --ty-cc2-heading: #FFFFFF;
     --ty-cc2-link: #F6672A;
-    --ty-surface-purple: #2B0536;
+    --ty-surface-purple: #141414;
     --ty-action-bg-hover: #F8834E;
     --ty-action2-bg: #C77BD6;
     --ty-action2-label: #1F0D05;
@@ -82,7 +82,7 @@
     --ty-app-brand-text: #F6672A;
     --ty-app-brand-text-hover: #F8834E;
     --ty-app-control: #F6672A;
-    --ty-app-brand-tint: #2A1207;
+    --ty-app-brand-tint: #292929;
     --ty-app-focus: #F8834E;
     --ty-timer-break: #C77BD6;
     --ty-timer-break-glyph: #1F0D05;
@@ -99,16 +99,16 @@
   }
 }
 [data-bs-theme="dark"] {
-  --ty-cc1-bg: #1F0D05;
-  --ty-cc1-text: #EDE6E3;
-  --ty-cc1-heading: #F2ECEA;
+  --ty-cc1-bg: #1F1F1F;
+  --ty-cc1-text: #D6D6D6;
+  --ty-cc1-heading: #FFFFFF;
   --ty-cc1-link: #F6672A;
   --ty-cc1-link-hover: #F8834E;
-  --ty-cc2-bg: #2A1207;
-  --ty-cc2-text: #EDE6E3;
-  --ty-cc2-heading: #F2ECEA;
+  --ty-cc2-bg: #292929;
+  --ty-cc2-text: #D6D6D6;
+  --ty-cc2-heading: #FFFFFF;
   --ty-cc2-link: #F6672A;
-  --ty-surface-purple: #2B0536;
+  --ty-surface-purple: #141414;
   --ty-action-bg-hover: #F8834E;
   --ty-action2-bg: #C77BD6;
   --ty-action2-label: #1F0D05;
@@ -119,7 +119,7 @@
   --ty-app-brand-text: #F6672A;
   --ty-app-brand-text-hover: #F8834E;
   --ty-app-control: #F6672A;
-  --ty-app-brand-tint: #2A1207;
+  --ty-app-brand-tint: #292929;
   --ty-app-focus: #F8834E;
   --ty-timer-break: #C77BD6;
   --ty-timer-break-glyph: #1F0D05;

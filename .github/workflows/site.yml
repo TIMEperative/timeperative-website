@@ -1,13 +1,16 @@
-# Builds timeperative.com on every push and pull request, and deploys it to
-# Cloudflare Workers from main: on a push, every three hours (so news set to
-# Publish in Notion appears without a commit) and on demand.
+# Builds and tests timeperative.com on every push and pull request.
 #
-# Repository secrets (Settings > Secrets and variables > Actions):
+# Deployment: Cloudflare Workers Builds deploys the production branch on
+# every push (Cloudflare dashboard, Workers & Pages, timeperative-website,
+# Settings, Build). `npm ci` builds the site through the prepare script, so
+# Cloudflare's default deploy command `npx wrangler deploy` finds dist/.
+#
+# News set to Publish in Notion needs a new build to appear. This workflow
+# rebuilds and deploys every three hours and on demand, once these
+# repository secrets exist (Settings > Secrets and variables > Actions):
 #   CLOUDFLARE_API_TOKEN   an account API token from the "Edit Cloudflare Workers" template
 #   CLOUDFLARE_ACCOUNT_ID  the Cloudflare account's ID
 #   NOTION_TOKEN           a Notion integration shared with "TIMEperative website content"
-# Without the Cloudflare secrets the site is built and checked, not deployed;
-# without NOTION_TOKEN it is built without the news from Notion.
 name: Site
 on:
   push:
@@ -34,18 +37,12 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - name: Install and build (prepare runs the news pull and the build)
+        run: npm ci
       - run: npm test
-      - name: News from Notion
-        if: env.NOTION_TOKEN != ''
-        run: npm run news
-      - name: No news from Notion
-        if: env.NOTION_TOKEN == ''
-        run: echo "::warning title=Notion::NOTION_TOKEN is not set, so the site is built without the news from Notion."
-      - run: npm run build
-      - name: Deploy to Cloudflare
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && env.CLOUDFLARE_API_TOKEN != ''
+      - name: Deploy the news to Cloudflare
+        if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && env.CLOUDFLARE_API_TOKEN != ''
         run: npx wrangler deploy
       - name: Not deployed
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && env.CLOUDFLARE_API_TOKEN == ''
-        run: echo "::warning title=Cloudflare::CLOUDFLARE_API_TOKEN is not set, so the site was built but not deployed."
+        if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && env.CLOUDFLARE_API_TOKEN == ''
+        run: echo "::warning title=Cloudflare::CLOUDFLARE_API_TOKEN is not set, so the scheduled rebuild for Notion news was not deployed."

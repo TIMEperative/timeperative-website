@@ -59,23 +59,22 @@ Remove-Item Env:NOTION_TOKEN
 
 ## Deploy
 
-The workflow deploys from `main` once these repository secrets exist
-(Settings, Secrets and variables, Actions):
+Cloudflare Workers Builds deploys the production branch (`main`) on every
+push: Cloudflare dashboard, Workers & Pages, timeperative-website, Settings,
+Build. `npm ci` builds the site through the `prepare` script, so the default
+deploy command `npx wrangler deploy` finds `dist/` whatever the build command
+is. Set `NOTION_TOKEN` there as a build variable to include the news.
 
-| Secret | Where it comes from |
-|---|---|
-| `CLOUDFLARE_API_TOKEN` | Cloudflare, Manage account, Account API tokens, Create token, template "Edit Cloudflare Workers", limited to the Acunomic account and the timeperative.com zone |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard: press Ctrl+K and run "Copy account ID" |
-| `NOTION_TOKEN` | Notion, Settings, Connections, Develop or manage integrations: an internal integration, then share the database TIMEperative website content with it |
+News set to Publish in Notion needs a new build. The workflow `Site` rebuilds
+and deploys every three hours and on demand once the repository has the
+secrets `CLOUDFLARE_API_TOKEN` (template "Edit Cloudflare Workers"),
+`CLOUDFLARE_ACCOUNT_ID` and `NOTION_TOKEN`.
 
-The custom domain in `wrangler.jsonc` needs the timeperative.com zone to be
-active on Cloudflare first (the setup guide in Notion, TIMEperative >
-TIMEperative.com website). To deploy by hand:
+To deploy by hand:
 
 ```powershell
-npm run build
 npx wrangler login
-npx wrangler deploy
+npm run deploy
 ```
 
 ## Writing a news article

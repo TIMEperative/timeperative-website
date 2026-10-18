@@ -5,12 +5,14 @@
   "description": "timeperative.com: the TIMEperative website, a static site on Cloudflare Workers.",
   "engines": { "node": ">=22" },
   "scripts": {
+    "site": "node scripts/notion-news.mjs --if-token && node scripts/build.mjs",
+    "prepare": "npm run site",
     "build": "node scripts/build.mjs",
     "build:offline": "node scripts/build.mjs --offline",
     "news": "node scripts/notion-news.mjs",
     "test": "node --test \"test/*.test.mjs\"",
-    "dev": "node scripts/build.mjs && wrangler dev",
-    "deploy": "wrangler deploy"
+    "dev": "npm run site && wrangler dev",
+    "deploy": "npm run site && wrangler deploy"
   },
   "devDependencies": {
     "wrangler": "4.147.0"

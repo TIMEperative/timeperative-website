@@ -1,6 +1,8 @@
 // News and release articles from Notion into content/news/notion/.
 //
 //   NOTION_TOKEN=... node scripts/notion-news.mjs [--strict]
+//   node scripts/notion-news.mjs --if-token   (the site build: skips without a
+//                                              token, warns instead of failing)
 //
 // Reads the Notion database "TIMEperative website content" (TIMEperative >
 // TIMEperative.com website) and keeps the rows whose Status is Publish and
@@ -234,5 +236,11 @@ async function main() {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  main().catch((error) => { console.error(error.message); process.exit(1); });
+  const optional = process.argv.includes("--if-token");
+  if (optional && !token) {
+    console.log("notion-news: no NOTION_TOKEN, the site is built without the news from Notion");
+  } else {
+    // In the site build a Notion outage must not stop a deployment: warn, build without news.
+    main().catch((error) => { console.error(error.message); process.exit(optional ? 0 : 1); });
+  }
 }
