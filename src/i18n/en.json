@@ -1,0 +1,30 @@
+{
+  "skip": "Skip to content",
+  "navLabel": "Main",
+  "nav": { "home": "Home", "download": "Download", "resources": "Resources", "support": "Support" },
+  "tagline": "Because nothing is more precious than your time.",
+  "language": { "name": "English" },
+  "scheme": { "label": "Colour scheme", "system": "System", "light": "Light", "dark": "Dark" },
+  "footer": {
+    "label": "Legal and contact",
+    "privacy": "Privacy policy",
+    "imprint": "Imprint",
+    "owner": "TIMEperative is a product of Acunomic GmbH.",
+    "contact": "Questions and support"
+  },
+  "news": {
+    "title": "News and releases",
+    "empty": "No news yet. Release notes appear here with every new version.",
+    "kinds": { "News": "News", "Release": "Release" }
+  },
+  "release": {
+    "title": "TIMEperative {version}",
+    "subtitle": "What is new in this version.",
+    "metaDescription": "Release notes for TIMEperative {version}: what is new and what changed for Windows and Android.",
+    "englishOnly": "Release notes are written in English.",
+    "summary": "Latest version: {version}, released on {date}.",
+    "unknown": "The latest version and every earlier one are listed on the {link}.",
+    "releasePage": "release page",
+    "notesLink": "Read the release notes"
+  }
+}

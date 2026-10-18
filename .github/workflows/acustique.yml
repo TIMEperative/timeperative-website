@@ -1,0 +1,100 @@
+# acustique product check, before merge. Copy to .github/workflows/acustique.yml
+# in a product repository (docs/ADOPTION.md).
+#
+# acustique is private, and a workflow's GITHUB_TOKEN can only read its own
+# repository, so the product needs one credential that can read
+# Acunomic/acustique:
+#   - a GitHub App installed on Acunomic with Contents: read on acustique
+#     (repository variable ACUSTIQUE_APP_CLIENT_ID, secret ACUSTIQUE_APP_KEY;
+#     tokens last one hour, nothing to rotate), or
+#   - a fine-grained personal access token with read-only Contents on
+#     Acunomic/acustique (secret ACUSTIQUE_TOKEN).
+# Pin acustique with the repository variable ACUSTIQUE_REF (a tag or commit);
+# empty means acustique's default branch.
+#
+# Without a credential the check cannot run. On a release tag (v*) that
+# fails the job, whatever the product's mode: a release must not pass a
+# check that never ran (GOV-003). On other runs it warns while the product is
+# report-only. A release workflow gates on this check by calling it:
+#   jobs:
+#     acustique:
+#       uses: ./.github/workflows/acustique.yml
+#       secrets: inherit
+#     build:
+#       needs: acustique
+name: acustique check
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+  workflow_call:
+permissions:
+  contents: read
+concurrency:
+  # a called run is named after its caller, so a release's call never cancels the tag's own run
+  group: acustique-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: product
+      - name: Credentials for acustique
+        id: cred
+        env:
+          APP_ID: ${{ vars.ACUSTIQUE_APP_CLIENT_ID }}
+          PAT: ${{ secrets.ACUSTIQUE_TOKEN }}
+        run: |
+          mode=$(jq -r '.mode // "blocking"' product/.acustique.json)
+          release=no
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            case "$GITHUB_REF_NAME" in v*) release=yes ;; esac
+          fi
+          if [ -n "$APP_ID" ]; then echo "use=app" >> "$GITHUB_OUTPUT"
+          elif [ -n "$PAT" ]; then echo "use=pat" >> "$GITHUB_OUTPUT"
+          elif [ "$release" = "yes" ]; then
+            echo "::error title=acustique::Release $GITHUB_REF_NAME has no credential to read Acunomic/acustique, so the check could not run; a release does not pass a check that never ran (GOV-003, acustique docs/ADOPTION.md, step 5)."
+            exit 1
+          elif [ "$mode" = "report-only" ]; then
+            echo "::warning title=acustique::No credential to read Acunomic/acustique yet, so the check did not run (acustique docs/ADOPTION.md, step 5). A release tag fails without it."
+            echo "use=none" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error title=acustique::This product is blocking but has no credential to read Acunomic/acustique; a check that cannot run must not pass (GOV-003)."
+            exit 1
+          fi
+      - if: steps.cred.outputs.use == 'app'
+        id: app
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.ACUSTIQUE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.ACUSTIQUE_APP_KEY }}
+          owner: Acunomic
+          repositories: acustique
+          permission-contents: read
+      - if: steps.cred.outputs.use != 'none'
+        uses: actions/checkout@v7
+        with:
+          repository: Acunomic/acustique
+          ref: ${{ vars.ACUSTIQUE_REF }}
+          token: ${{ steps.app.outputs.token || secrets.ACUSTIQUE_TOKEN }}
+          path: acustique
+      - if: steps.cred.outputs.use != 'none'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - if: steps.cred.outputs.use != 'none'
+        name: Run the product check
+        run: node acustique/checks/run.mjs --root product --out acustique-report.md --json acustique-report.json
+      - if: always() && steps.cred.outputs.use != 'none'
+        name: Report
+        run: test -f acustique-report.md && cat acustique-report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - if: always() && steps.cred.outputs.use != 'none'
+        uses: actions/upload-artifact@v7
+        with:
+          name: acustique-report
+          path: acustique-report.*
+          retention-days: 30
+          if-no-files-found: ignore

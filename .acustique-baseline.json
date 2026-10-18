@@ -1,0 +1,6 @@
+{
+  "$comment": "acustique baseline: findings accepted when the checks were introduced. Only new findings block. Shrink it as you fix; never add to it by hand (GOV-002).",
+  "created": "2026-10-18",
+  "acustique": "0.1.0",
+  "findings": {}
+}

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="{{locale}}">
+<head>
+<meta charset="utf-8">
+<script>(function(){var s;try{s=localStorage.getItem("ty-scheme")}catch(e){}if(s!=="light"&&s!=="dark")s="system";var d=s==="system"?(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):s;var r=document.documentElement;r.setAttribute("data-bs-theme",d);r.setAttribute("data-scheme",s)})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+{{robots}}
+{{canonical}}
+{{alternates}}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TIMEperative">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:url" content="{{ogUrl}}">
+<meta property="og:image" content="https://timeperative.com/assets/app-mark-512.png">
+<link rel="icon" type="image/png" href="/assets/app-mark-512.png">
+<link rel="apple-touch-icon" href="/assets/app-mark-512.png">
+<link rel="preload" href="/fonts/Geist-Variable.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="/fonts/Outfit-Variable.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="/assets/tokens.css">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">{{skip}}</a>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="{{home}}"><img src="/assets/app-mark-512.png" alt="" width="32" height="32"><span class="wordmark"><b>TIME</b>perative</span></a>
+    <nav class="site-nav" aria-label="{{navLabel}}"><ul>{{nav}}</ul></nav>
+    {{switcher}}
+  </div>
+</header>
+<main id="main">
+{{content}}
+</main>
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <p class="brand"><img src="/assets/app-mark-512.png" alt="" width="24" height="24"><span class="wordmark"><b>TIME</b>perative</span></p>
+      <p class="tagline">{{tagline}}</p>
+      <p>{{owner}}</p>
+    </div>
+    <nav class="footer-nav" aria-label="{{footerLabel}}">
+      <ul>{{footerLinks}}<li><a href="mailto:{{supportEmail}}">{{supportEmail}}</a></li></ul>
+    </nav>
+    <div class="scheme" role="group" aria-label="{{schemeLabel}}">
+      <span class="scheme-label" aria-hidden="true">{{schemeLabel}}</span>
+      <button type="button" data-scheme-choice="system" aria-pressed="false">{{schemeSystem}}</button>
+      <button type="button" data-scheme-choice="light" aria-pressed="false">{{schemeLight}}</button>
+      <button type="button" data-scheme-choice="dark" aria-pressed="false">{{schemeDark}}</button>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

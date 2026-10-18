@@ -1,0 +1,75 @@
+<!--
+title: Datenschutzerklärung: TIMEperative
+description: Was die App TIMEperative und timeperative.com mit Deinen Daten tun: was auf Deinem Gerät bleibt, was es wann verlässt und was Du steuerst.
+nav: none
+-->
+<div class="container page-head">
+  <h1>Datenschutzerklärung</h1>
+  <p class="lead">TIMEperative behält Deine Daten auf Deinem Gerät. Diese Seite erklärt, was die App und diese Website mit Personendaten tun, was Dein Gerät wann verlässt und was Du selbst steuerst.</p>
+  <p class="updated">Zuletzt geändert am 18. Oktober 2026.</p>
+</div>
+
+<section class="section">
+  <div class="container prose">
+    <h2>Wer verantwortlich ist</h2>
+    <p>Die Acunomic GmbH, Leutschenbachstrasse 95, 8050 Zürich, Schweiz, gibt TIMEperative und diese Website heraus. Schreib an <a href="mailto:{{support.email}}">{{support.email}}</a>, wenn Du Fragen zu Deinen Daten hast.</p>
+
+    <h2>Kurz gesagt</h2>
+    <ul>
+      <li>TIMEperative hat kein Konto, und wir betreiben keinen Server für die App. Wir erhalten keine Deiner Einträge, nichts von dem, was das Tracking aufzeichnet, und keine Nutzungsstatistiken, Absturzberichte oder Analysen.</li>
+      <li>Deine Daten bleiben in einer Datenbank auf Deinem Computer oder Telefon. Abgesehen von der Suche nach Updates verlassen sie Dein Gerät nur, wenn Du einen Dienst verbindest oder Einträge sendest, und dann gehen sie an diesen Dienst, nicht an uns.</li>
+      <li>Diese Website setzt keine Cookies und verwendet keine Analysewerkzeuge.</li>
+    </ul>
+
+    <h2>Die App TIMEperative</h2>
+
+    <h3>Wo Deine Daten liegen</h3>
+    <p>Alles, was Du erfasst, liegt in einer Datenbank auf Deinem Gerät: auf Windows im Ordner der App in den lokalen Anwendungsdaten Deines Benutzers (%LOCALAPPDATA%), die nicht mit Deinem Profil wandern; auf Android im privaten Speicher der App. TIMEperative verschlüsselt diese Datenbank nicht selbst; schütze Dein Gerät deshalb mit seiner eigenen Verschlüsselung, etwa BitLocker auf Windows.</p>
+    <p>Passwörter, Schlüssel und Anmeldetoken liegen im sicheren Speicher des Systems: in der Windows-Anmeldeinformationsverwaltung oder auf Android unter einem Schlüssel im Android Keystore. Zwei Arten von Einstellungen liegen stattdessen in der Datenbank: Client-ID und Secret Deiner eigenen Google-Registrierung sowie Kalenderlinks, die Du einfügst.</p>
+    <p>Bevor ein Update die Datenbank ändert, legt die App eine Kopie davon auf Deinem Gerät ab; sie behält die letzten fünf. Auf Android ist die App von Cloud-Sicherungen ausgenommen, ihre Daten werden also nicht in Dein Google-Konto kopiert. Löschst Du die Daten der App, kann sie niemand wiederherstellen, auch wir nicht.</p>
+
+    <h3>Was die App aufzeichnet</h3>
+    <p>Die App speichert, was Du eingibst: Deine Zeiteinträge, Projekte, Pläne, Reisen, Budgets und Einstellungen. Das Tracking ist aus, bis Du es einschaltest. Ist es an, zeichnet es nur auf Deinem Gerät auf:</p>
+    <ul>
+      <li>auf Windows alle drei Sekunden, welche App und welcher Fenstertitel vorne war, mit einer Pause nach vier Minuten ohne Eingabe; Deinen Browserverlauf, gelesen aus der eigenen Datei des Browsers; zuletzt verwendete Dokumente; und wann der PC in Gebrauch war, aus dem Systemprotokoll von Windows;</li>
+      <li>auf Windows, wann Microsoft Teams oder Zoom zuletzt das Mikrofon benutzt hat, gelesen aus den Datenschutzeinstellungen von Windows: die App, den Beginn und das Ende, nichts vom Anruf selbst;</li>
+      <li>auf Android, wie lange Du welche Apps benutzt hast, über den Nutzungszugriff von Android, den Du selbst erteilst, und Seiten, die Du aus Deinem Browser mit TIMEperative teilst.</li>
+    </ul>
+    <p>Die App liest nie die Unterhaltungen von KI-Assistenten, und sie verwendet keine Ortungsdienste: Sie fragt nach keiner Standortberechtigung und liest kein GPS.</p>
+
+    <h3>Verbindungen der App</h3>
+    <p>Die App verbindet sich nur zu den folgenden Zwecken mit dem Internet. Jeder Dienst erhält, was hier steht, und bearbeitet es nach seiner eigenen Datenschutzerklärung; wir erhalten nichts.</p>
+    <table>
+      <thead><tr><th>Verbindung</th><th>Was gesendet wird</th><th>Wann</th></tr></thead>
+      <tbody>
+        <tr><td>Suche nach Updates, bei GitHub (GitHub, Inc., USA)</td><td>Eine Anfrage nach der kleinen Datei, die die neueste Version nennt. GitHub sieht Deine IP-Adresse, wie bei jedem Download. Nichts über Dich oder Deine Daten wird gesendet.</td><td>Beim Start der App und einmal am Tag</td></tr>
+        <tr><td>Outlook-Kalender und Teams-Chats, bei Microsoft</td><td>Du meldest Dich bei Microsoft an. Die App liest dann Deinen Kalender und bei Teams, wie viele Nachrichten Du in welchem Chat wann geschrieben hast; sie behält keinen Nachrichtentext. Der Zugriff ist nur lesend.</td><td>Erst, wenn Du sie verbindest</td></tr>
+        <tr><td>Google Kalender, bei Google</td><td>Du meldest Dich bei Google an, mit Deiner eigenen Google-Registrierung. Die App liest Deinen Kalender, nur lesend.</td><td>Erst, wenn Du ihn verbindest</td></tr>
+        <tr><td>Ein Kalenderlink, etwa von Proton</td><td>Eine Anfrage an den Link, den Du eingefügt hast.</td><td>Erst, wenn Du ihn hinzufügst</td></tr>
+        <tr><td>DeepL</td><td>Der Text, den Du übersetzt, mit Deinem eigenen DeepL-Schlüssel.</td><td>Nur, wenn Du übersetzt</td></tr>
+        <tr><td>Odoo, das Deiner Organisation</td><td>Die Einträge, die Du sendest: Mitarbeiter, Projekt, Beschreibung, Beginn, Dauer, Zeitzone und eine Referenz. Mit Deinem eigenen Login liest die App ausserdem Projekte, Aufgaben und die Einstellungen Deiner Organisation.</td><td>Wenn Du Einträge sendest oder Projekte importierst, die Einstellungen, sobald Odoo eingerichtet ist</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Was Du steuerst</h3>
+    <ul>
+      <li>Schalte das Tracking jederzeit ein oder aus, blende Fenstertitel aus und schliesse Websites aus.</li>
+      <li>Verwirf oder lösche, was das Tracking gefunden hat. Beim Löschen bleiben nur ein kurzer Fingerabdruck und die Zeitspanne, damit derselbe Eintrag nicht noch einmal vorgeschlagen wird.</li>
+      <li>Leere das Tracking pro Zeitraum, lösche Einträge und stelle sie wieder her, und entferne sie endgültig.</li>
+      <li>Exportiere Deine Einträge als CSV und die Konfiguration als Datei ohne Einträge und ohne Geheimnisse.</li>
+    </ul>
+
+    <h2>Diese Website</h2>
+    <p>Cloudflare, Inc. (USA) hostet timeperative.com. Um die Seiten auszuliefern und vor Angriffen zu schützen, bearbeitet Cloudflare Deine IP-Adresse, die aufgerufene Adresse und was Dein Browser dabei mitsendet, möglicherweise ausserhalb der Schweiz, auch in den USA. Diese Website setzt keine Cookies, verwendet keine Analysewerkzeuge und lädt keine Schriften oder Skripte von anderen Websites. Deine Wahl des Farbschemas wird nur in Deinem Browser gespeichert.</p>
+    <p>Die Download-Schaltflächen leiten Dich zu GitHub weiter, das die Datei ausliefert und Deine IP-Adresse sieht.</p>
+
+    <h2>Wenn Du uns schreibst</h2>
+    <p>Schreibst Du an {{support.email}}, verwenden wir Deine E-Mail-Adresse, Deine Nachricht und Deine Anhänge, um Dir zu antworten. Unsere E-Mails laufen über Microsoft 365, und unsere Support-Tickets liegen in Odoo auf einem Server, den wir bei der Contabo GmbH mieten. Wir behalten eine Unterhaltung, solange wir sie brauchen, um Dir zu helfen, und solange das Gesetz verlangt, dass wir Geschäftskorrespondenz aufbewahren.</p>
+
+    <h2>Deine Rechte</h2>
+    <p>Nach dem Schweizer Datenschutzgesetz und, wo sie gilt, der EU-Datenschutz-Grundverordnung kannst Du verlangen, zu erfahren, welche Daten wir über Dich haben, sie berichtigen oder löschen zu lassen, und ihrer Verwendung widersprechen. Schreib an <a href="mailto:{{support.email}}">{{support.email}}</a>. Du kannst Dich auch beim Eidgenössischen Datenschutz- und Öffentlichkeitsbeauftragten oder bei der Behörde an Deinem Wohnort beschweren.</p>
+
+    <h2>Änderungen</h2>
+    <p>Wir passen diese Erklärung an, wenn die App oder die Website ändert, was sie mit Daten tut. Das Datum oben zeigt die letzte Änderung.</p>
+  </div>
+</section>

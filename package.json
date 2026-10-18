@@ -1,0 +1,18 @@
+{
+  "name": "timeperative-website",
+  "private": true,
+  "type": "module",
+  "description": "timeperative.com: the TIMEperative website, a static site on Cloudflare Workers.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:offline": "node scripts/build.mjs --offline",
+    "news": "node scripts/notion-news.mjs",
+    "test": "node --test \"test/*.test.mjs\"",
+    "dev": "node scripts/build.mjs && wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.147.0"
+  }
+}

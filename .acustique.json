@@ -1,0 +1,23 @@
+{
+  "$comment": "acustique product config (schema: acustique templates/acustique.schema.json). A static site on Cloudflare Workers, not Odoo modules, so the website surface's scan paths are set here. Run: node <acustique>/checks/run.mjs --root .",
+  "product": "timeperative-website",
+  "mode": "report-only",
+  "copy": {
+    "scan": ["src", "README.md"],
+    "extensions": [".html", ".json", ".md"],
+    "german": ["src/pages/de/**", "src/i18n/de.json"]
+  },
+  "colours": {
+    "scan": ["src"],
+    "extensions": [".css", ".html", ".js"],
+    "exempt": ["src/static/assets/tokens.css"]
+  },
+  "tokens": {
+    "files": ["src/static/assets/tokens.css"]
+  },
+  "probe": {
+    "urls": ["https://timeperative.com/", "https://timeperative.com/download/", "https://timeperative.com/resources/features/", "https://timeperative.com/support/", "https://timeperative.com/privacy/", "https://timeperative.com/de/"],
+    "widths": [1280, 360],
+    "theme": { "storageKey": "ty-scheme", "attribute": "data-bs-theme", "toggle": null }
+  }
+}

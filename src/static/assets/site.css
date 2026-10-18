@@ -1,0 +1,261 @@
+/* timeperative.com. Every colour is a token from tokens.css (acustique,
+   brand timely-you); lines mix the text colour with transparency. */
+
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Outfit";
+  src: url("/fonts/Outfit-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  --font-text: "Geist", system-ui, sans-serif;
+  --font-heading: "Outfit", "Geist", system-ui, sans-serif;
+  --line: color-mix(in srgb, var(--ty-cc1-text) 18%, transparent);
+  --radius: 12px;
+  --gutter: 1.25rem;
+  color-scheme: light dark;
+}
+[data-bs-theme="light"] { color-scheme: light; }
+[data-bs-theme="dark"] { color-scheme: dark; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--ty-cc1-bg);
+  color: var(--ty-cc1-text);
+  font-family: var(--font-text);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  color: var(--ty-cc1-heading);
+  font-family: var(--font-heading);
+  line-height: 1.2;
+  margin: 0 0 0.6em;
+}
+h1 { font-size: clamp(2rem, 4.5vw, 3.1rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.45rem, 3vw, 2rem); font-weight: 650; }
+h3 { font-size: 1.2rem; font-weight: 600; }
+p, ul, ol { margin: 0 0 1em; }
+
+a { color: var(--ty-cc1-link); text-underline-offset: 0.18em; }
+a:hover { color: var(--ty-cc1-link-hover); }
+:focus-visible { outline: 2px solid var(--ty-focus-ring); outline-offset: 2px; border-radius: 4px; }
+
+img { max-width: 100%; height: auto; }
+code { font-size: 0.92em; }
+
+.container { max-width: 72rem; margin: 0 auto; padding: 0 var(--gutter); }
+
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: -4rem;
+  background: var(--ty-action-bg);
+  color: var(--ty-action-label);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  z-index: 10;
+}
+.skip-link:focus { top: 0.75rem; }
+
+/* ------------------------------------------------------------ header */
+
+.site-header { border-bottom: 1px solid var(--line); }
+.header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1.5rem;
+  min-height: 4.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  color: var(--ty-cc1-heading);
+  text-decoration: none;
+}
+.wordmark { font-family: var(--font-heading); font-size: 1.35rem; font-weight: 400; color: var(--ty-app-brand-text); }
+.wordmark b { font-weight: 700; color: var(--ty-cc1-heading); }
+a.brand:hover .wordmark { color: var(--ty-app-brand-text-hover); }
+
+.site-nav ul { display: flex; flex-wrap: wrap; gap: 0.25rem; list-style: none; margin: 0; padding: 0; }
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  border-radius: 8px;
+  color: var(--ty-cc1-text);
+  text-decoration: none;
+  font-weight: 500;
+}
+.site-nav a:hover { background: var(--ty-cc2-bg); color: var(--ty-cc2-heading); }
+.site-nav a[aria-current="page"] {
+  color: var(--ty-cc1-heading);
+  font-weight: 650;
+  box-shadow: inset 0 -3px 0 var(--ty-cc1-link);
+  border-radius: 8px 8px 0 0;
+}
+.lang-switch {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ty-cc1-text);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.lang-switch:hover { border-color: var(--ty-cc1-link); color: var(--ty-cc1-link); }
+
+@media (max-width: 40rem) {
+  .header-inner { gap: 0.25rem 0.75rem; }
+  .site-nav { order: 3; flex-basis: 100%; margin: 0 -0.4rem; }
+  .site-nav ul { flex-wrap: nowrap; gap: 0; }
+  .site-nav a { padding: 0 0.4rem; font-size: 0.97rem; }
+}
+
+/* ------------------------------------------------------------ sections */
+
+.section { padding: clamp(2.5rem, 6vw, 4.5rem) 0; }
+.section-tint { background: var(--ty-cc2-bg); color: var(--ty-cc2-text); }
+.section-tint h2, .section-tint h3 { color: var(--ty-cc2-heading); }
+.section-tint a:not(.button) { color: var(--ty-cc2-link); }
+.section-purple { background: var(--ty-surface-purple); }
+
+.hero { padding: clamp(3rem, 8vw, 6rem) 0 clamp(2.5rem, 6vw, 4.5rem); }
+.hero-grid { display: grid; gap: 2.5rem; align-items: center; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+.hero-mark { justify-self: center; width: min(16rem, 70%); }
+.eyebrow { font-weight: 600; color: var(--ty-cc1-link); margin-bottom: 0.75rem; }
+.lead { font-size: 1.2rem; max-width: 60ch; }
+.tagline { font-family: var(--font-heading); font-size: 1.15rem; }
+.note { font-size: 0.95rem; max-width: 68ch; }
+@media (max-width: 48rem) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-mark { display: none; }
+}
+/* The mark has no dark variant yet, and its violet end fades on the dark
+   ground (BRAND-004): in dark it shows at icon size only, in the header. */
+[data-bs-theme="dark"] .hero-mark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-bs-theme="light"]) .hero-mark { display: none; }
+}
+
+/* Running text keeps a readable line (WEB-004); inside a container it stays
+   aligned with the container's left edge. */
+.prose > * { max-width: 68ch; }
+.prose > table { max-width: none; }
+.prose h2 { margin-top: 2rem; }
+.prose h3 { margin-top: 1.5rem; }
+.prose li { margin-bottom: 0.35em; }
+.prose table { border-collapse: collapse; width: 100%; margin-bottom: 1em; }
+.prose th, .prose td { text-align: left; vertical-align: top; padding: 0.5rem 0.75rem 0.5rem 0; border-bottom: 1px solid var(--line); }
+.page-head { padding-top: clamp(2.5rem, 6vw, 4rem); padding-bottom: 1rem; }
+.page-head .lead { margin-bottom: 0.75rem; }
+.updated { font-size: 0.95rem; }
+
+/* ------------------------------------------------------------ buttons */
+
+.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 1rem; }
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 1.4rem;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.button-primary { background: var(--ty-action-bg); color: var(--ty-action-label); }
+.button-primary:hover { background: var(--ty-action-bg-hover); color: var(--ty-action-label); }
+.button-secondary { border-color: var(--ty-cc1-link); color: var(--ty-cc1-link); background: transparent; }
+.button-secondary:hover { background: var(--ty-cc2-bg); color: var(--ty-cc1-link-hover); }
+.section-tint .button-secondary { border-color: var(--ty-cc2-link); color: var(--ty-cc2-link); }
+.section-tint .button-secondary:hover { background: var(--ty-cc1-bg); }
+.button-purple { background: var(--ty-action2-bg); color: var(--ty-action2-label); }
+.button-purple:hover { background: var(--ty-action2-bg-hover); color: var(--ty-action2-label); }
+
+/* ------------------------------------------------------------ cards */
+
+.cards { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr)); list-style: none; padding: 0; margin: 1.5rem 0 0; }
+.card { background: var(--ty-cc1-bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.4rem 1.4rem 0.6rem; }
+.section-tint .card { color: var(--ty-cc1-text); }
+.section-tint .card h3 { color: var(--ty-cc1-heading); }
+.section-tint .card a:not(.button) { color: var(--ty-cc1-link); }
+.card-icon { width: 28px; height: 28px; margin-bottom: 0.6rem; }
+.card .button { margin-bottom: 0.9rem; }
+.platform-card { display: flex; flex-direction: column; }
+.platform-card .actions { margin-top: auto; }
+.facts { list-style: none; padding: 0; }
+.facts li { padding: 0.35rem 0; border-bottom: 1px solid var(--line); }
+
+/* ------------------------------------------------------------ news */
+
+.news-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+.news-item { border-bottom: 1px solid var(--line); padding-bottom: 1rem; }
+.news-item h2, .news-item h3 { margin: 0 0 0.3em; font-size: 1.2rem; }
+.news-meta { font-size: 0.95rem; margin-bottom: 0.4em; }
+.kind {
+  display: inline-block;
+  padding: 0.05rem 0.55rem;
+  border-radius: 999px;
+  background: var(--ty-surface-purple);
+  color: var(--ty-cc1-heading);
+  font-weight: 600;
+  margin-right: 0.35rem;
+}
+.empty { font-style: italic; }
+.article { padding-top: clamp(2rem, 5vw, 3.5rem); padding-bottom: 3rem; }
+.breadcrumb { font-size: 0.95rem; }
+.release-summary { font-size: 1.05rem; }
+
+/* ------------------------------------------------------------ footer */
+
+.site-footer { border-top: 1px solid var(--line); padding: 2.5rem 0 3rem; font-size: 0.95rem; }
+.footer-inner { display: grid; gap: 1.5rem 2rem; grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) minmax(0, 1.4fr); align-items: start; }
+.footer-brand .brand { margin-bottom: 0.5rem; }
+.footer-brand .wordmark { font-size: 1.1rem; }
+.footer-brand .tagline { font-size: 1rem; }
+.footer-nav ul { list-style: none; margin: 0; padding: 0; }
+.footer-nav a { display: inline-flex; align-items: center; min-height: 44px; }
+.scheme { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
+.scheme-label { flex-basis: 100%; margin-bottom: 0.1rem; }
+.scheme button {
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ty-cc1-text);
+  font: inherit;
+  cursor: pointer;
+}
+.scheme button:hover { border-color: var(--ty-cc1-link); }
+.scheme button[aria-pressed="true"] { border: 2px solid var(--ty-cc1-link); color: var(--ty-cc1-heading); font-weight: 650; }
+@media (max-width: 48rem) {
+  .footer-inner { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a, .button, .site-nav a, .scheme button { transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease; }
+}

@@ -1,0 +1,30 @@
+{
+  "skip": "Zum Inhalt springen",
+  "navLabel": "Hauptnavigation",
+  "nav": { "home": "Start", "download": "Download", "resources": "Ressourcen", "support": "Support" },
+  "tagline": "Weil nichts kostbarer ist als Deine Zeit.",
+  "language": { "name": "Deutsch" },
+  "scheme": { "label": "Farbschema", "system": "System", "light": "Hell", "dark": "Dunkel" },
+  "footer": {
+    "label": "Rechtliches und Kontakt",
+    "privacy": "Datenschutzerklärung",
+    "imprint": "Impressum",
+    "owner": "TIMEperative ist ein Produkt der Acunomic GmbH.",
+    "contact": "Fragen und Support"
+  },
+  "news": {
+    "title": "News und Versionen",
+    "empty": "Noch keine News. Mit jeder neuen Version erscheinen hier die Versionshinweise.",
+    "kinds": { "News": "News", "Release": "Version" }
+  },
+  "release": {
+    "title": "TIMEperative {version}",
+    "subtitle": "Was in dieser Version neu ist.",
+    "metaDescription": "Versionshinweise zu TIMEperative {version}: was für Windows und Android neu ist und was sich geändert hat.",
+    "englishOnly": "Die Versionshinweise erscheinen auf Englisch.",
+    "summary": "Aktuelle Version: {version}, erschienen am {date}.",
+    "unknown": "Die aktuelle Version und alle früheren findest Du auf der {link}.",
+    "releasePage": "Versionsseite",
+    "notesLink": "Versionshinweise lesen"
+  }
+}

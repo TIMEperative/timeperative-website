@@ -1,0 +1,51 @@
+# Builds timeperative.com on every push and pull request, and deploys it to
+# Cloudflare Workers from main: on a push, every three hours (so news set to
+# Publish in Notion appears without a commit) and on demand.
+#
+# Repository secrets (Settings > Secrets and variables > Actions):
+#   CLOUDFLARE_API_TOKEN   an account API token from the "Edit Cloudflare Workers" template
+#   CLOUDFLARE_ACCOUNT_ID  the Cloudflare account's ID
+#   NOTION_TOKEN           a Notion integration shared with "TIMEperative website content"
+# Without the Cloudflare secrets the site is built and checked, not deployed;
+# without NOTION_TOKEN it is built without the news from Notion.
+name: Site
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: News from Notion
+        if: env.NOTION_TOKEN != ''
+        run: npm run news
+      - name: No news from Notion
+        if: env.NOTION_TOKEN == ''
+        run: echo "::warning title=Notion::NOTION_TOKEN is not set, so the site is built without the news from Notion."
+      - run: npm run build
+      - name: Deploy to Cloudflare
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && env.CLOUDFLARE_API_TOKEN != ''
+        run: npx wrangler deploy
+      - name: Not deployed
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && env.CLOUDFLARE_API_TOKEN == ''
+        run: echo "::warning title=Cloudflare::CLOUDFLARE_API_TOKEN is not set, so the site was built but not deployed."
