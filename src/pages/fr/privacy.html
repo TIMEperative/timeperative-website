@@ -1,0 +1,79 @@
+<!--
+title: Politique de confidentialité : TIMEperative
+description: Ce que l'application TIMEperative et ce site web font de vos données : ce qui reste sur votre appareil, ce qui en sort et quand, et ce que vous contrôlez.
+nav: none
+-->
+<div class="container page-head">
+  <h1>Politique de confidentialité</h1>
+  <p class="lead">TIMEperative conserve vos données sur votre appareil. Cette page explique ce que l'application et ce site web font des données personnelles, ce qui quitte votre appareil et quand, et ce que vous contrôlez.</p>
+  <p class="updated">Dernière mise à jour le 19 octobre 2026.</p>
+</div>
+
+<section class="section">
+  <div class="container prose">
+    <h2>Qui est responsable</h2>
+    <p>Acunomic GmbH, Leutschenbachstrasse 95, 8050 Zurich, Suisse, publie TIMEperative et ce site web. Pour toute question concernant vos données, écrivez à <a href="mailto:{{support.email}}">{{support.email}}</a>.</p>
+
+    <h2>En bref</h2>
+    <ul>
+      <li>TIMEperative n'a pas de compte, et nous n'exploitons aucun serveur pour l'application. Nous ne recevons aucune de vos entrées, rien de ce qu'enregistre le suivi, ni statistiques d'utilisation, ni rapports de plantage, ni données d'analyse.</li>
+      <li>Vos données restent dans une base de données sur votre ordinateur ou votre téléphone. Hormis la recherche de mises à jour, elles ne quittent votre appareil que lorsque vous connectez un service ou envoyez des entrées ; elles vont alors à ce service, et non à nous.</li>
+      <li>Ce site web ne dépose aucun cookie et n'utilise aucun outil d'analyse. Si vous vous inscrivez sur la liste d'attente pour macOS ou iOS, nous conservons votre adresse e-mail jusqu'à ce que nous puissions vous annoncer la sortie de cette version.</li>
+    </ul>
+
+    <h2>L'application TIMEperative</h2>
+
+    <h3>Où vos données sont stockées</h3>
+    <p>Tout ce que vous enregistrez se trouve dans une seule base de données sur votre appareil : sous Windows, dans le dossier de l'application parmi les données d'application locales de votre utilisateur (%LOCALAPPDATA%), qui ne suivent pas votre profil itinérant ; sous Android, dans le stockage privé de l'application. TIMEperative ne chiffre pas lui-même cette base de données : protégez donc votre appareil avec son propre chiffrement, comme BitLocker sous Windows.</p>
+    <p>Les mots de passe, clés et jetons de connexion sont conservés dans le magasin sécurisé du système : le Gestionnaire d'identification de Windows ou, sur Android, sous une clé du Keystore Android. Deux types de paramètres sont en revanche conservés dans la base de données : l'identifiant client et le secret de votre propre enregistrement Google, et les liens de calendrier que vous collez.</p>
+    <p>Avant qu'une mise à jour ne modifie la base de données, l'application en conserve une copie sur votre appareil ; elle garde les cinq dernières. Sur Android, l'application est exclue des sauvegardes dans le cloud : ses données ne sont donc pas copiées sur votre compte Google. Si vous supprimez les données de l'application, personne ne peut les restaurer, pas même nous.</p>
+
+    <h3>Ce que l'application enregistre</h3>
+    <p>L'application stocke ce que vous saisissez : vos entrées de temps, projets, plans, déplacements, budgets et paramètres. Le suivi est désactivé jusqu'à ce que vous l'activiez. Lorsqu'il est activé, il enregistre uniquement sur votre appareil :</p>
+    <ul>
+      <li>sous Windows, l'application et le titre de la fenêtre au premier plan, toutes les trois secondes, avec une pause après quatre minutes sans saisie ; l'historique de votre navigateur, lu dans le fichier du navigateur ; les documents récemment utilisés ; et les périodes d'utilisation du PC, d'après le journal système de Windows ;</li>
+      <li>sous Windows, quand Microsoft Teams ou Zoom a utilisé le microphone pour la dernière fois, lu dans les paramètres de confidentialité de Windows : l'application, le début et la fin, rien de l'appel lui-même ;</li>
+      <li>sous Android, combien de temps vous avez utilisé quelles applications, grâce à l'accès aux données d'utilisation d'Android, que vous accordez vous-même, ainsi que les pages que vous partagez avec TIMEperative depuis votre navigateur.</li>
+    </ul>
+    <p>L'application ne lit jamais les conversations des assistants IA et n'utilise aucun service de localisation : elle ne demande aucune autorisation de localisation et ne lit aucune donnée GPS.</p>
+
+    <h3>Connexions établies par l'application</h3>
+    <p>L'application se connecte à Internet uniquement aux fins indiquées ci-dessous. Chaque service reçoit ce qui est indiqué et le traite selon sa propre politique de confidentialité ; nous ne recevons rien.</p>
+    <table>
+      <thead><tr><th>Connexion</th><th>Ce qui est envoyé</th><th>Quand</th></tr></thead>
+      <tbody>
+        <tr><td>Recherche de mises à jour, chez GitHub (GitHub, Inc., États-Unis)</td><td>Une requête pour le petit fichier qui indique la dernière version. GitHub voit votre adresse IP, comme pour tout téléchargement. Rien sur vous ni sur vos données n'est envoyé.</td><td>Au démarrage de l'application et une fois par jour</td></tr>
+        <tr><td>Calendrier Outlook et discussions Teams, chez Microsoft</td><td>Vous vous connectez chez Microsoft. L'application lit ensuite votre calendrier et, pour Teams, combien de messages vous avez écrits dans quelle discussion et quand ; elle ne conserve aucun texte de message. L'accès est en lecture seule.</td><td>Uniquement après les avoir connectés</td></tr>
+        <tr><td>Google Agenda, chez Google</td><td>Vous vous connectez chez Google, avec votre propre enregistrement Google. L'application lit votre agenda, en lecture seule.</td><td>Uniquement après l'avoir connecté</td></tr>
+        <tr><td>Un lien de calendrier, comme Proton</td><td>Une requête vers le lien que vous avez collé.</td><td>Uniquement après l'avoir ajouté</td></tr>
+        <tr><td>DeepL</td><td>Le texte que vous traduisez, avec votre propre clé DeepL.</td><td>Uniquement lorsque vous traduisez</td></tr>
+        <tr><td>TIMEperative Cloud Hub, celui de votre organisation</td><td>Les entrées que vous envoyez : employé, projet, description, début, durée, fuseau horaire et une référence. Avec vos propres identifiants, l'application lit aussi les projets, les tâches et les paramètres de votre organisation.</td><td>Lorsque vous envoyez des entrées ou importez des projets, et les paramètres lorsque la connexion est configurée</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Ce que vous contrôlez</h3>
+    <ul>
+      <li>Activez ou désactivez le suivi à tout moment, masquez les titres de fenêtre et excluez des sites web.</li>
+      <li>Ignorez ou supprimez ce que le suivi a trouvé. La suppression ne garde qu'une courte empreinte et la période, pour que le même élément ne soit pas proposé à nouveau.</li>
+      <li>Effacez le suivi par période, supprimez et restaurez des entrées, et purgez-les définitivement.</li>
+      <li>Exportez vos entrées au format CSV, et la configuration sous forme de fichier sans entrées et sans secrets.</li>
+    </ul>
+
+    <h2>Ce site web</h2>
+    <p>Cloudflare, Inc. (États-Unis) héberge www.timeperative.com. Pour fournir les pages et les protéger contre les attaques, Cloudflare traite votre adresse IP, l'adresse que vous demandez et ce que votre navigateur envoie avec elle, éventuellement hors de Suisse, y compris aux États-Unis. Ce site web ne dépose aucun cookie, n'utilise aucun outil d'analyse et ne charge aucune police ni aucun script depuis d'autres sites. Votre choix de jeu de couleurs est enregistré uniquement dans votre navigateur.</p>
+    <p>Les boutons de téléchargement vous envoient vers GitHub, qui fournit le fichier et voit votre adresse IP.</p>
+
+    <h2 id="waitlist">La liste d'attente pour macOS et iOS</h2>
+    <p>TIMEperative pour macOS et iOS n'existe pas encore. Si vous vous inscrivez sur sa liste d'attente, nous conservons votre adresse e-mail, la plateforme choisie, la langue de la page et l'heure de votre inscription dans notre système de gestion de la relation client, sur un serveur que nous louons auprès de Contabo GmbH, Allemagne. Le formulaire transite par Cloudflare, comme chaque page de ce site web.</p>
+    <p>Nous utilisons votre adresse uniquement pour vous annoncer la sortie de cette version, et nous la supprimons dès que nous vous l'avons annoncée. Vous pouvez retirer votre adresse de la liste à tout moment : écrivez à <a href="mailto:{{support.email}}">{{support.email}}</a>.</p>
+
+    <h2>Lorsque vous nous écrivez</h2>
+    <p>Si vous écrivez à {{support.email}}, nous utilisons votre adresse e-mail, votre message et vos pièces jointes pour vous répondre. Notre messagerie fonctionne sous Microsoft 365, et nos tickets d'assistance sont conservés dans notre système d'assistance, sur un serveur que nous louons auprès de Contabo GmbH, Allemagne. Nous conservons un échange aussi longtemps que nécessaire pour vous aider et aussi longtemps que la loi nous oblige à conserver la correspondance commerciale.</p>
+
+    <h2>Vos droits</h2>
+    <p>Selon la loi fédérale suisse sur la protection des données et, le cas échéant, le règlement général sur la protection des données de l'UE, vous pouvez demander quelles données nous détenons à votre sujet, les faire rectifier ou supprimer, et vous opposer à leur utilisation. Écrivez à <a href="mailto:{{support.email}}">{{support.email}}</a>. Vous pouvez aussi déposer une plainte auprès du Préposé fédéral à la protection des données et à la transparence ou de l'autorité de votre lieu de résidence.</p>
+
+    <h2>Modifications</h2>
+    <p>Nous mettons à jour cette politique lorsque l'application ou le site web change ce qu'il fait des données. La date en haut de la page indique la dernière modification.</p>
+  </div>
+</section>

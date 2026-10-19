@@ -6,6 +6,7 @@ nav: download
 <div class="container page-head">
   <h1>TIMEperative herunterladen</h1>
   <p class="lead">TIMEperative ist kostenlos. Wähl Deine Plattform; danach sagt Dir die App, wenn eine neue Version bereit ist.</p>
+  {{platforms}}
   {{release.summary}}
   <p>{{release.notes}}</p>
 </div>
@@ -13,7 +14,7 @@ nav: download
 <section class="section">
   <div class="container">
     <ul class="cards">
-      <li class="card platform-card">
+      <li class="card platform-card" id="windows">
         <h2>Windows</h2>
         <ul class="facts">
           <li>Windows 11, 64 Bit</li>
@@ -24,7 +25,7 @@ nav: download
           <a class="button button-primary" href="/download/windows">Für Windows herunterladen</a>
         </div>
       </li>
-      <li class="card platform-card">
+      <li class="card platform-card" id="android">
         <h2>Android</h2>
         <ul class="facts">
           <li>Android ab Version 7.0</li>

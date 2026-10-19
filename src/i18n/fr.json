@@ -1,0 +1,66 @@
+{
+  "skip": "Aller au contenu",
+  "navLabel": "Navigation principale",
+  "nav": {
+    "home": "Accueil",
+    "download": "Télécharger",
+    "resources": "Ressources",
+    "support": "Assistance"
+  },
+  "tagline": "Parce que rien n'est plus important que votre temps.",
+  "language": {
+    "name": "Français",
+    "label": "Langue"
+  },
+  "scheme": {
+    "label": "Jeu de couleurs",
+    "system": "Système",
+    "light": "Clair",
+    "dark": "Sombre"
+  },
+  "footer": {
+    "label": "Mentions légales et contact",
+    "privacy": "Politique de confidentialité",
+    "imprint": "Mentions légales",
+    "owner": "TIMEperative est un produit d'Acunomic GmbH.",
+    "contact": "Questions et assistance"
+  },
+  "news": {
+    "title": "Actualités et versions",
+    "empty": "Pas encore d'actualités. Les notes de version apparaissent ici avec chaque nouvelle version.",
+    "kinds": {
+      "News": "Actualité",
+      "Release": "Version"
+    }
+  },
+  "release": {
+    "title": "TIMEperative {version}",
+    "subtitle": "Les nouveautés de cette version.",
+    "metaDescription": "Notes de version de TIMEperative {version} : ce qui est nouveau et ce qui a changé pour Windows et Android.",
+    "englishOnly": "Les notes de version sont rédigées en anglais.",
+    "summary": "Dernière version : {version}, publiée le {date}.",
+    "unknown": "La dernière version et toutes les précédentes figurent sur la {link}.",
+    "releasePage": "page des versions",
+    "notesLink": "Lire les notes de version"
+  },
+  "platforms": {
+    "label": "TIMEperative pour votre appareil",
+    "names": {
+      "windows": "Windows",
+      "android": "Android",
+      "macos": "macOS",
+      "ios": "iOS"
+    },
+    "download": "Télécharger pour {platform}",
+    "about": "TIMEperative pour {platform} : téléchargement et configuration requise",
+    "soon": "TIMEperative pour {platform} n'existe pas encore. Laissez-nous votre adresse e-mail et nous vous préviendrons dès qu'il sera disponible.",
+    "email": "Votre adresse e-mail",
+    "submit": "M'inscrire sur la liste d'attente",
+    "trap": "Laissez ce champ vide",
+    "use": "Nous utilisons votre adresse uniquement pour vous annoncer la sortie de TIMEperative pour {platform}.",
+    "privacy": "Politique de confidentialité",
+    "ok": "Merci. Nous vous écrirons dès que TIMEperative pour {platform} sera disponible.",
+    "invalid": "Veuillez vérifier votre adresse e-mail.",
+    "error": "Cela n'a pas fonctionné. Réessayez plus tard ou écrivez à {email}."
+  }
+}

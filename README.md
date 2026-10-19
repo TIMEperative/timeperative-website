@@ -1,13 +1,14 @@
-# timeperative.com
+# www.timeperative.com
 
 The website of TIMEperative, the time tracker for Windows and Android by
-Acunomic GmbH. It replaces www.timely.you.
+Acunomic GmbH. It replaces www.timely.you. The site answers on
+www.timeperative.com; timeperative.com redirects there.
 
 - **Pages:** Home (with News and releases), Download, Resources (with
   Features), Support; Privacy policy and Imprint in the footer. English at
-  `/`, German at `/de/`.
-- **Hosting:** Cloudflare Workers static assets, with a small Worker for the
-  download links. Cloudflare recommends Workers over Pages for new sites
+  `/`, German at `/de/`, French at `/fr/`, Spanish at `/es/`.
+- **Hosting:** Cloudflare Workers static assets, with a small Worker in front:
+  the redirect to www, the download links and the macOS and iOS waitlist. Cloudflare recommends Workers over Pages for new sites
   (developers.cloudflare.com/workers/best-practices/workers-best-practices/,
   read 2026-10-18).
 - **News:** written in Notion (TIMEperative > TIMEperative.com website >
@@ -22,7 +23,7 @@ Acunomic GmbH. It replaces www.timely.you.
 | `src/layout.html`, `src/i18n/*.json` | Header, footer and the strings around the pages |
 | `src/static/` | Copied as is: stylesheets, the tokens from acustique, the fonts, the mark |
 | `src/site.json` | Languages, menu, the release stores, the Worker routes, the support address |
-| `src/worker.js` | `/download/windows` and `/download/android`: a redirect to the newest installer the stores' update manifests name |
+| `src/worker.js` | timeperative.com to www; `/download/windows` and `/download/android`: a redirect to the newest installer the stores' update manifests name; `/waitlist`: a lead in the CRM |
 | `scripts/build.mjs` | Builds `dist/` and checks every page (one h1, headings in order, meta lengths, alt text, internal links) |
 | `scripts/notion-news.mjs` | News and release articles from Notion into `content/news/notion/` |
 | `.github/workflows/site.yml` | Build on every push; deploy from `main`, every three hours and on demand |
@@ -77,20 +78,42 @@ npx wrangler login
 npm run deploy
 ```
 
+## The macOS and iOS waitlist
+
+The macOS and iOS buttons open a waitlist form. The Worker creates a lead in
+the TIMEperative CRM through the JSON-2 API (`POST /json/2/crm.lead/create`).
+It needs three secrets on the Worker; without them the form says it did not
+work and asks people to write to support.
+
+1. In the CRM, create a user for the website (an internal user with the
+   Sales rights to create leads, nothing else), and an API key for it:
+   its preferences, Account Security, New API Key.
+2. Set the secrets (PowerShell, in this folder):
+
+```powershell
+npx wrangler secret put ODOO_URL       # https://erp.timeperative.com
+npx wrangler secret put ODOO_DB        # the database name
+npx wrangler secret put ODOO_API_KEY   # the key from step 1
+```
+
+Optional: `ODOO_TEAM_ID` (sales team), `ODOO_COMPANY_ID`, `ODOO_TAG_IDS`
+(comma-separated tag ids). The same can be set in the dashboard: Workers &
+Pages, timeperative-website, Settings, Variables and Secrets (type Secret).
+
 ## Writing a news article
 
 1. In Notion, add a row to TIMEperative website content: Kind News (or
    Release), Title and Title DE, Subtitle and Subtitle DE, Slug (English,
    lowercase, hyphenated), Published.
 2. Write the article in English, then a heading 1 "Deutsch", then the
-   German. Use heading 2 and 3 inside; every image needs a caption, which
+   German. French and Spanish pages show the English text. Use heading 2 and 3 inside; every image needs a caption, which
    becomes its alt text.
 3. Set Status to Publish. The next build, at most three hours later, puts it
    on the site; run the workflow by hand for it to appear at once. Set
    Status to Withdrawn to take it down again.
 
 A row that breaks a rule (meta title over 60 characters, meta description
-over 155, a long dash, the sharp s in German) is left out, and the workflow
+over 155, a long dash, the sharp s in German, a name COPY-NEW-CLOUD-HUB keeps off the site) is left out, and the workflow
 log names it and the rule.
 
 ## Before a change is done

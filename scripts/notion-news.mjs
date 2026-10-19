@@ -93,7 +93,7 @@ function link(href, problems) {
   try {
     const url = new URL(href);
     if (["timeperative.com", "www.timeperative.com"].includes(url.host)) return url.pathname + url.search + url.hash;
-    if (url.host === "app.notion.com" || url.host.endsWith("notion.so")) problems.push(`link to Notion (${href}); link the page on timeperative.com instead`);
+    if (url.host === "app.notion.com" || url.host.endsWith("notion.so")) problems.push(`link to Notion (${href}); link the page on www.timeperative.com instead`);
   } catch {
     // a relative link stays as written
   }
@@ -163,7 +163,12 @@ function splitLanguages(blocks) {
   return [english, blocks.slice(n + 1)];
 }
 
-const COPY = [[/—/, "a long dash (COPY-001)"], [/–/, "an en dash (COPY-002)"]];
+const COPY = [
+  [/—/, "a long dash (COPY-001)"],
+  [/–/, "an en dash (COPY-002)"],
+  // acustique brands/timely-you not_public: the site never names Odoo; host names and paths are not copy.
+  [/(?<![/\\.@_\w])[Oo][Dd][Oo][Oo]s?(?![/\\_\w]|\.\w)/u, "Odoo; write TIMEperative Cloud Hub (COPY-NEW-CLOUD-HUB)"],
+];
 
 /** The rules a row must meet; returns what is wrong. */
 export function problemsOf(item) {

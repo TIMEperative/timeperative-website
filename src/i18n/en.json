@@ -1,10 +1,23 @@
 {
   "skip": "Skip to content",
   "navLabel": "Main",
-  "nav": { "home": "Home", "download": "Download", "resources": "Resources", "support": "Support" },
-  "tagline": "Because nothing is more precious than your time.",
-  "language": { "name": "English" },
-  "scheme": { "label": "Colour scheme", "system": "System", "light": "Light", "dark": "Dark" },
+  "nav": {
+    "home": "Home",
+    "download": "Download",
+    "resources": "Resources",
+    "support": "Support"
+  },
+  "tagline": "Because nothing is more important than your time.",
+  "language": {
+    "name": "English",
+    "label": "Language"
+  },
+  "scheme": {
+    "label": "Colour scheme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
   "footer": {
     "label": "Legal and contact",
     "privacy": "Privacy policy",
@@ -15,7 +28,10 @@
   "news": {
     "title": "News and releases",
     "empty": "No news yet. Release notes appear here with every new version.",
-    "kinds": { "News": "News", "Release": "Release" }
+    "kinds": {
+      "News": "News",
+      "Release": "Release"
+    }
   },
   "release": {
     "title": "TIMEperative {version}",
@@ -26,5 +42,25 @@
     "unknown": "The latest version and every earlier one are listed on the {link}.",
     "releasePage": "release page",
     "notesLink": "Read the release notes"
+  },
+  "platforms": {
+    "label": "TIMEperative for your device",
+    "names": {
+      "windows": "Windows",
+      "android": "Android",
+      "macos": "macOS",
+      "ios": "iOS"
+    },
+    "download": "Download for {platform}",
+    "about": "TIMEperative for {platform}: download and requirements",
+    "soon": "TIMEperative for {platform} does not exist yet. Leave your email address and we will let you know when it does.",
+    "email": "Your email address",
+    "submit": "Join the waitlist",
+    "trap": "Leave this field empty",
+    "use": "We use your address only to tell you when TIMEperative for {platform} is out.",
+    "privacy": "Privacy policy",
+    "ok": "Thank you. We will write to you when TIMEperative for {platform} is out.",
+    "invalid": "Please check your email address.",
+    "error": "That did not work. Please try again later, or write to {email}."
   }
 }

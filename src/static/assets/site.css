@@ -42,6 +42,8 @@ h1, h2, h3 {
   font-family: var(--font-heading);
   line-height: 1.2;
   margin: 0 0 0.6em;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 h1 { font-size: clamp(2rem, 4.5vw, 3.1rem); font-weight: 700; letter-spacing: -0.01em; }
 h2 { font-size: clamp(1.45rem, 3vw, 2rem); font-weight: 650; }
@@ -111,25 +113,64 @@ a.brand:hover .wordmark { color: var(--ty-app-brand-text-hover); }
   box-shadow: inset 0 -3px 0 var(--ty-cc1-link);
   border-radius: 8px 8px 0 0;
 }
-.lang-switch {
-  margin-left: auto;
+/* Language menu: the current language's flag and code; the others open below. */
+.lang-menu { margin-left: auto; position: relative; }
+.lang-menu summary {
   display: inline-flex;
   align-items: center;
+  gap: 0.45rem;
   min-height: 44px;
-  padding: 0 0.75rem;
+  padding: 0 0.8rem;
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--ty-cc1-text);
-  text-decoration: none;
   font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
 }
-.lang-switch:hover { border-color: var(--ty-cc1-link); color: var(--ty-cc1-link); }
+.lang-menu summary::-webkit-details-marker { display: none; }
+.lang-menu summary::after { content: ""; width: 0.45em; height: 0.45em; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-0.15em) rotate(45deg); margin-left: 0.15rem; }
+.lang-menu[open] summary::after { transform: translateY(0.1em) rotate(225deg); }
+.lang-menu summary:hover, .lang-menu[open] summary { border-color: var(--ty-cc1-link); color: var(--ty-cc1-heading); }
+.lang-menu ul {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 20;
+  min-width: 11rem;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  background: var(--ty-cc1-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ty-cc1-text) 18%, transparent);
+}
+.lang-menu li a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0 0.7rem;
+  border-radius: 8px;
+  color: var(--ty-cc1-text);
+  text-decoration: none;
+}
+.lang-menu li a:hover { background: var(--ty-cc2-bg); color: var(--ty-cc2-heading); }
+.lang-menu li a[aria-current="true"] { font-weight: 650; color: var(--ty-cc1-heading); }
+.lang-code { font-weight: 600; letter-spacing: 0.02em; }
+.lang-name { font-size: 0.92rem; }
+.flag { display: block; width: 21px; height: 14px; border-radius: 2px; box-shadow: 0 0 0 1px var(--line); }
 
 @media (max-width: 40rem) {
   .header-inner { gap: 0.25rem 0.75rem; }
   .site-nav { order: 3; flex-basis: 100%; margin: 0 -0.4rem; }
   .site-nav ul { flex-wrap: nowrap; gap: 0; }
-  .site-nav a { padding: 0 0.4rem; font-size: 0.97rem; }
+  .site-nav a { padding: 0 0.35rem; font-size: clamp(0.84rem, 3.9vw, 0.97rem); }
+}
+@media (max-width: 22rem) {
+  .site-nav a { padding: 0 0.22rem; }
 }
 
 /* ------------------------------------------------------------ sections */
@@ -146,6 +187,7 @@ a.brand:hover .wordmark { color: var(--ty-app-brand-text-hover); }
 .eyebrow { font-weight: 600; color: var(--ty-cc1-link); margin-bottom: 0.75rem; }
 .lead { font-size: 1.2rem; max-width: 60ch; }
 .tagline { font-family: var(--font-heading); font-size: 1.15rem; }
+.subline { font-family: var(--font-heading); font-size: clamp(1.2rem, 2.4vw, 1.45rem); font-weight: 600; color: var(--ty-cc1-heading); margin-bottom: 0.9rem; }
 .note { font-size: 0.95rem; max-width: 68ch; }
 @media (max-width: 48rem) {
   .hero-grid { grid-template-columns: 1fr; }
@@ -166,7 +208,7 @@ a.brand:hover .wordmark { color: var(--ty-app-brand-text-hover); }
 .prose h3 { margin-top: 1.5rem; }
 .prose li { margin-bottom: 0.35em; }
 .prose table { border-collapse: collapse; width: 100%; margin-bottom: 1em; }
-.prose th, .prose td { text-align: left; vertical-align: top; padding: 0.5rem 0.75rem 0.5rem 0; border-bottom: 1px solid var(--line); }
+.prose th, .prose td { overflow-wrap: anywhere; hyphens: auto; text-align: left; vertical-align: top; padding: 0.5rem 0.75rem 0.5rem 0; border-bottom: 1px solid var(--line); }
 .page-head { padding-top: clamp(2.5rem, 6vw, 4rem); padding-bottom: 1rem; }
 .page-head .lead { margin-bottom: 0.75rem; }
 .updated { font-size: 0.95rem; }
@@ -182,6 +224,7 @@ a.brand:hover .wordmark { color: var(--ty-app-brand-text-hover); }
   padding: 0 1.4rem;
   border-radius: 10px;
   border: 2px solid transparent;
+  font: inherit;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
@@ -194,6 +237,63 @@ a.brand:hover .wordmark { color: var(--ty-app-brand-text-hover); }
 .section-tint .button-secondary:hover { background: var(--ty-cc1-bg); }
 .button-purple { background: var(--ty-action2-bg); color: var(--ty-action2-label); }
 .button-purple:hover { background: var(--ty-action2-bg-hover); color: var(--ty-action2-label); }
+
+/* ------------------------------------------------------------ platforms */
+
+/* Four buttons; macOS and iOS open their waitlist right under themselves,
+   on a row of its own so the message never squeezes beside a button. */
+.platforms { display: flex; flex-wrap: wrap; gap: 0.6rem; list-style: none; margin: 1.25rem 0 0.5rem; padding: 0; }
+.platforms > li:has(> details[open]) { flex-basis: 100%; }
+.platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 48px;
+  padding: 0 1rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--ty-cc1-bg);
+  color: var(--ty-cc1-heading);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  list-style: none;
+}
+.platform::-webkit-details-marker { display: none; }
+a.platform:hover, summary.platform:hover { border-color: var(--ty-cc1-link); color: var(--ty-cc1-heading); }
+.platform-soon[open] > .platform { border-color: var(--ty-cc1-link); }
+.platform-mark { flex: none; }
+.waitlist {
+  margin-top: 0.6rem;
+  padding: 1rem 1.1rem 0.25rem;
+  border-left: 3px solid var(--ty-cc1-link);
+  background: var(--ty-cc2-bg);
+  color: var(--ty-cc2-text);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  max-width: 40rem;
+}
+.waitlist p { margin-bottom: 0.75rem; }
+.waitlist label { display: block; font-weight: 600; margin-bottom: 0.35rem; color: var(--ty-cc2-heading); }
+.waitlist-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.75rem; }
+.waitlist input[type="email"] {
+  flex: 1 1 14rem;
+  min-height: 48px;
+  padding: 0 0.85rem;
+  border: 1px solid var(--ty-cc1-text);
+  border-radius: 10px;
+  background: var(--ty-cc1-bg);
+  color: var(--ty-cc1-text);
+  font: inherit;
+}
+.waitlist .button { margin: 0; }
+.waitlist .fine { font-size: 0.92rem; }
+.waitlist a { color: var(--ty-cc2-link); }
+.waitlist-trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.waitlist-status:empty { display: none; }
+.waitlist-status, .waitlist-done { font-weight: 600; color: var(--ty-cc2-heading); }
+/* Without script the form comes back to its own message (#waitlist-<platform>-<outcome>). */
+.waitlist-done { display: none; }
+.waitlist-done:target { display: block; }
 
 /* ------------------------------------------------------------ cards */
 
@@ -257,5 +357,5 @@ a.brand:hover .wordmark { color: var(--ty-app-brand-text-hover); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a, .button, .site-nav a, .scheme button { transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease; }
+  a, .button, .site-nav a, .scheme button, .platform, .lang-menu summary { transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease; }
 }

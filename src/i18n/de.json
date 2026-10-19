@@ -1,10 +1,23 @@
 {
   "skip": "Zum Inhalt springen",
   "navLabel": "Hauptnavigation",
-  "nav": { "home": "Start", "download": "Download", "resources": "Ressourcen", "support": "Support" },
-  "tagline": "Weil nichts kostbarer ist als Deine Zeit.",
-  "language": { "name": "Deutsch" },
-  "scheme": { "label": "Farbschema", "system": "System", "light": "Hell", "dark": "Dunkel" },
+  "nav": {
+    "home": "Start",
+    "download": "Download",
+    "resources": "Ressourcen",
+    "support": "Support"
+  },
+  "tagline": "Weil nichts wichtiger ist als Deine Zeit.",
+  "language": {
+    "name": "Deutsch",
+    "label": "Sprache"
+  },
+  "scheme": {
+    "label": "Farbschema",
+    "system": "System",
+    "light": "Hell",
+    "dark": "Dunkel"
+  },
   "footer": {
     "label": "Rechtliches und Kontakt",
     "privacy": "Datenschutzerklärung",
@@ -15,7 +28,10 @@
   "news": {
     "title": "News und Versionen",
     "empty": "Noch keine News. Mit jeder neuen Version erscheinen hier die Versionshinweise.",
-    "kinds": { "News": "News", "Release": "Version" }
+    "kinds": {
+      "News": "News",
+      "Release": "Version"
+    }
   },
   "release": {
     "title": "TIMEperative {version}",
@@ -26,5 +42,25 @@
     "unknown": "Die aktuelle Version und alle früheren findest Du auf der {link}.",
     "releasePage": "Versionsseite",
     "notesLink": "Versionshinweise lesen"
+  },
+  "platforms": {
+    "label": "TIMEperative für Dein Gerät",
+    "names": {
+      "windows": "Windows",
+      "android": "Android",
+      "macos": "macOS",
+      "ios": "iOS"
+    },
+    "download": "Download für {platform}",
+    "about": "TIMEperative für {platform}: Download und Voraussetzungen",
+    "soon": "TIMEperative für {platform} gibt es noch nicht. Hinterlasse Deine E-Mail-Adresse, und wir melden uns, sobald es so weit ist.",
+    "email": "Deine E-Mail-Adresse",
+    "submit": "Auf die Warteliste",
+    "trap": "Dieses Feld leer lassen",
+    "use": "Wir verwenden Deine Adresse nur, um Dir zu sagen, wann TIMEperative für {platform} erscheint.",
+    "privacy": "Datenschutzerklärung",
+    "ok": "Danke. Wir schreiben Dir, sobald TIMEperative für {platform} erscheint.",
+    "invalid": "Bitte prüfe Deine E-Mail-Adresse.",
+    "error": "Das hat nicht geklappt. Versuche es später noch einmal, oder schreib an {email}."
   }
 }

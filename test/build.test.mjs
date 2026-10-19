@@ -35,9 +35,18 @@ test("release notes become headings, lists and escaped text", () => {
   assert.equal(notesHtml("## New\r\n- One <b>\n- Two `code`\n\nText"), "<h2>New</h2>\n<ul>\n<li>One &lt;b&gt;</li>\n<li>Two <code>code</code></li>\n</ul>\n<p>Text</p>");
 });
 
-test("the Worker routes in site.json and wrangler.jsonc agree", () => {
+test("the Worker runs first on every request, on www and on the host it redirects", () => {
   const site = JSON.parse(readFileSync(new URL("../src/site.json", import.meta.url), "utf8"));
   const wrangler = readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8");
-  const routes = JSON.parse(/"run_worker_first":\s*(\[[^\]]*\])/.exec(wrangler)[1]);
-  assert.deepEqual(routes, site.workerRoutes);
+  // a host that matched a static file would otherwise be served without the redirect
+  assert.match(wrangler, /"run_worker_first":\s*true/);
+  const domains = [...wrangler.matchAll(/"pattern":\s*"([^"]+)",\s*"custom_domain":\s*true/g)].map((m) => m[1]);
+  assert.deepEqual(domains.sort(), [new URL(site.origin).host, ...site.redirectHosts].sort());
+});
+
+test("news in Notion that names Odoo is left out (COPY-NEW-CLOUD-HUB); a host or a path is not copy", async () => {
+  const { problemsOf } = await import("../scripts/notion-news.mjs");
+  const item = (body) => ({ slug: "a-b", published: "2026-10-19", title: { en: "T", de: "T" }, subtitle: { en: "S", de: "S" }, metaTitle: { en: "", de: "" }, metaDescription: { en: "", de: "" }, body: { en: body, de: "<p>Text</p>" } });
+  assert.ok(problemsOf(item("<p>Send it to Odoo.</p>")).some((p) => p.includes("COPY-NEW-CLOUD-HUB")));
+  assert.deepEqual(problemsOf(item('<p>Your <a href="https://erp.example.com/odoo">TIMEperative Cloud Hub</a>.</p>')), []);
 });

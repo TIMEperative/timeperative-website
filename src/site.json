@@ -1,9 +1,12 @@
 {
-  "$comment": "One source for the build (scripts/build.mjs) and the Worker (src/worker.js). stores: the GitHub repositories whose releases carry latest.json and latest-android.json, read in this order; the Worker and the build take the newest. releasePage: where people find every release, and where /download/<platform> sends them when no store answers.",
-  "origin": "https://timeperative.com",
+  "$comment": "One source for the build (scripts/build.mjs) and the Worker (src/worker.js). stores: the GitHub repositories whose releases carry latest.json and latest-android.json, read in this order; the Worker and the build take the newest. releasePage: where people find every release, and where /download/<platform> sends them when no store answers. origin: the one address the site shows; the Worker sends redirectHosts there with a 301.",
+  "origin": "https://www.timeperative.com",
+  "redirectHosts": ["timeperative.com"],
   "languages": [
     { "code": "en", "locale": "en-GB", "prefix": "" },
-    { "code": "de", "locale": "de-CH", "prefix": "/de" }
+    { "code": "de", "locale": "de-CH", "prefix": "/de" },
+    { "code": "fr", "locale": "fr", "prefix": "/fr" },
+    { "code": "es", "locale": "es", "prefix": "/es" }
   ],
   "nav": [
     { "id": "home", "path": "/" },
@@ -17,6 +20,6 @@
   ],
   "stores": ["TIMEperative/timeperative", "Acunomic/timeperative"],
   "releasePage": "https://github.com/Acunomic/timeperative/releases",
-  "workerRoutes": ["/download/windows", "/download/android"],
+  "workerRoutes": ["/download/windows", "/download/android", "/waitlist"],
   "supportEmail": "support@timeperative.com"
 }

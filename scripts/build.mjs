@@ -5,7 +5,8 @@
 //
 // Pages are src/pages/<lang>/**/*.html, each opening with a comment of
 // "key: value" lines (title, description, nav). English is served at /,
-// German at /de/, with the same paths. News and release notes come from
+// the other languages under their prefix in site.json (/de/, /fr/, /es/),
+// with the same paths. News and release notes come from
 // content/news/*.json (written by scripts/notion-news.mjs) and from the
 // update manifests the app's release workflows publish. The build then
 // checks every page it wrote (one h1, headings that never skip, meta
@@ -146,9 +147,81 @@ function newsList(items, lang, limit, level = 3) {
   if (!shown.length) return `<p class="empty">${escapeHtml(t.news.empty)}</p>`;
   return `<ul class="news-list">\n${shown.map((i) => `<li class="news-item">
   <p class="news-meta"><span class="kind">${escapeHtml(t.news.kinds[i.kind] ?? i.kind)}</span> <time datetime="${i.published}">${formatDate(i.published, lang)}</time></p>
-  <h${level}><a href="${localPath(lang, `/news/${i.slug}/`)}">${escapeHtml(i.title[lang] ?? i.title.en)}</a></h${level}>
-  ${i.subtitle?.[lang] ? `<p>${escapeHtml(i.subtitle[lang])}</p>` : ""}
+  <h${level}><a href="${localPath(lang, `/news/${i.slug}/`)}">${i.title[lang] ? escapeHtml(i.title[lang]) : `<span lang="en">${escapeHtml(i.title.en)}</span>`}</a></h${level}>
+  ${i.subtitle?.[lang] ? `<p>${escapeHtml(i.subtitle[lang])}</p>` : i.subtitle?.en ? `<p lang="en">${escapeHtml(i.subtitle.en)}</p>` : ""}
 </li>`).join("\n")}\n</ul>`;
+}
+
+// ------------------------------------------------------------ platforms
+
+// The platform marks on the download buttons are the owner's decision against
+// the vendors' guidelines (acustique HOST-007, AQ-NEW-PLATFORM-MARKS). Drawn
+// in the text colour, so they follow the theme. Apple and Android: Simple
+// Icons 16.35.0 (CC0-1.0 for the drawing; the Android robot is Google's,
+// CC BY 3.0). Windows: four panes, drawn here.
+const MARKS = {
+  windows: "M0 0h11.4v11.4H0zM12.6 0H24v11.4H12.6zM0 12.6h11.4V24H0zM12.6 12.6H24V24H12.6z",
+  android: "M18.4395 5.5586c-.675 1.1664-1.352 2.3318-2.0274 3.498-.0366-.0155-.0742-.0286-.1113-.043-1.8249-.6957-3.484-.8-4.42-.787-1.8551.0185-3.3544.4643-4.2597.8203-.084-.1494-1.7526-3.021-2.0215-3.4864a1.1451 1.1451 0 0 0-.1406-.1914c-.3312-.364-.9054-.4859-1.379-.203-.475.282-.7136.9361-.3886 1.5019 1.9466 3.3696-.0966-.2158 1.9473 3.3593.0172.031-.4946.2642-1.3926 1.0177C2.8987 12.176.452 14.772 0 18.9902h24c-.119-1.1108-.3686-2.099-.7461-3.0683-.7438-1.9118-1.8435-3.2928-2.7402-4.1836a12.1048 12.1048 0 0 0-2.1309-1.6875c.6594-1.122 1.312-2.2559 1.9649-3.3848.2077-.3615.1886-.7956-.0254-1.1328a1.1001 1.1001 0 0 0-.9165-.4996.9631.9631 0 0 0-.9663.5252zm-.0078 8.4082c.5378.7972.4061 1.8366-.2944 2.3215-.7005.485-1.7038.2302-2.2416-.5669-.5378-.7972-.4061-1.8366.2944-2.3216.7005-.4849 1.7038-.2302 2.2416.567zM7.8887 14.4964c.5378-.7972.4061-1.8366-.2944-2.3216-.7005-.4849-1.7038-.2302-2.2416.5669-.5378.7972-.4061 1.8366.2944 2.3216.7005.4849 1.7038.2302 2.2416-.5669z",
+  apple: "M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701",
+};
+MARKS.macos = MARKS.apple;
+MARKS.ios = MARKS.apple;
+
+const mark = (platform) => `<svg class="platform-mark" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="${MARKS[platform]}"/></svg>`;
+
+/**
+ * The four platforms as buttons. Windows and Android download (on the
+ * download page) or lead to it; macOS and iOS open, right under their
+ * button, the message that the version does not exist yet and the waitlist.
+ */
+function platformsHtml(lang, pagePath) {
+  const t = strings[lang].platforms;
+  const fill = (text, platform) => text.replaceAll("{platform}", t.names[platform]);
+  const onDownloadPage = pagePath === "/download/";
+  const available = ["windows", "android"].map((p) => {
+    const href = onDownloadPage ? `/download/${p}` : `/download/#${p}`;
+    const label = onDownloadPage ? fill(t.download, p) : fill(t.about, p);
+    return `<li><a class="platform" href="${href}" aria-label="${escapeHtml(label)}">${mark(p)}<span>${escapeHtml(t.names[p])}</span></a></li>`;
+  });
+  const soon = ["macos", "ios"].map((p) => `<li><details class="platform-soon" id="waitlist-${p}">
+  <summary class="platform">${mark(p)}<span>${escapeHtml(t.names[p])}</span></summary>
+  <div class="waitlist">
+    <p>${escapeHtml(fill(t.soon, p))}</p>
+    <form class="waitlist-form" method="post" action="/waitlist" data-ok="${escapeHtml(fill(t.ok, p))}" data-invalid="${escapeHtml(t.invalid)}" data-error="${escapeHtml(t.error.replace("{email}", site.supportEmail))}">
+      <input type="hidden" name="platform" value="${p}">
+      <input type="hidden" name="lang" value="${lang}">
+      <input type="hidden" name="page" value="${localPath(lang, pagePath)}">
+      <label for="waitlist-${p}-email">${escapeHtml(t.email)}</label>
+      <div class="waitlist-row">
+        <input id="waitlist-${p}-email" type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email">
+        <button class="button button-primary" type="submit">${escapeHtml(t.submit)}</button>
+      </div>
+      <p class="waitlist-trap" aria-hidden="true"><label>${escapeHtml(t.trap)} <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>
+      <p class="fine">${escapeHtml(fill(t.use, p))} <a href="/privacy/#waitlist">${escapeHtml(t.privacy)}</a></p>
+      <p class="waitlist-status" role="status" aria-live="polite"></p>
+      <p class="waitlist-done" id="waitlist-${p}-ok">${escapeHtml(fill(t.ok, p))}</p>
+      <p class="waitlist-done" id="waitlist-${p}-invalid">${escapeHtml(t.invalid)}</p>
+      <p class="waitlist-done" id="waitlist-${p}-error">${escapeHtml(t.error.replace("{email}", site.supportEmail))}</p>
+    </form>
+  </div>
+</details></li>`);
+  return `<ul class="platforms" aria-label="${escapeHtml(t.label)}">\n${[...available, ...soon].join("\n")}\n</ul>`;
+}
+
+// ------------------------------------------------------------ languages
+
+/** The language menu: the current language's flag and code, the others to choose. */
+function switcherHtml(page) {
+  const isNotFound = page.path === "/404.html";
+  const current = site.languages.find((l) => l.code === page.lang);
+  const flag = (l) => `<img class="flag" src="/assets/flags/${l.code}.svg" alt="" width="21" height="14">`;
+  const items = site.languages.map((l) => {
+    const name = strings[l.code].language.name;
+    const here = l.code === page.lang;
+    return `<li><a href="${localPath(l.code, isNotFound ? "/" : page.path)}" hreflang="${l.locale}" lang="${l.locale}"${here ? ' aria-current="true"' : ""}>${flag(l)}<span class="lang-code">${l.code.toUpperCase()}</span><span class="lang-name">${escapeHtml(name)}</span></a></li>`;
+  }).join("");
+  const t = strings[page.lang].language;
+  return `<details class="lang-menu"><summary aria-label="${escapeHtml(`${t.label}: ${t.name}`)}">${flag(current)}<span class="lang-code">${current.code.toUpperCase()}</span></summary><ul>${items}</ul></details>`;
 }
 
 // ------------------------------------------------------------ pages
@@ -174,7 +247,6 @@ function localiseLinks(html, lang) {
 function render(page, ctx) {
   const t = strings[page.lang];
   const lang = site.languages.find((l) => l.code === page.lang);
-  const other = site.languages.filter((l) => l.code !== page.lang);
   const nav = site.nav.map((n) => {
     const current = page.meta.nav === n.id;
     return `<li><a href="${localPath(page.lang, n.path)}"${current ? ' aria-current="page"' : ""}>${escapeHtml(t.nav[n.id])}</a></li>`;
@@ -183,13 +255,14 @@ function render(page, ctx) {
   const isNotFound = page.path === "/404.html";
   const alternates = isNotFound ? "" : site.languages.map((l) => `<link rel="alternate" hreflang="${l.locale}" href="${site.origin}${localPath(l.code, page.path)}">`).join("\n")
     + `\n<link rel="alternate" hreflang="x-default" href="${site.origin}${localPath("en", page.path)}">`;
-  const switcher = other.map((l) => `<a class="lang-switch" href="${localPath(l.code, isNotFound ? "/" : page.path)}" hreflang="${l.locale}" lang="${l.locale}">${escapeHtml(strings[l.code].language.name)}</a>`).join("");
+  const switcher = switcherHtml(page);
   const fill = (text) => text
     .replace(/\{\{release\.summary\}\}/g, ctx.releaseSummary(page.lang))
     .replace(/\{\{release\.notes\}\}/g, ctx.releaseNotesLink(page.lang))
     .replace(/\{\{release\.page\}\}/g, site.releasePage)
     .replace(/\{\{news\.latest\}\}/g, newsList(ctx.news, page.lang, 3))
     .replace(/\{\{news\.all\}\}/g, newsList(ctx.news, page.lang, undefined, 2))
+    .replace(/\{\{platforms\}\}/g, () => platformsHtml(page.lang, page.path))
     .replace(/\{\{support\.email\}\}/g, site.supportEmail)
     .replace(/\{\{year\}\}/g, String(new Date().getUTCFullYear()));
   const vars = {
@@ -200,6 +273,7 @@ function render(page, ctx) {
     ogUrl: `${site.origin}${localPath(page.lang, isNotFound ? "/" : page.path)}`,
     alternates,
     home: localPath(page.lang, "/"),
+    origin: site.origin,
     skip: escapeHtml(t.skip),
     navLabel: escapeHtml(t.navLabel),
     nav,
@@ -222,18 +296,21 @@ function render(page, ctx) {
 
 function articlePage(item, lang) {
   const t = strings[lang];
-  const title = item.title[lang] ?? item.title.en;
+  // News written in English and German only shows its English in the other languages, marked as English.
+  const own = (field) => item[field]?.[lang];
+  const english = (field) => item[field]?.en;
+  const title = own("title") ?? english("title");
   return {
     lang,
     path: `/news/${item.slug}/`,
-    meta: { title: item.metaTitle?.[lang] || title, description: item.metaDescription?.[lang] || item.subtitle?.[lang] || "", nav: "home" },
+    meta: { title: own("metaTitle") || title, description: own("metaDescription") || own("subtitle") || english("metaDescription") || english("subtitle") || "", nav: "home" },
     body: `<article class="container article">
 <p class="breadcrumb"><a href="${localPath(lang, "/news/")}">${escapeHtml(t.news.title)}</a></p>
-<h1>${escapeHtml(title)}</h1>
+<h1${own("title") ? "" : ' lang="en"'}>${escapeHtml(title)}</h1>
 <p class="news-meta"><span class="kind">${escapeHtml(t.news.kinds[item.kind] ?? item.kind)}</span> <time datetime="${item.published}">${formatDate(item.published, lang)}</time></p>
-${item.subtitle?.[lang] ? `<p class="lead">${escapeHtml(item.subtitle[lang])}</p>` : ""}
-<div class="prose">
-${item.body[lang] ?? item.body.en}
+${own("subtitle") ? `<p class="lead">${escapeHtml(own("subtitle"))}</p>` : english("subtitle") ? `<p class="lead" lang="en">${escapeHtml(english("subtitle"))}</p>` : ""}
+<div class="prose"${own("body") ? "" : ' lang="en"'}>
+${own("body") ?? english("body")}
 </div>
 </article>`,
     file: `content/news/${item.slug}.json`,

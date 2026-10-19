@@ -1,6 +1,6 @@
 // Cloudflare Workers: the static site in dist/ (npm run build) with a small
-// Worker for the download links (src/worker.js). Workers Static Assets is
-// what Cloudflare recommends for new static sites instead of Pages
+// Worker in front of it (src/worker.js). Workers Static Assets is what
+// Cloudflare recommends for new static sites instead of Pages
 // (developers.cloudflare.com/workers/best-practices/workers-best-practices/,
 // read 2026-10-18).
 {
@@ -13,14 +13,24 @@
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page",
-    // Navigation requests prefer static assets (and their 404 page) since
-    // compatibility date 2025-04-01, so the download links must run the
-    // Worker first. Keep this list equal to site.json "workerRoutes".
-    "run_worker_first": ["/download/windows", "/download/android"]
+    // The Worker runs on every request: a request for timeperative.com that
+    // matched a file would otherwise be served without it, so it could not
+    // send the visitor to www (developers.cloudflare.com/workers/static-assets/
+    // routing/worker-script/, read 2026-10-19). It also answers the download
+    // links and the waitlist; everything else it hands to ASSETS.
+    "run_worker_first": true
   },
-  // The apex serves the site; www.timeperative.com and timely.you redirect
-  // here with Cloudflare redirect rules (setup guides in Notion: TIMEperative >
-  // TIMEperative.com website). A custom domain
-  // needs the zone active on Cloudflare first.
-  "routes": [{ "pattern": "timeperative.com", "custom_domain": true }]
+  // The site is www.timeperative.com (Gabriel, 2026-10-19); timeperative.com
+  // is a second custom domain of the same Worker, which redirects it to www
+  // (site.json "redirectHosts"). A custom domain creates its DNS record and
+  // certificate; it needs the zone active on Cloudflare and no other record
+  // on that name.
+  "routes": [
+    { "pattern": "www.timeperative.com", "custom_domain": true },
+    { "pattern": "timeperative.com", "custom_domain": true }
+  ]
+  // Secrets for the waitlist (wrangler secret put, or the dashboard: Workers
+  // & Pages, timeperative-website, Settings, Variables and Secrets):
+  //   ODOO_URL, ODOO_DB, ODOO_API_KEY
+  //   optional: ODOO_TEAM_ID, ODOO_COMPANY_ID, ODOO_TAG_IDS (comma-separated)
 }
