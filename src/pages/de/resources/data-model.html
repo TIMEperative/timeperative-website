@@ -1,0 +1,166 @@
+<!--
+title: Datenmodell der Zeiteinträge
+description: Felder, Regeln und Status eines Zeiteintrags in TIMEperative und der Datensätze rundherum, für alle, die Zeiten importieren, exportieren oder prüfen.
+nav: resources
+-->
+<div class="container page-head">
+  <h1>Datenmodell der Zeiteinträge</h1>
+  <p class="lead">Was ein Zeiteintrag in TIMEperative enthält, welchen Regeln er folgt und wie er mit Projekten, der Verrechnung und dem Änderungsprotokoll zusammenhängt.</p>
+</div>
+
+<section class="section">
+  <div class="container prose">
+    <h2>Über diese Referenz</h2>
+    <p>Diese Seite ist für alle, die Exporte von TIMEperative lesen, in ein anderes System laden oder in einer Prüfung kontrollieren. Sie beschreibt die Daten so, wie die App sie heute speichert, Version 0.1.0-alpha.16, abgeglichen mit dem Code der App am 21. Oktober 2026. TIMEperative ist im Early Access, deshalb können Felder dazukommen; diese Seite ändert sich mit ihnen.</p>
+    <p>Jede Installation speichert ihre Daten in einer Datenbank auf dem Gerät, unter Windows oder Android. Es gibt keinen Server von TIMEperative. Daten verlassen das Gerät nur, wenn Du sie exportierst oder Einträge an Deinen TIMEperative Cloud Hub sendest, der die separate App TIMEperative.sync braucht. Die <a href="/privacy/">Datenschutzerklärung</a> nennt jede Verbindung.</p>
+
+    <h2>Konventionen</h2>
+    <table>
+      <thead><tr><th>Art des Werts</th><th>Format</th><th>Beispiel</th></tr></thead>
+      <tbody>
+        <tr><td>Datum</td><td>Kalenderdatum nach ISO 8601, JJJJ-MM-TT, der Tag in der Zeitzone des Eintrags</td><td><code>2026-10-21</code></td></tr>
+        <tr><td>Zeitpunkt</td><td>ISO 8601 in UTC, auf die Sekunde, endet mit Z</td><td><code>2026-10-21T07:30:00Z</code></td></tr>
+        <tr><td>Zeitzone</td><td>Name der Zeitzone nach IANA</td><td><code>Europe/Zurich</code></td></tr>
+        <tr><td>Dauer</td><td>Ganze Minuten; in Exporten auch als Stunden mit zwei Dezimalstellen und einem Punkt</td><td><code>90</code>, <code>1.50</code></td></tr>
+        <tr><td>Kennung</td><td>Ganze Zahl, eindeutig innerhalb einer Installation</td><td><code>4711</code></td></tr>
+        <tr><td>Land</td><td>Code nach ISO 3166-1 alpha-2 in Grossbuchstaben</td><td><code>CH</code></td></tr>
+      </tbody>
+    </table>
+    <p>Exporte behalten diese Formate, egal welche Sprache und welches Regionalformat Du in der App verwendest.</p>
+
+    <h2>Überblick</h2>
+    <p>Der Zeiteintrag steht im Zentrum. Alles andere beschreibt ihn oder entsteht aus ihm.</p>
+    <table>
+      <thead><tr><th>Datensatz</th><th>Beziehung zum Zeiteintrag</th></tr></thead>
+      <tbody>
+        <tr><td>Person</td><td>Jeder Eintrag gehört genau einer Person.</td></tr>
+        <tr><td>Projekt</td><td>Jeder Eintrag ist auf genau ein Projekt gebucht.</td></tr>
+        <tr><td>Aktivität</td><td>Ein Eintrag kann eine Aktivität seines Projekts nennen; manche Projekte verlangen eine.</td></tr>
+        <tr><td>Tag</td><td>Ein Eintrag trägt beliebig viele Tags; ein Tag kann an beliebig vielen Einträgen hängen.</td></tr>
+        <tr><td>Ort</td><td>Ein Eintrag kann den Ort nennen, an dem gearbeitet wurde.</td></tr>
+        <tr><td>Geplanter Eintrag</td><td>Ein Ist-Eintrag kann auf den geplanten Eintrag verweisen, den er umsetzt; ein Plan kann von mehreren Ist-Einträgen umgesetzt werden.</td></tr>
+        <tr><td>Verrechenbarer Eintrag</td><td>Entsteht aus genehmigten Einträgen; ein verrechenbarer Eintrag umfasst einen oder mehrere Einträge, und jeder Eintrag gehört zu höchstens einem verrechenbaren Eintrag.</td></tr>
+        <tr><td>Protokolleintrag</td><td>Anlegen, Ändern, Löschen, Wiederherstellen und Statuswechsel eines Eintrags schreiben je einen Protokolleintrag.</td></tr>
+        <tr><td>Verknüpfung zum Cloud Hub</td><td>Wird ein Eintrag an den Cloud Hub gesendet, hält eine Verknüpfung fest, ob er angekommen ist.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Zeiteintrag</h2>
+    <p>Die Namen sind die Spaltennamen des Exports der Zeiteinträge.</p>
+    <table>
+      <thead><tr><th>Feld</th><th>Typ</th><th>Pflicht</th><th>Werte und Bedeutung</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>Kennung</td><td>Ja</td><td>Die Nummer des Eintrags in dieser Installation.</td></tr>
+        <tr><td><code>date</code></td><td>Datum</td><td>Ja</td><td>Der Tag, auf den der Eintrag gebucht ist.</td></tr>
+        <tr><td><code>user</code></td><td>Text</td><td>Ja</td><td>Der Name der Person.</td></tr>
+        <tr><td><code>project</code></td><td>Text</td><td>Ja</td><td>Der Name des Projekts.</td></tr>
+        <tr><td><code>activity</code></td><td>Text</td><td>Nein</td><td>Der Name der Aktivität, leer, wenn es keine gibt.</td></tr>
+        <tr><td><code>description</code></td><td>Text</td><td>Nein</td><td>Was gemacht wurde. Das Feld darf leer sein; der Compliance-Status zeigt das an.</td></tr>
+        <tr><td><code>internalComment</code></td><td>Text</td><td>Nein</td><td>Eine Notiz für das Team, nicht für den Kunden gedacht.</td></tr>
+        <tr><td><code>durationMinutes</code></td><td>Ganze Zahl</td><td>Ja</td><td>Die Dauer in Minuten, immer grösser als 0. Sind Beginn und Ende gesetzt, sind es die ganzen Minuten dazwischen.</td></tr>
+        <tr><td><code>durationHours</code></td><td>Dezimalzahl</td><td>Ja</td><td>Dieselbe Dauer in Stunden, zwei Dezimalstellen.</td></tr>
+        <tr><td><code>entryType</code></td><td>Text</td><td>Ja</td><td><code>actual</code>, <code>planned</code> oder <code>requested</code>; siehe Eintragstypen.</td></tr>
+        <tr><td><code>plannedEntryId</code></td><td>Kennung</td><td>Nein</td><td>Bei einem Ist-Eintrag: der geplante Eintrag, den er umsetzt.</td></tr>
+        <tr><td><code>status</code></td><td>Text</td><td>Ja</td><td><code>draft</code>, <code>submitted</code>, <code>approved</code>, <code>rejected</code>, <code>inquiry</code> oder <code>converted</code>; siehe Status und Sperre.</td></tr>
+        <tr><td><code>complianceStatus</code></td><td>Text</td><td>Ja</td><td><code>description_missing</code>, <code>unclear</code>, <code>misleading</code> oder <code>compliant</code>; siehe Compliance-Status.</td></tr>
+        <tr><td><code>workLocation</code></td><td>Text</td><td>Nein</td><td>Der Name des Orts.</td></tr>
+        <tr><td><code>source</code></td><td>Text</td><td>Ja</td><td>Woher der Eintrag kommt: <code>manual</code> für Einträge, die in der App erfasst wurden, sonst der Import oder die Funktion, die ihn angelegt hat.</td></tr>
+        <tr><td><code>timezone</code></td><td>Zeitzone</td><td>Ja</td><td>Die Zeitzone, in der der Eintrag erfasst wurde; <code>date</code> ist der Tag in dieser Zeitzone.</td></tr>
+        <tr><td><code>startUtc</code></td><td>Zeitpunkt</td><td>Nein</td><td>Wann die Arbeit begann. Beginn und Ende sind beide gesetzt oder beide leer; ein Eintrag ohne sie hat nur eine Dauer.</td></tr>
+        <tr><td><code>endUtc</code></td><td>Zeitpunkt</td><td>Nein</td><td>Wann die Arbeit endete.</td></tr>
+        <tr><td><code>deletedAt</code></td><td>Zeitpunkt</td><td>Nein</td><td>Gesetzt, wenn der Eintrag gelöscht wurde; siehe Löschen.</td></tr>
+        <tr><td><code>createdAt</code></td><td>Zeitpunkt</td><td>Ja</td><td>Wann der Eintrag angelegt wurde.</td></tr>
+        <tr><td><code>updatedAt</code></td><td>Zeitpunkt</td><td>Ja</td><td>Wann der Eintrag zuletzt geändert wurde.</td></tr>
+        <tr><td><code>placeId</code></td><td>Kennung</td><td>Nein</td><td>Die Nummer des Orts in dieser Installation.</td></tr>
+        <tr><td><code>placeKind</code></td><td>Text</td><td>Nein</td><td>Die Art des Orts; siehe Orte.</td></tr>
+        <tr><td><code>placeCountry</code></td><td>Land</td><td>Nein</td><td>Das Land des Orts.</td></tr>
+      </tbody>
+    </table>
+    <p>Die App speichert ausserdem die Tags eines Eintrags und den Kommentar zum letzten Statuswechsel. Beides ist heute nicht Teil des Exports.</p>
+
+    <h2>Eintragstypen</h2>
+    <ul>
+      <li><code>actual</code>: geleistete Zeit. Nur Ist-Einträge zählen als geleistete Zeit, gehen in die Verrechnung und werden an den Cloud Hub gesendet.</li>
+      <li><code>planned</code>: eingeplante Zeit, zum Beispiel aus der Planung oder aus einem Kalender.</li>
+      <li><code>requested</code>: angefragte, aber nicht zugesagte Zeit, zum Beispiel eine noch nicht angenommene Einladung zu einer Sitzung.</li>
+    </ul>
+    <p>Der Typ eines Eintrags ändert sich nicht. Wird ein Plan umgesetzt, entsteht ein neuer Ist-Eintrag, der auf den Plan verweist, und der Plan bleibt, wie er war. Aus einem Kalender importierte Einträge behalten den Verweis auf den Termin, sodass ein erneuter Import sie aktualisiert, statt Kopien anzulegen.</p>
+
+    <h2>Status und Sperre</h2>
+    <p>Ein neuer Eintrag ist ein Entwurf. Nur Entwürfe lassen sich ändern; ein Eintrag in einem anderen Status geht dafür zuerst zurück in den Entwurf.</p>
+    <table>
+      <thead><tr><th>Von</th><th>Nach</th><th>Bedeutung</th></tr></thead>
+      <tbody>
+        <tr><td><code>draft</code></td><td><code>submitted</code></td><td>Die Person reicht den Eintrag ein.</td></tr>
+        <tr><td><code>submitted</code></td><td><code>approved</code></td><td>Der Eintrag wird genehmigt.</td></tr>
+        <tr><td><code>submitted</code></td><td><code>rejected</code></td><td>Der Eintrag wird abgelehnt, wahlweise mit einem Kommentar.</td></tr>
+        <tr><td><code>submitted</code></td><td><code>inquiry</code></td><td>Eine Rückfrage zum Eintrag, wahlweise mit einem Kommentar.</td></tr>
+        <tr><td><code>submitted</code>, <code>approved</code>, <code>rejected</code>, <code>inquiry</code></td><td><code>draft</code></td><td>Der Eintrag wird wieder zum Ändern geöffnet.</td></tr>
+        <tr><td><code>approved</code></td><td><code>converted</code></td><td>Nur über die Verrechnung: Der Eintrag wurde Teil eines verrechenbaren Eintrags. Wird dieser entfernt, kehrt er zu <code>approved</code> zurück.</td></tr>
+      </tbody>
+    </table>
+    <p>Jeder Statuswechsel schreibt einen Protokolleintrag.</p>
+
+    <h2>Compliance-Status</h2>
+    <p>Der Compliance-Status sagt, ob die Beschreibung für die Verrechnung genügt. Eine leere Beschreibung ist immer <code>description_missing</code>. Eine ausgefüllte Beschreibung ist <code>compliant</code>, ausser jemand hat sie als <code>unclear</code> oder <code>misleading</code> markiert.</p>
+
+    <h2>Löschen</h2>
+    <ul>
+      <li>Das Löschen eines Eintrags setzt <code>deletedAt</code>; der Eintrag lässt sich wiederherstellen. Der Export der Zeiteinträge lässt gelöschte Einträge weg.</li>
+      <li>Ein gelöschter Eintrag kann danach endgültig gelöscht werden. Sein letzter Stand bleibt im Änderungsprotokoll.</li>
+      <li>Ein verrechneter Eintrag lässt sich nicht löschen, weil ein verrechenbarer Eintrag auf ihn verweist.</li>
+    </ul>
+
+    <h2>Projekte und Aktivitäten</h2>
+    <p>Ein Projekt hat einen Namen, einen Typ, wahlweise einen Kundennamen, eine Farbe und eine Einstellung, ob seine Zeit standardmässig verrechenbar ist. Sein Typ ist <code>work</code>, <code>private</code>, <code>public_holiday</code>, <code>vacation</code> oder <code>absence</code>.</p>
+    <p>Eine Aktivität gehört zu genau einem Projekt. Aktivitäten lassen sich unter einer übergeordneten Aktivität zu einem Projektstrukturplan verschachteln, einen Code tragen und die Verrechenbarkeit des Projekts übersteuern.</p>
+
+    <h2>Tags</h2>
+    <p>Ein Tag hat einen Namen, eindeutig in der Installation, und eine Farbe. Einträge und Tags sind n:m verknüpft.</p>
+
+    <h2>Orte</h2>
+    <p>Ein Ort hat einen Namen, eine Art, wahlweise eine Adresse mit Land und wahlweise Koordinaten. Seine Art ist <code>home</code>, <code>remote</code>, <code>office</code>, <code>customer</code>, <code>collection_point</code>, <code>work_area</code>, <code>transit</code>, <code>other</code> oder <code>unclassified</code>. Ein Ort kann einer Person gehören oder in der Installation geteilt sein.</p>
+
+    <h2>Verrechenbare Einträge</h2>
+    <p>Die Verrechnung macht aus genehmigten Ist-Einträgen verrechenbare Einträge. Sie gruppiert sie nach Tag, Projekt und Person und wendet die Verrechnungsregeln an, die die Zeit runden und begrenzen können. Die verwendeten Einträge werden <code>converted</code>.</p>
+    <table>
+      <thead><tr><th>Spalte</th><th>Werte und Bedeutung</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>Die Nummer des verrechenbaren Eintrags in dieser Installation.</td></tr>
+        <tr><td><code>date</code></td><td>Der Tag.</td></tr>
+        <tr><td><code>user</code></td><td>Der Name der Person.</td></tr>
+        <tr><td><code>project</code></td><td>Der Name des Projekts.</td></tr>
+        <tr><td><code>description</code></td><td>Der Text für die Rechnung, aus den Beschreibungen der Einträge gebildet oder von Hand geschrieben.</td></tr>
+        <tr><td><code>durationMinutes</code>, <code>durationHours</code></td><td>Die verrechenbare Dauer nach den Regeln.</td></tr>
+        <tr><td><code>status</code></td><td><code>open</code> oder <code>exported_for_billing</code>.</td></tr>
+        <tr><td><code>batchId</code></td><td>Der Export, der ihn gesperrt hat: <code>B-</code>, gefolgt von Datum und Uhrzeit des Exports in UTC, zum Beispiel <code>B-20261021-073000</code>.</td></tr>
+        <tr><td><code>exportedAt</code></td><td>Wann er für die Verrechnung exportiert wurde.</td></tr>
+        <tr><td><code>adjustments</code></td><td>Was die Regeln geändert haben.</td></tr>
+        <tr><td><code>linkedEntryIds</code></td><td>Die Nummern der Zeiteinträge, aus denen er entstand, durch Leerzeichen getrennt.</td></tr>
+      </tbody>
+    </table>
+    <p>Der Export für die Verrechnung sperrt die verrechenbaren Einträge, die er markiert, damit nichts doppelt verrechnet wird. Ein gesperrter Eintrag lässt sich entsperren und ist dann wieder <code>open</code>.</p>
+
+    <h2>Änderungsprotokoll</h2>
+    <p>Jede Änderung schreibt einen Protokolleintrag, und der Export des Änderungsprotokolls enthält sie mit diesen Spalten:</p>
+    <ul>
+      <li><code>id</code>: die Nummer des Protokolleintrags.</li>
+      <li><code>entity</code> und <code>entityId</code>: was geändert wurde, zum Beispiel ein Zeiteintrag und seine Nummer.</li>
+      <li><code>action</code>: <code>create</code>, <code>update</code>, <code>delete</code>, <code>restore</code>, <code>purge</code> (endgültig gelöscht) oder <code>status_change</code>.</li>
+      <li><code>changes</code>: als JSON der alte und der neue Wert jedes geänderten Felds; bei einem neuen oder endgültig gelöschten Eintrag sein ganzer Stand.</li>
+      <li><code>actor</code>: der Name der Person, die die Änderung gemacht hat.</li>
+      <li><code>atUtc</code>: wann, als Zeitpunkt.</li>
+    </ul>
+
+    <h2>Senden an den Cloud Hub</h2>
+    <p>An Deinen TIMEperative Cloud Hub gehen nur genehmigte Ist-Einträge, die nicht gelöscht sind. Für jeden Eintrag speichert die App, ob er wartet, angekommen oder fehlgeschlagen ist, mit dem Fehler. Angekommene Einträge werden nicht erneut gesendet, und wo der Cloud Hub es unterstützt, erkennt er einen Eintrag, den er schon hat, sodass erneutes Senden keine Kopie anlegt.</p>
+
+    <h2>Exporte heute</h2>
+    <ul>
+      <li>Zeiteinträge, verrechenbare Einträge und das Änderungsprotokoll werden als CSV exportiert: UTF-8, durch Kommas getrennt, eine Kopfzeile, Werte in Anführungszeichen, wo nötig.</li>
+      <li>Der Export der Zeiteinträge enthält die Einträge, die die Liste mit ihren Filtern zeigt.</li>
+      <li>Neue Spalten kamen bisher am Ende dazu, sodass Programme, die Spalten über ihre Position lesen, weiter funktionieren.</li>
+      <li>Kennungen sind nur innerhalb einer Installation eindeutig. Zwei Installationen nummerieren ihre Einträge unabhängig voneinander.</li>
+    </ul>
+  </div>
+</section>
