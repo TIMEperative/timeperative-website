@@ -113,7 +113,7 @@ Pages, timeperative-website, Settings, Variables and Secrets (type Secret).
    Status to Withdrawn to take it down again.
 
 A row that breaks a rule (meta title over 60 characters, meta description
-over 155, a long dash, the sharp s in German, a name COPY-NEW-CLOUD-HUB keeps off the site) is left out, and the workflow
+over 155, a long dash, the sharp s in German, a name COPY-016 keeps off the site) is left out, and the workflow
 log names it and the rule.
 
 ## Before a change is done

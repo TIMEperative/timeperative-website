@@ -114,7 +114,28 @@ a.brand:hover .wordmark { color: var(--ty-app-brand-text-hover); }
   border-radius: 8px 8px 0 0;
 }
 /* Language menu: the current language's flag and code; the others open below. */
-.lang-menu { margin-left: auto; position: relative; }
+/* Right-hand tools: the colour scheme, then the language (as on acunomic.com). */
+.header-tools { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; }
+/* One button that shows the current scheme and cycles Dark, Light, System (NAV-007). */
+.scheme-cycle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ty-cc1-text);
+  cursor: pointer;
+}
+.scheme-cycle:hover { border-color: var(--ty-cc1-link); color: var(--ty-cc1-heading); }
+.scheme-icon { display: none; }
+:root[data-scheme="dark"] .scheme-icon[data-scheme-icon="dark"],
+:root[data-scheme="light"] .scheme-icon[data-scheme-icon="light"],
+:root[data-scheme="system"] .scheme-icon[data-scheme-icon="system"] { display: block; }
+.lang-menu { position: relative; }
 .lang-menu summary {
   display: inline-flex;
   align-items: center;
@@ -168,6 +189,8 @@ a.brand:hover .wordmark { color: var(--ty-app-brand-text-hover); }
   .site-nav { order: 3; flex-basis: 100%; margin: 0 -0.4rem; }
   .site-nav ul { flex-wrap: nowrap; gap: 0; }
   .site-nav a { padding: 0 0.35rem; font-size: clamp(0.84rem, 3.9vw, 0.97rem); }
+  .header-tools { gap: 0.35rem; }
+  .lang-menu summary { padding: 0 0.55rem; gap: 0.35rem; }
 }
 @media (max-width: 22rem) {
   .site-nav a { padding: 0 0.22rem; }
@@ -332,30 +355,16 @@ a.platform:hover, summary.platform:hover { border-color: var(--ty-cc1-link); col
 /* ------------------------------------------------------------ footer */
 
 .site-footer { border-top: 1px solid var(--line); padding: 2.5rem 0 3rem; font-size: 0.95rem; }
-.footer-inner { display: grid; gap: 1.5rem 2rem; grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) minmax(0, 1.4fr); align-items: start; }
+.footer-inner { display: grid; gap: 1.5rem 2rem; grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr); align-items: start; }
 .footer-brand .brand { margin-bottom: 0.5rem; }
 .footer-brand .wordmark { font-size: 1.1rem; }
 .footer-brand .tagline { font-size: 1rem; }
 .footer-nav ul { list-style: none; margin: 0; padding: 0; }
 .footer-nav a { display: inline-flex; align-items: center; min-height: 44px; }
-.scheme { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
-.scheme-label { flex-basis: 100%; margin-bottom: 0.1rem; }
-.scheme button {
-  min-height: 44px;
-  padding: 0 0.9rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--ty-cc1-text);
-  font: inherit;
-  cursor: pointer;
-}
-.scheme button:hover { border-color: var(--ty-cc1-link); }
-.scheme button[aria-pressed="true"] { border: 2px solid var(--ty-cc1-link); color: var(--ty-cc1-heading); font-weight: 650; }
 @media (max-width: 48rem) {
   .footer-inner { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a, .button, .site-nav a, .scheme button, .platform, .lang-menu summary { transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease; }
+  a, .button, .site-nav a, .scheme-cycle, .platform, .lang-menu summary { transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease; }
 }

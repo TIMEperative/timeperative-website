@@ -2,7 +2,7 @@
 <html lang="{{locale}}">
 <head>
 <meta charset="utf-8">
-<script>(function(){var s;try{s=localStorage.getItem("ty-scheme")}catch(e){}if(s!=="light"&&s!=="dark")s="system";var d=s==="system"?(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):s;var r=document.documentElement;r.setAttribute("data-bs-theme",d);r.setAttribute("data-scheme",s)})();</script>
+<script>(function(){var s;try{s=localStorage.getItem("ty-scheme")}catch(e){}if(s!=="light"&&s!=="system")s="dark";var d=s==="system"?(window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"):s;var r=document.documentElement;r.setAttribute("data-bs-theme",d);r.setAttribute("data-scheme",s)})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>{{title}}</title>
@@ -30,7 +30,14 @@
   <div class="container header-inner">
     <a class="brand" href="{{home}}"><img src="/assets/app-mark-512.png" alt="" width="32" height="32"><span class="wordmark"><b>TIME</b>perative</span></a>
     <nav class="site-nav" aria-label="{{navLabel}}"><ul>{{nav}}</ul></nav>
-    {{switcher}}
+    <div class="header-tools">
+      <button type="button" class="scheme-cycle" data-scheme-cycle data-label="{{schemeLabel}}" data-names="{{schemeNames}}" aria-label="{{schemeLabel}}: {{schemeDark}}">
+        <svg class="scheme-icon" data-scheme-icon="dark" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.7 14.6A8.5 8.5 0 0 1 9.4 3.3a.6.6 0 0 0-.8-.7A9.6 9.6 0 1 0 21.4 15.4a.6.6 0 0 0-.7-.8z"/></svg>
+        <svg class="scheme-icon" data-scheme-icon="light" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 1.8v2.4M12 19.8v2.4M1.8 12h2.4M19.8 12h2.4M4.8 4.8l1.7 1.7M17.5 17.5l1.7 1.7M4.8 19.2l1.7-1.7M17.5 6.5l1.7-1.7"/></svg>
+        <svg class="scheme-icon" data-scheme-icon="system" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path fill="currentColor" d="M12 3a9 9 0 0 1 0 18z"/></svg>
+      </button>
+      {{switcher}}
+    </div>
   </div>
 </header>
 <main id="main">
@@ -46,12 +53,6 @@
     <nav class="footer-nav" aria-label="{{footerLabel}}">
       <ul>{{footerLinks}}<li><a href="mailto:{{supportEmail}}">{{supportEmail}}</a></li></ul>
     </nav>
-    <div class="scheme" role="group" aria-label="{{schemeLabel}}">
-      <span class="scheme-label" aria-hidden="true">{{schemeLabel}}</span>
-      <button type="button" data-scheme-choice="system" aria-pressed="false">{{schemeSystem}}</button>
-      <button type="button" data-scheme-choice="light" aria-pressed="false">{{schemeLight}}</button>
-      <button type="button" data-scheme-choice="dark" aria-pressed="false">{{schemeDark}}</button>
-    </div>
   </div>
 </footer>
 </body>

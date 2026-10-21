@@ -155,7 +155,7 @@ function newsList(items, lang, limit, level = 3) {
 // ------------------------------------------------------------ platforms
 
 // The platform marks on the download buttons are the owner's decision against
-// the vendors' guidelines (acustique HOST-007, AQ-NEW-PLATFORM-MARKS). Drawn
+// the vendors' guidelines (acustique HOST-007, AQ-089). Drawn
 // in the text colour, so they follow the theme. Apple and Android: Simple
 // Icons 16.35.0 (CC0-1.0 for the drawing; the Android robot is Google's,
 // CC BY 3.0). Windows: four panes, drawn here.
@@ -286,6 +286,7 @@ function render(page, ctx) {
     supportEmail: site.supportEmail,
     schemeLabel: escapeHtml(t.scheme.label),
     schemeSystem: escapeHtml(t.scheme.system),
+    schemeNames: escapeHtml(JSON.stringify({ dark: t.scheme.dark, light: t.scheme.light, system: t.scheme.system })),
     schemeLight: escapeHtml(t.scheme.light),
     schemeDark: escapeHtml(t.scheme.dark),
     robots: isNotFound ? '<meta name="robots" content="noindex">' : "",

@@ -1,41 +1,47 @@
-// Colour scheme: System, Light or Dark (NAV-007). The inline script at the top
-// of every page applies the stored choice before the first paint; this file
-// wires the three buttons in the footer and follows the system while the
-// choice is System.
+// Colour scheme: Dark, Light or System (NAV-007). Dark is the default
+// (owner, 2026-10-19): nothing stored means dark, so System is stored as
+// such. The inline script at the top of every page applies the choice before
+// the first paint; this file wires the header button, which shows the current
+// scheme and cycles Dark, Light, System, and follows the OS while the choice
+// is System.
 (function () {
   var KEY = "ty-scheme";
+  var CYCLE = ["dark", "light", "system"];
   var root = document.documentElement;
-  var media = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  var media = window.matchMedia ? window.matchMedia("(prefers-color-scheme: light)") : null;
 
   function stored() {
     var s = null;
-    try { s = localStorage.getItem(KEY); } catch (e) { /* storage blocked: System */ }
-    return s === "light" || s === "dark" ? s : "system";
+    try { s = localStorage.getItem(KEY); } catch (e) { /* storage blocked: the default */ }
+    return s === "light" || s === "system" ? s : "dark";
   }
 
   function apply(choice) {
-    var dark = choice === "dark" || (choice === "system" && media && media.matches);
-    root.setAttribute("data-bs-theme", dark ? "dark" : "light");
+    var light = choice === "light" || (choice === "system" && media && media.matches);
+    root.setAttribute("data-bs-theme", light ? "light" : "dark");
     root.setAttribute("data-scheme", choice);
-    var buttons = document.querySelectorAll("[data-scheme-choice]");
-    for (var i = 0; i < buttons.length; i++) {
-      buttons[i].setAttribute("aria-pressed", String(buttons[i].getAttribute("data-scheme-choice") === choice));
+    var button = document.querySelector("[data-scheme-cycle]");
+    if (button) {
+      var names = {};
+      try { names = JSON.parse(button.getAttribute("data-names")); } catch (e) { /* the label keeps its name */ }
+      button.setAttribute("aria-label", button.getAttribute("data-label") + ": " + (names[choice] || choice));
     }
   }
 
   function choose(choice) {
     try {
-      if (choice === "system") localStorage.removeItem(KEY);
+      if (choice === "dark") localStorage.removeItem(KEY);
       else localStorage.setItem(KEY, choice);
     } catch (e) { /* the choice lasts for this page only */ }
     apply(choice);
   }
 
   document.addEventListener("click", function (event) {
-    var button = event.target.closest && event.target.closest("[data-scheme-choice]");
-    if (button) choose(button.getAttribute("data-scheme-choice"));
+    var button = event.target.closest && event.target.closest("[data-scheme-cycle]");
+    if (button) choose(CYCLE[(CYCLE.indexOf(stored()) + 1) % CYCLE.length]);
   });
   if (media && media.addEventListener) media.addEventListener("change", function () { if (stored() === "system") apply("system"); });
+  window.addEventListener("storage", function (event) { if (event.key === KEY) apply(stored()); });
   apply(stored());
 })();
 
