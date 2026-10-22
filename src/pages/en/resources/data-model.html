@@ -1,0 +1,166 @@
+<!--
+title: Time entry data model
+description: The fields, rules and states of a TIMEperative time entry and the records around it, for anyone who imports, exports, integrates or audits time.
+nav: resources
+-->
+<div class="container page-head">
+  <h1>Time entry data model</h1>
+  <p class="lead">What a time entry in TIMEperative holds, which rules it follows and how it relates to projects, billing and the audit trail.</p>
+</div>
+
+<section class="section">
+  <div class="container prose">
+    <h2>About this reference</h2>
+    <p>This page is for people who read TIMEperative's exports, load them into another system, or check them in an audit. It describes the data as the app keeps it today, version 0.1.0-alpha.16, checked against the app's code on 21 October 2026. TIMEperative is in early access, so fields may be added; this page changes with them.</p>
+    <p>Each installation keeps its data in one database on the device, on Windows or on Android. There is no TIMEperative server. Data leaves the device only when you export it or send entries to your TIMEperative Cloud Hub, which needs the separate TIMEperative.sync app. The <a href="/privacy/">privacy policy</a> lists every connection.</p>
+
+    <h2>Conventions</h2>
+    <table>
+      <thead><tr><th>Kind of value</th><th>Format</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>Date</td><td>ISO 8601 calendar date, YYYY-MM-DD, the day in the entry's time zone</td><td><code>2026-10-21</code></td></tr>
+        <tr><td>Point in time</td><td>ISO 8601 in UTC, to the second, ending in Z</td><td><code>2026-10-21T07:30:00Z</code></td></tr>
+        <tr><td>Time zone</td><td>IANA time zone name</td><td><code>Europe/Zurich</code></td></tr>
+        <tr><td>Duration</td><td>Whole minutes; in exports also as hours with two decimals and a full stop</td><td><code>90</code>, <code>1.50</code></td></tr>
+        <tr><td>Identifier</td><td>Whole number, unique within one installation</td><td><code>4711</code></td></tr>
+        <tr><td>Country</td><td>ISO 3166-1 alpha-2 code in capitals</td><td><code>CH</code></td></tr>
+      </tbody>
+    </table>
+    <p>Exports keep these formats whatever language and regional format you use in the app.</p>
+
+    <h2>Overview</h2>
+    <p>The time entry is the centre. Everything else either describes it or is made from it.</p>
+    <table>
+      <thead><tr><th>Record</th><th>Relation to the time entry</th></tr></thead>
+      <tbody>
+        <tr><td>Person</td><td>Every entry belongs to exactly one person.</td></tr>
+        <tr><td>Project</td><td>Every entry is booked on exactly one project.</td></tr>
+        <tr><td>Activity</td><td>An entry may name one activity of its project; some projects require one.</td></tr>
+        <tr><td>Tag</td><td>An entry carries any number of tags; a tag is used by any number of entries.</td></tr>
+        <tr><td>Place</td><td>An entry may name the place where the work was done.</td></tr>
+        <tr><td>Planned entry</td><td>An actual entry may point to the planned entry it carries out; one plan can be carried out by several actual entries.</td></tr>
+        <tr><td>Billable entry</td><td>Made from approved entries; one billable entry covers one or more entries, and each entry belongs to at most one billable entry.</td></tr>
+        <tr><td>Audit record</td><td>Creating, changing, deleting, restoring and changing the status of an entry each write an audit record.</td></tr>
+        <tr><td>Cloud Hub link</td><td>When an entry is sent to the Cloud Hub, one link records whether it arrived.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Time entry</h2>
+    <p>The names are the column names of the time entries export.</p>
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Values and meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>Identifier</td><td>Yes</td><td>The entry's number in this installation.</td></tr>
+        <tr><td><code>date</code></td><td>Date</td><td>Yes</td><td>The day the entry is booked on.</td></tr>
+        <tr><td><code>user</code></td><td>Text</td><td>Yes</td><td>The person's name.</td></tr>
+        <tr><td><code>project</code></td><td>Text</td><td>Yes</td><td>The project's name.</td></tr>
+        <tr><td><code>activity</code></td><td>Text</td><td>No</td><td>The activity's name, empty when there is none.</td></tr>
+        <tr><td><code>description</code></td><td>Text</td><td>No</td><td>What was done. It may be empty, which the compliance status reports.</td></tr>
+        <tr><td><code>internalComment</code></td><td>Text</td><td>No</td><td>A note for the team, not meant for the customer.</td></tr>
+        <tr><td><code>durationMinutes</code></td><td>Whole number</td><td>Yes</td><td>The length in minutes, always more than 0. When start and end are set, it is the whole minutes between them.</td></tr>
+        <tr><td><code>durationHours</code></td><td>Decimal</td><td>Yes</td><td>The same length in hours, two decimals.</td></tr>
+        <tr><td><code>entryType</code></td><td>Text</td><td>Yes</td><td><code>actual</code>, <code>planned</code> or <code>requested</code>; see Entry types.</td></tr>
+        <tr><td><code>plannedEntryId</code></td><td>Identifier</td><td>No</td><td>For an actual entry: the planned entry it carries out.</td></tr>
+        <tr><td><code>status</code></td><td>Text</td><td>Yes</td><td><code>draft</code>, <code>submitted</code>, <code>approved</code>, <code>rejected</code>, <code>inquiry</code> or <code>converted</code>; see Status and locking.</td></tr>
+        <tr><td><code>complianceStatus</code></td><td>Text</td><td>Yes</td><td><code>description_missing</code>, <code>unclear</code>, <code>misleading</code> or <code>compliant</code>; see Compliance status.</td></tr>
+        <tr><td><code>workLocation</code></td><td>Text</td><td>No</td><td>The place's name.</td></tr>
+        <tr><td><code>source</code></td><td>Text</td><td>Yes</td><td>Where the entry came from: <code>manual</code> for entries made in the app, otherwise the import or feature that made it.</td></tr>
+        <tr><td><code>timezone</code></td><td>Time zone</td><td>Yes</td><td>The time zone the entry was recorded in; <code>date</code> is the day in this zone.</td></tr>
+        <tr><td><code>startUtc</code></td><td>Point in time</td><td>No</td><td>When the work started. Start and end are both set or both empty; an entry without them has only a length.</td></tr>
+        <tr><td><code>endUtc</code></td><td>Point in time</td><td>No</td><td>When the work ended.</td></tr>
+        <tr><td><code>deletedAt</code></td><td>Point in time</td><td>No</td><td>Set when the entry was deleted; see Deleting.</td></tr>
+        <tr><td><code>createdAt</code></td><td>Point in time</td><td>Yes</td><td>When the entry was created.</td></tr>
+        <tr><td><code>updatedAt</code></td><td>Point in time</td><td>Yes</td><td>When the entry last changed.</td></tr>
+        <tr><td><code>placeId</code></td><td>Identifier</td><td>No</td><td>The place's number in this installation.</td></tr>
+        <tr><td><code>placeKind</code></td><td>Text</td><td>No</td><td>The kind of place; see Places.</td></tr>
+        <tr><td><code>placeCountry</code></td><td>Country</td><td>No</td><td>The place's country.</td></tr>
+      </tbody>
+    </table>
+    <p>The app also keeps an entry's tags and the comment given with its last status change. They are not part of the export today.</p>
+
+    <h2>Entry types</h2>
+    <ul>
+      <li><code>actual</code>: time that was worked. Only actual entries count as worked time, go to billing and are sent to the Cloud Hub.</li>
+      <li><code>planned</code>: time that is scheduled, for example from planning or from a calendar.</li>
+      <li><code>requested</code>: time that was asked for but not committed, for example a meeting invitation not yet accepted.</li>
+    </ul>
+    <p>The type of an entry does not change. Carrying out a plan creates a new actual entry that points to the plan, and the plan stays as it was. Entries imported from a calendar keep the event's reference, so importing again updates them instead of adding copies.</p>
+
+    <h2>Status and locking</h2>
+    <p>A new entry is a draft. Only drafts can be changed; to change an entry in another status, it goes back to draft first.</p>
+    <table>
+      <thead><tr><th>From</th><th>To</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>draft</code></td><td><code>submitted</code></td><td>The person hands the entry in.</td></tr>
+        <tr><td><code>submitted</code></td><td><code>approved</code></td><td>The entry is accepted.</td></tr>
+        <tr><td><code>submitted</code></td><td><code>rejected</code></td><td>The entry is not accepted, optionally with a comment.</td></tr>
+        <tr><td><code>submitted</code></td><td><code>inquiry</code></td><td>A question about the entry, optionally with a comment.</td></tr>
+        <tr><td><code>submitted</code>, <code>approved</code>, <code>rejected</code>, <code>inquiry</code></td><td><code>draft</code></td><td>The entry is opened again for changes.</td></tr>
+        <tr><td><code>approved</code></td><td><code>converted</code></td><td>Only through billing: the entry became part of a billable entry. Removing that billable entry returns it to <code>approved</code>.</td></tr>
+      </tbody>
+    </table>
+    <p>Every status change writes an audit record.</p>
+
+    <h2>Compliance status</h2>
+    <p>The compliance status says whether the description is good enough to bill. An empty description is always <code>description_missing</code>. A filled description is <code>compliant</code>, unless someone marked it <code>unclear</code> or <code>misleading</code>.</p>
+
+    <h2>Deleting</h2>
+    <ul>
+      <li>Deleting an entry sets <code>deletedAt</code>; the entry can be restored. The time entries export leaves deleted entries out.</li>
+      <li>An entry that was deleted can then be deleted forever. Its last state stays in the audit trail.</li>
+      <li>A converted entry cannot be deleted, because a billable entry refers to it.</li>
+    </ul>
+
+    <h2>Projects and activities</h2>
+    <p>A project has a name, a type, an optional customer name, a colour and a setting for whether its time is billable by default. Its type is one of <code>work</code>, <code>private</code>, <code>public_holiday</code>, <code>vacation</code> or <code>absence</code>.</p>
+    <p>An activity belongs to exactly one project. Activities can be nested under a parent activity to form a work breakdown, carry a code, and override the project's billable setting.</p>
+
+    <h2>Tags</h2>
+    <p>A tag has a name, unique in the installation, and a colour. Entries and tags are linked many to many.</p>
+
+    <h2>Places</h2>
+    <p>A place has a name, a kind, an optional address with country, and optional coordinates. Its kind is one of <code>home</code>, <code>remote</code>, <code>office</code>, <code>customer</code>, <code>collection_point</code>, <code>work_area</code>, <code>transit</code>, <code>other</code> or <code>unclassified</code>. A place can belong to one person or be shared in the installation.</p>
+
+    <h2>Billable entries</h2>
+    <p>Billing turns approved actual entries into billable entries. It groups them by day, project and person and applies the billing rules, which can round and cap the time. The entries it used become <code>converted</code>.</p>
+    <table>
+      <thead><tr><th>Column</th><th>Values and meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>The billable entry's number in this installation.</td></tr>
+        <tr><td><code>date</code></td><td>The day.</td></tr>
+        <tr><td><code>user</code></td><td>The person's name.</td></tr>
+        <tr><td><code>project</code></td><td>The project's name.</td></tr>
+        <tr><td><code>description</code></td><td>The text for the invoice, made from the entries' descriptions or written by hand.</td></tr>
+        <tr><td><code>durationMinutes</code>, <code>durationHours</code></td><td>The billable length after the rules.</td></tr>
+        <tr><td><code>status</code></td><td><code>open</code> or <code>exported_for_billing</code>.</td></tr>
+        <tr><td><code>batchId</code></td><td>The export that locked it, <code>B-</code> followed by the export's date and time in UTC, for example <code>B-20261021-073000</code>.</td></tr>
+        <tr><td><code>exportedAt</code></td><td>When it was exported for billing.</td></tr>
+        <tr><td><code>adjustments</code></td><td>What the rules changed.</td></tr>
+        <tr><td><code>linkedEntryIds</code></td><td>The numbers of the time entries it was made from, separated by spaces.</td></tr>
+      </tbody>
+    </table>
+    <p>Exporting for billing locks the billable entries it marks, so nothing is billed twice. A locked billable entry can be unlocked, which makes it <code>open</code> again.</p>
+
+    <h2>Audit trail</h2>
+    <p>Every change writes one audit record, and the audit trail export holds them with these columns:</p>
+    <ul>
+      <li><code>id</code>: the record's number.</li>
+      <li><code>entity</code> and <code>entityId</code>: what was changed, for example a time entry and its number.</li>
+      <li><code>action</code>: <code>create</code>, <code>update</code>, <code>delete</code>, <code>restore</code>, <code>purge</code> (deleted forever) or <code>status_change</code>.</li>
+      <li><code>changes</code>: as JSON, the old and the new value of each changed field; for a new or a forever deleted entry, its whole state.</li>
+      <li><code>actor</code>: the name of the person who made the change.</li>
+      <li><code>atUtc</code>: when, as a point in time.</li>
+    </ul>
+
+    <h2>Sending to the Cloud Hub</h2>
+    <p>Only approved actual entries that are not deleted are sent to your TIMEperative Cloud Hub. For each entry the app keeps whether it is waiting, arrived or failed, with the error. Entries that arrived are not sent again, and where the Cloud Hub supports it, it recognises an entry it already has, so sending again adds no copy.</p>
+
+    <h2>Exports today</h2>
+    <ul>
+      <li>Time entries, billable entries and the audit trail export as CSV: UTF-8, comma separated, one header row, values in quotes where they need them.</li>
+      <li>The time entries export holds the entries the list shows, with its filters.</li>
+      <li>New columns have so far been added at the end, so readers that address columns by position keep working.</li>
+      <li>Identifiers are unique within one installation only. Two installations number their entries independently.</li>
+    </ul>
+  </div>
+</section>

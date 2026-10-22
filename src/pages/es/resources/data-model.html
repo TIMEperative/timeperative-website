@@ -1,0 +1,166 @@
+<!--
+title: Modelo de datos de las entradas de tiempo
+description: Campos, reglas y estados de una entrada de tiempo de TIMEperative y de los registros a su alrededor, para importar, exportar, integrar o auditar horas.
+nav: resources
+-->
+<div class="container page-head">
+  <h1>Modelo de datos de las entradas de tiempo</h1>
+  <p class="lead">Qué contiene una entrada de tiempo en TIMEperative, qué reglas sigue y cómo se relaciona con los proyectos, la facturación y el registro de auditoría.</p>
+</div>
+
+<section class="section">
+  <div class="container prose">
+    <h2>Acerca de esta referencia</h2>
+    <p>Esta página es para quienes leen las exportaciones de TIMEperative, las cargan en otro sistema o las revisan en una auditoría. Describe los datos tal como la aplicación los guarda hoy, versión 0.1.0-alpha.16, contrastados con el código de la aplicación el 21 de octubre de 2026. TIMEperative está en acceso anticipado, así que pueden añadirse campos; esta página cambia con ellos.</p>
+    <p>Cada instalación guarda sus datos en una base de datos en el dispositivo, en Windows o en Android. No hay ningún servidor de TIMEperative. Los datos solo salen del dispositivo cuando los exportas o envías entradas a tu TIMEperative Cloud Hub, que necesita la aplicación independiente TIMEperative.sync. La <a href="/privacy/">política de privacidad</a> enumera cada conexión.</p>
+
+    <h2>Convenciones</h2>
+    <table>
+      <thead><tr><th>Tipo de valor</th><th>Formato</th><th>Ejemplo</th></tr></thead>
+      <tbody>
+        <tr><td>Fecha</td><td>Fecha de calendario ISO 8601, AAAA-MM-DD, el día en la zona horaria de la entrada</td><td><code>2026-10-21</code></td></tr>
+        <tr><td>Instante</td><td>ISO 8601 en UTC, al segundo, terminado en Z</td><td><code>2026-10-21T07:30:00Z</code></td></tr>
+        <tr><td>Zona horaria</td><td>Nombre de zona horaria de la IANA</td><td><code>Europe/Zurich</code></td></tr>
+        <tr><td>Duración</td><td>Minutos enteros; en las exportaciones, también en horas con dos decimales y un punto</td><td><code>90</code>, <code>1.50</code></td></tr>
+        <tr><td>Identificador</td><td>Número entero, único dentro de una instalación</td><td><code>4711</code></td></tr>
+        <tr><td>País</td><td>Código ISO 3166-1 alfa-2 en mayúsculas</td><td><code>CH</code></td></tr>
+      </tbody>
+    </table>
+    <p>Las exportaciones mantienen estos formatos, sea cual sea el idioma y el formato regional que uses en la aplicación.</p>
+
+    <h2>Visión general</h2>
+    <p>La entrada de tiempo es el centro. Todo lo demás la describe o se crea a partir de ella.</p>
+    <table>
+      <thead><tr><th>Registro</th><th>Relación con la entrada de tiempo</th></tr></thead>
+      <tbody>
+        <tr><td>Persona</td><td>Cada entrada pertenece exactamente a una persona.</td></tr>
+        <tr><td>Proyecto</td><td>Cada entrada se imputa a exactamente un proyecto.</td></tr>
+        <tr><td>Actividad</td><td>Una entrada puede indicar una actividad de su proyecto; algunos proyectos la exigen.</td></tr>
+        <tr><td>Etiqueta</td><td>Una entrada lleva cualquier número de etiquetas; una etiqueta se usa en cualquier número de entradas.</td></tr>
+        <tr><td>Lugar</td><td>Una entrada puede indicar el lugar donde se hizo el trabajo.</td></tr>
+        <tr><td>Entrada planificada</td><td>Una entrada real puede apuntar a la entrada planificada que lleva a cabo; un plan puede llevarse a cabo con varias entradas reales.</td></tr>
+        <tr><td>Entrada facturable</td><td>Se crea a partir de entradas aprobadas; una entrada facturable abarca una o varias entradas, y cada entrada pertenece como mucho a una entrada facturable.</td></tr>
+        <tr><td>Registro de auditoría</td><td>Crear, modificar, eliminar, restaurar y cambiar el estado de una entrada escriben cada uno un registro de auditoría.</td></tr>
+        <tr><td>Vínculo con el Cloud Hub</td><td>Cuando una entrada se envía al Cloud Hub, un vínculo registra si ha llegado.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Entrada de tiempo</h2>
+    <p>Los nombres son los de las columnas de la exportación de entradas de tiempo.</p>
+    <table>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Valores y significado</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>Identificador</td><td>Sí</td><td>El número de la entrada en esta instalación.</td></tr>
+        <tr><td><code>date</code></td><td>Fecha</td><td>Sí</td><td>El día al que se imputa la entrada.</td></tr>
+        <tr><td><code>user</code></td><td>Texto</td><td>Sí</td><td>El nombre de la persona.</td></tr>
+        <tr><td><code>project</code></td><td>Texto</td><td>Sí</td><td>El nombre del proyecto.</td></tr>
+        <tr><td><code>activity</code></td><td>Texto</td><td>No</td><td>El nombre de la actividad, vacío si no hay ninguna.</td></tr>
+        <tr><td><code>description</code></td><td>Texto</td><td>No</td><td>Lo que se hizo. Puede estar vacío, y el estado de cumplimiento lo indica.</td></tr>
+        <tr><td><code>internalComment</code></td><td>Texto</td><td>No</td><td>Una nota para el equipo, no pensada para el cliente.</td></tr>
+        <tr><td><code>durationMinutes</code></td><td>Número entero</td><td>Sí</td><td>La duración en minutos, siempre mayor que 0. Si hay inicio y fin, son los minutos enteros entre ambos.</td></tr>
+        <tr><td><code>durationHours</code></td><td>Decimal</td><td>Sí</td><td>La misma duración en horas, con dos decimales.</td></tr>
+        <tr><td><code>entryType</code></td><td>Texto</td><td>Sí</td><td><code>actual</code>, <code>planned</code> o <code>requested</code>; consulta Tipos de entrada.</td></tr>
+        <tr><td><code>plannedEntryId</code></td><td>Identificador</td><td>No</td><td>En una entrada real: la entrada planificada que lleva a cabo.</td></tr>
+        <tr><td><code>status</code></td><td>Texto</td><td>Sí</td><td><code>draft</code>, <code>submitted</code>, <code>approved</code>, <code>rejected</code>, <code>inquiry</code> o <code>converted</code>; consulta Estado y bloqueo.</td></tr>
+        <tr><td><code>complianceStatus</code></td><td>Texto</td><td>Sí</td><td><code>description_missing</code>, <code>unclear</code>, <code>misleading</code> o <code>compliant</code>; consulta Estado de cumplimiento.</td></tr>
+        <tr><td><code>workLocation</code></td><td>Texto</td><td>No</td><td>El nombre del lugar.</td></tr>
+        <tr><td><code>source</code></td><td>Texto</td><td>Sí</td><td>De dónde viene la entrada: <code>manual</code> para las entradas hechas en la aplicación; si no, la importación o la función que la creó.</td></tr>
+        <tr><td><code>timezone</code></td><td>Zona horaria</td><td>Sí</td><td>La zona horaria en la que se registró la entrada; <code>date</code> es el día en esa zona.</td></tr>
+        <tr><td><code>startUtc</code></td><td>Instante</td><td>No</td><td>Cuándo empezó el trabajo. Inicio y fin están ambos definidos o ambos vacíos; una entrada sin ellos solo tiene una duración.</td></tr>
+        <tr><td><code>endUtc</code></td><td>Instante</td><td>No</td><td>Cuándo terminó el trabajo.</td></tr>
+        <tr><td><code>deletedAt</code></td><td>Instante</td><td>No</td><td>Se rellena cuando la entrada se ha eliminado; consulta Eliminar.</td></tr>
+        <tr><td><code>createdAt</code></td><td>Instante</td><td>Sí</td><td>Cuándo se creó la entrada.</td></tr>
+        <tr><td><code>updatedAt</code></td><td>Instante</td><td>Sí</td><td>Cuándo cambió la entrada por última vez.</td></tr>
+        <tr><td><code>placeId</code></td><td>Identificador</td><td>No</td><td>El número del lugar en esta instalación.</td></tr>
+        <tr><td><code>placeKind</code></td><td>Texto</td><td>No</td><td>El tipo de lugar; consulta Lugares.</td></tr>
+        <tr><td><code>placeCountry</code></td><td>País</td><td>No</td><td>El país del lugar.</td></tr>
+      </tbody>
+    </table>
+    <p>La aplicación también guarda las etiquetas de una entrada y el comentario de su último cambio de estado. Hoy no forman parte de la exportación.</p>
+
+    <h2>Tipos de entrada</h2>
+    <ul>
+      <li><code>actual</code>: tiempo trabajado. Solo las entradas reales cuentan como tiempo trabajado, pasan a facturación y se envían al Cloud Hub.</li>
+      <li><code>planned</code>: tiempo programado, por ejemplo desde la planificación o desde un calendario.</li>
+      <li><code>requested</code>: tiempo solicitado pero no confirmado, por ejemplo una invitación a una reunión aún no aceptada.</li>
+    </ul>
+    <p>El tipo de una entrada no cambia. Llevar a cabo un plan crea una nueva entrada real que apunta al plan, y el plan queda como estaba. Las entradas importadas de un calendario guardan la referencia del evento, así que importar de nuevo las actualiza en lugar de añadir copias.</p>
+
+    <h2>Estado y bloqueo</h2>
+    <p>Una entrada nueva es un borrador. Solo los borradores se pueden cambiar; para cambiar una entrada en otro estado, primero vuelve a borrador.</p>
+    <table>
+      <thead><tr><th>De</th><th>A</th><th>Significado</th></tr></thead>
+      <tbody>
+        <tr><td><code>draft</code></td><td><code>submitted</code></td><td>La persona presenta la entrada.</td></tr>
+        <tr><td><code>submitted</code></td><td><code>approved</code></td><td>La entrada se aprueba.</td></tr>
+        <tr><td><code>submitted</code></td><td><code>rejected</code></td><td>La entrada se rechaza, con un comentario opcional.</td></tr>
+        <tr><td><code>submitted</code></td><td><code>inquiry</code></td><td>Una consulta sobre la entrada, con un comentario opcional.</td></tr>
+        <tr><td><code>submitted</code>, <code>approved</code>, <code>rejected</code>, <code>inquiry</code></td><td><code>draft</code></td><td>La entrada se vuelve a abrir para cambiarla.</td></tr>
+        <tr><td><code>approved</code></td><td><code>converted</code></td><td>Solo mediante la facturación: la entrada pasó a formar parte de una entrada facturable. Al quitar esa entrada facturable, vuelve a <code>approved</code>.</td></tr>
+      </tbody>
+    </table>
+    <p>Cada cambio de estado escribe un registro de auditoría.</p>
+
+    <h2>Estado de cumplimiento</h2>
+    <p>El estado de cumplimiento indica si la descripción basta para facturar. Una descripción vacía es siempre <code>description_missing</code>. Una descripción rellenada es <code>compliant</code>, salvo que alguien la haya marcado como <code>unclear</code> o <code>misleading</code>.</p>
+
+    <h2>Eliminar</h2>
+    <ul>
+      <li>Eliminar una entrada rellena <code>deletedAt</code>; la entrada se puede restaurar. La exportación de entradas de tiempo deja fuera las entradas eliminadas.</li>
+      <li>Una entrada eliminada puede después eliminarse para siempre. Su último estado queda en el registro de auditoría.</li>
+      <li>Una entrada convertida no se puede eliminar, porque una entrada facturable hace referencia a ella.</li>
+    </ul>
+
+    <h2>Proyectos y actividades</h2>
+    <p>Un proyecto tiene un nombre, un tipo, un nombre de cliente opcional, un color y un ajuste que indica si su tiempo es facturable por defecto. Su tipo es <code>work</code>, <code>private</code>, <code>public_holiday</code>, <code>vacation</code> o <code>absence</code>.</p>
+    <p>Una actividad pertenece exactamente a un proyecto. Las actividades se pueden anidar bajo una actividad superior para formar un desglose del trabajo, llevar un código y anular el ajuste de facturación del proyecto.</p>
+
+    <h2>Etiquetas</h2>
+    <p>Una etiqueta tiene un nombre, único en la instalación, y un color. Las entradas y las etiquetas se relacionan de muchos a muchos.</p>
+
+    <h2>Lugares</h2>
+    <p>Un lugar tiene un nombre, un tipo, una dirección opcional con país y unas coordenadas opcionales. Su tipo es <code>home</code>, <code>remote</code>, <code>office</code>, <code>customer</code>, <code>collection_point</code>, <code>work_area</code>, <code>transit</code>, <code>other</code> o <code>unclassified</code>. Un lugar puede pertenecer a una persona o compartirse en la instalación.</p>
+
+    <h2>Entradas facturables</h2>
+    <p>La facturación convierte las entradas reales aprobadas en entradas facturables. Las agrupa por día, proyecto y persona y aplica las reglas de facturación, que pueden redondear y limitar el tiempo. Las entradas usadas pasan a <code>converted</code>.</p>
+    <table>
+      <thead><tr><th>Columna</th><th>Valores y significado</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>El número de la entrada facturable en esta instalación.</td></tr>
+        <tr><td><code>date</code></td><td>El día.</td></tr>
+        <tr><td><code>user</code></td><td>El nombre de la persona.</td></tr>
+        <tr><td><code>project</code></td><td>El nombre del proyecto.</td></tr>
+        <tr><td><code>description</code></td><td>El texto para la factura, hecho a partir de las descripciones de las entradas o escrito a mano.</td></tr>
+        <tr><td><code>durationMinutes</code>, <code>durationHours</code></td><td>La duración facturable después de las reglas.</td></tr>
+        <tr><td><code>status</code></td><td><code>open</code> o <code>exported_for_billing</code>.</td></tr>
+        <tr><td><code>batchId</code></td><td>La exportación que la bloqueó: <code>B-</code> seguido de la fecha y la hora de la exportación en UTC, por ejemplo <code>B-20261021-073000</code>.</td></tr>
+        <tr><td><code>exportedAt</code></td><td>Cuándo se exportó para facturar.</td></tr>
+        <tr><td><code>adjustments</code></td><td>Lo que cambiaron las reglas.</td></tr>
+        <tr><td><code>linkedEntryIds</code></td><td>Los números de las entradas de tiempo de las que procede, separados por espacios.</td></tr>
+      </tbody>
+    </table>
+    <p>Exportar para facturar bloquea las entradas facturables que marca, para que nada se facture dos veces. Una entrada facturable bloqueada se puede desbloquear, y vuelve a ser <code>open</code>.</p>
+
+    <h2>Registro de auditoría</h2>
+    <p>Cada cambio escribe un registro de auditoría, y la exportación del registro de auditoría los contiene con estas columnas:</p>
+    <ul>
+      <li><code>id</code>: el número del registro.</li>
+      <li><code>entity</code> y <code>entityId</code>: qué se cambió, por ejemplo una entrada de tiempo y su número.</li>
+      <li><code>action</code>: <code>create</code>, <code>update</code>, <code>delete</code>, <code>restore</code>, <code>purge</code> (eliminada para siempre) o <code>status_change</code>.</li>
+      <li><code>changes</code>: en JSON, el valor anterior y el nuevo de cada campo cambiado; en una entrada nueva o eliminada para siempre, su estado completo.</li>
+      <li><code>actor</code>: el nombre de la persona que hizo el cambio.</li>
+      <li><code>atUtc</code>: cuándo, como instante.</li>
+    </ul>
+
+    <h2>Envío al Cloud Hub</h2>
+    <p>A tu TIMEperative Cloud Hub solo se envían las entradas reales aprobadas que no estén eliminadas. Para cada entrada, la aplicación guarda si está en espera, si llegó o si falló, con el error. Las entradas que llegaron no se vuelven a enviar y, cuando el Cloud Hub lo admite, reconoce una entrada que ya tiene, así que volver a enviar no añade ninguna copia.</p>
+
+    <h2>Exportaciones hoy</h2>
+    <ul>
+      <li>Las entradas de tiempo, las entradas facturables y el registro de auditoría se exportan como CSV: UTF-8, separado por comas, una fila de encabezado y valores entre comillas donde hace falta.</li>
+      <li>La exportación de entradas de tiempo contiene las entradas que muestra la lista, con sus filtros.</li>
+      <li>Hasta ahora, las columnas nuevas se han añadido al final, así que los programas que leen las columnas por su posición siguen funcionando.</li>
+      <li>Los identificadores solo son únicos dentro de una instalación. Dos instalaciones numeran sus entradas de forma independiente.</li>
+    </ul>
+  </div>
+</section>
