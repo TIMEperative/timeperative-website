@@ -281,7 +281,6 @@ function render(page, ctx) {
     footerLinks,
     footerLabel: escapeHtml(t.footer.label),
     tagline: escapeHtml(t.tagline),
-    owner: escapeHtml(t.footer.owner),
     contact: escapeHtml(t.footer.contact),
     supportEmail: site.supportEmail,
     schemeLabel: escapeHtml(t.scheme.label),
