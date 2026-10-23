@@ -50,7 +50,7 @@ jobs:
           node-version: 22
       - name: Fetch the feeds, build and run the gates
         run: node scripts/email-domains.mjs ${{ inputs.allow_large_change && '--allow-large-change' || '' }}
-      - name: The report of source conflicts
+      - name: The report of source conflicts, and the registry this run built
         if: always()
         uses: actions/upload-artifact@v7
         with:
@@ -60,6 +60,8 @@ jobs:
           path: |
             .email-domains/source-conflicts.json
             .email-domains/summary.md
+            data/email-domains.json
+            data/email-domains-manifest.json
           retention-days: 30
           if-no-files-found: ignore
       - name: Changed?

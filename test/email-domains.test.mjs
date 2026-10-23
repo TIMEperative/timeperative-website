@@ -4,7 +4,7 @@ import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } f
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { domainToASCII } from "node:url";
-import { canonicalDomain, classifyDomain, emailDomain, groupRows, urlToASCII } from "../src/email-domains.js";
+import { canonicalDomain, classifyDomain, decide, emailDomain, groupRows, inWorker, POLICIES, urlToASCII } from "../src/email-domains.js";
 import { GROUPS } from "../src/email-domains.generated.js";
 import {
   FEEDS, FILES, build, buildRegistry, check, checkDelta, checkFeeds, checkHandList, checkRegistry, fetchFeed, nextVersion, parseFeed, registryText, validateSchema,
@@ -77,6 +77,26 @@ test("a lookup matches whole lines only, and explicitly listed subdomains", () =
   assert.equal(classifyDomain("ail.com", groups).email_domain_type, "CUSTOM_DOMAIN");
 });
 
+test("one policy per entry point (specification 10): the converter request refuses, the waitlist takes everything", () => {
+  const c = (type, confidence = "MEDIUM") => ({ email_domain_type: type, confidence });
+  assert.equal(decide("converter-request", c("WEBMAIL", "LOW")), "refuse");
+  assert.equal(decide("converter-request", c("ISP_PERSONAL")), "refuse");
+  assert.equal(decide("converter-request", c("DISPOSABLE", "HIGH")), "refuse");
+  assert.equal(decide("converter-request", c("DISPOSABLE")), "review");
+  assert.equal(decide("converter-request", c("ALIAS", "HIGH")), "review");
+  assert.equal(decide("converter-request", c("CUSTOM_DOMAIN", "LOW")), "accept");
+  assert.equal(decide("converter-request", c("UNKNOWN", "LOW")), "accept");
+  for (const type of ["WEBMAIL", "ISP_PERSONAL", "ALIAS", "DISPOSABLE", "CUSTOM_DOMAIN"]) assert.equal(decide("waitlist", c(type, "HIGH")), "accept");
+  assert.throws(() => decide("corporate-signup", c("WEBMAIL")), /no email domain policy/);
+  // Every rule the policies refuse on is in the Worker's subset, so the Worker can apply it.
+  for (const policy of Object.values(POLICIES)) {
+    for (const rule of policy.refuse) {
+      const [type, confidence] = rule.split(" ");
+      for (const conf of confidence ? [confidence] : ["HIGH", "MEDIUM", "LOW"]) assert.ok(inWorker({ type, confidence: conf }), rule);
+    }
+  }
+});
+
 // ------------------------------------------------------------ the committed files
 
 test("the committed registry, manifest, overrides, exclusions and the Worker's copy pass every check", () => {
@@ -89,6 +109,14 @@ test("the published files hold the specification's names and the overrides it re
   for (const [domain, type] of Object.entries(want)) assert.equal(overrides.find((o) => o.domain === domain)?.type, type, domain);
   const registry = readFileSync(join(ROOT, FILES.registry), "utf8");
   assert.doesNotMatch(registry, /"category"|PUBLIC_WEBMAIL|EMAIL_ALIAS/);
+});
+
+test("the Worker bundles every row but DISPOSABLE below HIGH, which the full registry keeps", () => {
+  const rows = JSON.parse(readFileSync(join(ROOT, FILES.registry), "utf8"));
+  assert.ok(rows.some((r) => r.type === "DISPOSABLE" && r.confidence === "MEDIUM"));
+  assert.deepEqual(Object.keys(GROUPS).filter((k) => k.startsWith("DISPOSABLE")), ["DISPOSABLE HIGH"]);
+  const bundled = Object.values(GROUPS).reduce((n, list) => n + list.split("\n").filter(Boolean).length, 0);
+  assert.equal(bundled, rows.filter(inWorker).length);
 });
 
 test("the registry is never a page asset: the build copies src/static and src/pages only", () => {

@@ -16,7 +16,7 @@ form only ever learns "please use your work address".
 | `email-domains-exclusions.json` | you, by hand | Reviewed false positives: domains the feeds list that the registry must not |
 | `email-domains.json` | the builder | The registry: `{ domain, type, sources, confidence }` per domain, sorted by domain |
 | `email-domains-manifest.json` | the builder | Version, build time, the feeds' hashes, counts and licences |
-| `../src/email-domains.generated.js` | the builder | The Worker's copy: the same domains grouped by type and confidence |
+| `../src/email-domains.generated.js` | the builder | The Worker's copy: every domain but DISPOSABLE below HIGH, grouped by type and confidence |
 | `*.schema.json` | rarely changes | JSON Schema of the three lists; Visual Studio Code checks the lists as you type (`.vscode/settings.json`) |
 
 The types are the specification's six: `WEBMAIL` (a public mailbox,
@@ -27,14 +27,25 @@ domain it does not list is `CUSTOM_DOMAIN` at run time, which says only that
 no list knows it, never that a company owns it. `confidence` is how sure the
 classification is (`HIGH`, `MEDIUM`, `LOW`), not how likely fraud is.
 
-## What the converter request does with it
+## What the forms do with it
+
+Each form has its policy in `src/email-domains.js` (`POLICIES`, one entry
+per entry point of the specification's section 10, and `decide()`); a
+corporate sign-up on the website, once it is defined, adds its entry there.
+The waitlist takes every type, as a newsletter does. The converter request:
 
 | Type of the address's domain | The request |
 |---|---|
 | `WEBMAIL`, `ISP_PERSONAL` (any confidence) | refused: "Please use your work email address. If your business has no domain of its own, write to us at support@timeperative.com." |
 | `DISPOSABLE` with `HIGH` (Castle lists it) | refused, same message |
-| `DISPOSABLE` with `MEDIUM` (only the community list), `ALIAS` | taken; the lead's description names the type, the confidence and the registry version |
-| not listed (`CUSTOM_DOMAIN`) | taken, the same note in the lead |
+| `ALIAS` | taken; the lead's description names the type, the confidence and the registry version |
+| not listed (`CUSTOM_DOMAIN`), or `DISPOSABLE` with `MEDIUM` (only the community list) | taken, the same note in the lead |
+
+The Worker bundles only what its policies refuse on, plus `ALIAS` for the
+note: about 6,000 domains, 87 KiB. The community list's 97,000 domains only
+ever label and never refuse, so they stay out of the Worker, and its note
+reads `CUSTOM_DOMAIN` for them; the system that receives the lead can label
+it from the full registry (below).
 
 Matching is exact, after IDNA: `gmail.com` never matches `sub.gmail.com`
 or `gmail.com.evil.test`. List a subdomain on its own when it needs a type.
@@ -115,6 +126,24 @@ registry stays as it was:
 Every build writes `.email-domains/source-conflicts.json` (each disagreement
 between the feeds, every exclusion applied, and the lines a feed held that
 were no domain) and `.email-domains/summary.md`; neither is committed.
+
+## For other systems: importing the registry
+
+Git is the one source: the owner edits the overrides and exclusions here
+and nowhere else, and every other system imports the generated files. A
+system that labels leads after the Worker created them (a scheduled action
+in the CRM, say) reads, from `main`:
+
+- `https://raw.githubusercontent.com/TIMEperative/timeperative-website/main/data/email-domains-manifest.json`
+  first, and only when its `registry_version` differs from the one imported
+  last,
+- `https://raw.githubusercontent.com/TIMEperative/timeperative-website/main/data/email-domains.json`
+  (10.5 MiB, 665 KiB gzipped), checks its SHA-256 against the manifest's
+  `registry_sha256`, and replaces its copy only when both match.
+
+It looks a domain up exactly as the Worker does (lowercase, IDNA, exact
+match) and never edits a domain on its own side. Each refresh run also keeps
+both files as its artifact for 30 days.
 
 ## The daily refresh
 

@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import worker, { latestInstaller, readSignup, addToWaitlist, waitlist, readConverterRequest, addConverterRequest, converterRequest, classifyEmail, refusedForConverter } from "../src/worker.js";
-import { groupRows } from "../src/email-domains.js";
+import worker, { latestInstaller, readSignup, addToWaitlist, waitlist, readConverterRequest, addConverterRequest, converterRequest, classifyEmail } from "../src/worker.js";
+import { decide, groupRows } from "../src/email-domains.js";
 import { REGISTRY_VERSION } from "../src/email-domains.generated.js";
 
 const json = (body, ok = true) => ({ ok, json: async () => body });
@@ -186,8 +186,10 @@ test("with the committed registry, Gmail, Bluewin, Proton and Mailinator are ref
   assert.equal(read("ana@duck.com").domain.email_domain_type, "ALIAS");
   assert.equal(read("ana@sub.gmail.com").domain.email_domain_type, "CUSTOM_DOMAIN");
   assert.equal(read("ana@gmail.com.evil.test").domain.email_domain_type, "CUSTOM_DOMAIN");
+  // The community list only labels, so it stays out of the Worker: its domains are taken.
+  assert.equal(read("ana@0-00.usa.cc").domain.email_domain_type, "CUSTOM_DOMAIN");
   assert.equal(classifyEmail("ana@firma.ch").registry_version, REGISTRY_VERSION);
-  assert.equal(refusedForConverter({ email_domain_type: "DISPOSABLE", confidence: "LOW" }), false);
+  assert.equal(decide("converter-request", { email_domain_type: "DISPOSABLE", confidence: "LOW" }), "review");
 });
 
 test("a converter request becomes one lead with the contact, the system and the number of people", async () => {
@@ -201,10 +203,10 @@ test("a converter request becomes one lead with the contact, the system and the 
   assert.equal(lead.email_from, "ana@firma.ch");
   assert.equal(lead.team_id, 3);
   assert.match(lead.description, /SAP system: SAP ERP 6\.0 \(ECC\), enhancement package 6 to 8\. People who would use it: 11 to 50\. Language of the page: de\./);
-  assert.ok(lead.description.endsWith(`Email domain: email_domain_type CUSTOM_DOMAIN, confidence LOW, registry ${REGISTRY_VERSION}.`));
+  assert.ok(lead.description.endsWith(`Email domain: email_domain_type CUSTOM_DOMAIN, confidence LOW, registry ${REGISTRY_VERSION} (the Worker leaves out DISPOSABLE below HIGH).`));
   const alias = odoo();
   await addConverterRequest(readConverterRequest(form({ ...REQUEST, email: "ana@maybe-burn.example" }), GROUPS, "test.1"), ENV, alias.fetcher);
-  assert.match(alias.calls[1].body.vals_list[0].description, /email_domain_type DISPOSABLE, confidence MEDIUM, registry test\.1\.$/);
+  assert.match(alias.calls[1].body.vals_list[0].description, /email_domain_type DISPOSABLE, confidence MEDIUM, registry test\.1 \(/);
   const again = odoo(1);
   assert.deepEqual(await addConverterRequest(request, ENV, again.fetcher), { ok: true, known: true });
   assert.equal(again.calls.length, 1);

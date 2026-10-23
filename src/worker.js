@@ -15,7 +15,7 @@
 //   - serves everything else from the static assets.
 
 import site from "./site.json" with { type: "json" };
-import { classifyDomain, emailDomain } from "./email-domains.js";
+import { classifyDomain, decide, emailDomain, OUTSIDE_THE_WORKER } from "./email-domains.js";
 import { GROUPS, REGISTRY_VERSION } from "./email-domains.generated.js";
 
 const ORIGIN = new URL(site.origin);
@@ -58,9 +58,8 @@ export function readSignup(form) {
   // The hidden field people never see: a filled one is a robot.
   if (String(form.get("website") ?? "") !== "") return { robot: true };
   if (!WAITLIST_PLATFORMS[platform]) return { error: "invalid" };
-  // Any plausible address: the waitlist is like a newsletter, where a public
-  // mail provider is what people use (owner's specification, section 10).
   if (!emailDomain(email)) return { error: "invalid" };
+  if (decide("waitlist", classifyEmail(email)) === "refuse") return { error: "personal" };
   return { email, platform, lang: site.languages.some((l) => l.code === lang) ? lang : "en" };
 }
 
@@ -138,23 +137,16 @@ export const SAP_SYSTEMS = {
 export const USER_COUNTS = { "1-10": "1 to 10", "11-50": "11 to 50", "51-250": "51 to 250", "251-1000": "251 to 1,000", "1000+": "more than 1,000" };
 
 // A request for a converter is a sales lead from a company, so it needs the
-// company's own address (owner, 2026-10-23). The registry's type of the
-// address's domain decides: a public mailbox (WEBMAIL), an internet
-// provider's (ISP_PERSONAL) and a throwaway address that Castle confirms
-// (DISPOSABLE, HIGH) are refused; a forwarding address (ALIAS) and one that
-// only the community list calls throwaway are taken, with the type in the
-// lead for the owner to judge. The browser learns only "personal", never the
-// type or the list.
-export const REFUSED_FOR_CONVERTER = ["WEBMAIL", "ISP_PERSONAL", "DISPOSABLE HIGH"];
+// company's own address (owner, 2026-10-23): the policy "converter-request"
+// in src/email-domains.js refuses public mailboxes, internet providers'
+// mailboxes and throwaway addresses Castle confirms, and takes the rest with
+// the type in the lead for the owner to judge. The browser learns only
+// "personal", never the type or the list.
 
 /** The registry's view of an address's domain: its type, its confidence and the registry's version. */
 export function classifyEmail(email, groups = GROUPS, version = REGISTRY_VERSION) {
   return { ...classifyDomain(emailDomain(email), groups), registry_version: version };
 }
-
-/** Whether a request for a converter from an address of this type is refused. */
-export const refusedForConverter = ({ email_domain_type: type, confidence }) =>
-  REFUSED_FOR_CONVERTER.includes(type) || REFUSED_FOR_CONVERTER.includes(`${type} ${confidence}`);
 
 const NAME = /^[^<>{}\[\]\\/@:;"=]{1,80}$/u;
 
@@ -171,7 +163,7 @@ export function readConverterRequest(form, groups = GROUPS, version = REGISTRY_V
   if (!emailDomain(email)) return { error: "invalid" };
   if (!NAME.test(firstName) || !NAME.test(lastName) || !SAP_SYSTEMS[system] || !USER_COUNTS[users]) return { error: "invalid" };
   const domain = classifyEmail(email, groups, version);
-  if (refusedForConverter(domain)) return { error: "personal" };
+  if (decide("converter-request", domain) === "refuse") return { error: "personal" };
   return { email, firstName, lastName, system, users, lang: site.languages.some((l) => l.code === lang) ? lang : "en", domain };
 }
 
@@ -182,7 +174,7 @@ export async function addConverterRequest(request, env, fetcher = fetch) {
     name: "TIMEperative converter for SAP: request",
     contact_name: `${request.firstName} ${request.lastName}`,
     email_from: request.email,
-    description: `Asked on ${ORIGIN.host} for a converter for SAP. SAP system: ${SAP_SYSTEMS[request.system]}. People who would use it: ${USER_COUNTS[request.users]}. Language of the page: ${request.lang}. Email domain: email_domain_type ${domain.email_domain_type}, confidence ${domain.confidence}, registry ${domain.registry_version}.`,
+    description: `Asked on ${ORIGIN.host} for a converter for SAP. SAP system: ${SAP_SYSTEMS[request.system]}. People who would use it: ${USER_COUNTS[request.users]}. Language of the page: ${request.lang}. Email domain: email_domain_type ${domain.email_domain_type}, confidence ${domain.confidence}, registry ${domain.registry_version} (the Worker leaves out ${OUTSIDE_THE_WORKER}).`,
   }, env, fetcher, "converter-request");
 }
 
