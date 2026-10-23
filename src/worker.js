@@ -9,10 +9,14 @@
 //     "stores") needs no new code;
 //   - takes the macOS and iOS waitlist sign-ups (POST /waitlist) and the
 //     requests for a converter for SAP (POST /converter-request) into the
-//     CRM, as leads created through the external JSON-2 API;
+//     CRM, as leads created through the external JSON-2 API; a request for a
+//     converter needs a work address, which the email domain registry
+//     (data/README.md) tells from a public mail provider's;
 //   - serves everything else from the static assets.
 
 import site from "./site.json" with { type: "json" };
+import { classifyDomain, emailDomain } from "./email-domains.js";
+import { GROUPS, REGISTRY_VERSION } from "./email-domains.generated.js";
 
 const ORIGIN = new URL(site.origin);
 
@@ -45,7 +49,6 @@ export async function latestInstaller(platform, stores = site.stores, fetcher = 
 // ------------------------------------------------------------ the waitlist
 
 export const WAITLIST_PLATFORMS = { macos: "macOS", ios: "iOS" };
-const EMAIL = /^[^\s@<>()[\]\\,;:"]{1,64}@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
 
 /** The sign-up a form sent, or the reason it cannot be taken. */
 export function readSignup(form) {
@@ -55,7 +58,9 @@ export function readSignup(form) {
   // The hidden field people never see: a filled one is a robot.
   if (String(form.get("website") ?? "") !== "") return { robot: true };
   if (!WAITLIST_PLATFORMS[platform]) return { error: "invalid" };
-  if (email.length > 254 || !EMAIL.test(email)) return { error: "invalid" };
+  // Any plausible address: the waitlist is like a newsletter, where a public
+  // mail provider is what people use (owner's specification, section 10).
+  if (!emailDomain(email)) return { error: "invalid" };
   return { email, platform, lang: site.languages.some((l) => l.code === lang) ? lang : "en" };
 }
 
@@ -132,17 +137,29 @@ export const SAP_SYSTEMS = {
 };
 export const USER_COUNTS = { "1-10": "1 to 10", "11-50": "11 to 50", "51-250": "51 to 250", "251-1000": "251 to 1,000", "1000+": "more than 1,000" };
 
-// Addresses anyone can open for themselves: a request needs the company's own.
-export const PERSONAL_MAIL = new Set([
-  "aol.com", "bluewin.ch", "gmail.com", "googlemail.com", "gmx.at", "gmx.ch", "gmx.de", "gmx.net", "hotmail.ch", "hotmail.com",
-  "hotmail.de", "icloud.com", "live.com", "mac.com", "mail.com", "me.com", "msn.com", "outlook.com", "outlook.de", "proton.me",
-  "protonmail.com", "t-online.de", "web.de", "yahoo.com", "yahoo.de", "yandex.com",
-]);
+// A request for a converter is a sales lead from a company, so it needs the
+// company's own address (owner, 2026-10-23). The registry's type of the
+// address's domain decides: a public mailbox (WEBMAIL), an internet
+// provider's (ISP_PERSONAL) and a throwaway address that Castle confirms
+// (DISPOSABLE, HIGH) are refused; a forwarding address (ALIAS) and one that
+// only the community list calls throwaway are taken, with the type in the
+// lead for the owner to judge. The browser learns only "personal", never the
+// type or the list.
+export const REFUSED_FOR_CONVERTER = ["WEBMAIL", "ISP_PERSONAL", "DISPOSABLE HIGH"];
+
+/** The registry's view of an address's domain: its type, its confidence and the registry's version. */
+export function classifyEmail(email, groups = GROUPS, version = REGISTRY_VERSION) {
+  return { ...classifyDomain(emailDomain(email), groups), registry_version: version };
+}
+
+/** Whether a request for a converter from an address of this type is refused. */
+export const refusedForConverter = ({ email_domain_type: type, confidence }) =>
+  REFUSED_FOR_CONVERTER.includes(type) || REFUSED_FOR_CONVERTER.includes(`${type} ${confidence}`);
 
 const NAME = /^[^<>{}\[\]\\/@:;"=]{1,80}$/u;
 
 /** The converter request a form sent, or the reason it cannot be taken. */
-export function readConverterRequest(form) {
+export function readConverterRequest(form, groups = GROUPS, version = REGISTRY_VERSION) {
   const field = (name) => String(form.get(name) ?? "").trim();
   if (field("website") !== "") return { robot: true };
   const email = field("email");
@@ -151,19 +168,21 @@ export function readConverterRequest(form) {
   const system = field("system");
   const users = field("users");
   const lang = field("lang");
-  if (email.length > 254 || !EMAIL.test(email)) return { error: "invalid" };
+  if (!emailDomain(email)) return { error: "invalid" };
   if (!NAME.test(firstName) || !NAME.test(lastName) || !SAP_SYSTEMS[system] || !USER_COUNTS[users]) return { error: "invalid" };
-  if (PERSONAL_MAIL.has(email.split("@")[1].toLowerCase())) return { error: "personal" };
-  return { email, firstName, lastName, system, users, lang: site.languages.some((l) => l.code === lang) ? lang : "en" };
+  const domain = classifyEmail(email, groups, version);
+  if (refusedForConverter(domain)) return { error: "personal" };
+  return { email, firstName, lastName, system, users, lang: site.languages.some((l) => l.code === lang) ? lang : "en", domain };
 }
 
 /** The request as a lead in the CRM. */
 export async function addConverterRequest(request, env, fetcher = fetch) {
+  const domain = request.domain ?? classifyEmail(request.email);
   return addLead({
     name: "TIMEperative converter for SAP: request",
     contact_name: `${request.firstName} ${request.lastName}`,
     email_from: request.email,
-    description: `Asked on ${ORIGIN.host} for a converter for SAP. SAP system: ${SAP_SYSTEMS[request.system]}. People who would use it: ${USER_COUNTS[request.users]}. Language of the page: ${request.lang}.`,
+    description: `Asked on ${ORIGIN.host} for a converter for SAP. SAP system: ${SAP_SYSTEMS[request.system]}. People who would use it: ${USER_COUNTS[request.users]}. Language of the page: ${request.lang}. Email domain: email_domain_type ${domain.email_domain_type}, confidence ${domain.confidence}, registry ${domain.registry_version}.`,
   }, env, fetcher, "converter-request");
 }
 

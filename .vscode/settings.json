@@ -1,0 +1,7 @@
+{
+  "json.schemas": [
+    { "fileMatch": ["/data/email-domains-overrides.json"], "url": "./data/email-domains-overrides.schema.json" },
+    { "fileMatch": ["/data/email-domains-exclusions.json"], "url": "./data/email-domains-exclusions.schema.json" },
+    { "fileMatch": ["/data/email-domains.json"], "url": "./data/email-domains.schema.json" }
+  ]
+}

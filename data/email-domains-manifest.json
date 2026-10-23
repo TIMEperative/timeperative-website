@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "registry_version": "2026-10-23.1",
+  "built_at": "2026-10-23T08:36:21.245Z",
+  "ruleset_version": "converter-request-v1",
+  "row_count": 103418,
+  "counts": {
+    "by_type": {
+      "ALIAS": 59,
+      "DISPOSABLE": 98507,
+      "ISP_PERSONAL": 2,
+      "WEBMAIL": 4850
+    },
+    "by_type_and_confidence": {
+      "ALIAS HIGH": 2,
+      "ALIAS MEDIUM": 57,
+      "DISPOSABLE HIGH": 1000,
+      "DISPOSABLE MEDIUM": 97507,
+      "ISP_PERSONAL HIGH": 2,
+      "WEBMAIL HIGH": 4,
+      "WEBMAIL MEDIUM": 4846
+    }
+  },
+  "registry_sha256": "sha256:51549c8bd0770aa611729b88705a07c21091750b6545313183f089eff498212e",
+  "source_versions": {
+    "free-email-providers": "sha256:cbd32ff0f6302921631b49e687cf58d22ab8a7fcc4885e606a5777994b93fdf6",
+    "castle-disposable": "sha256:438a5a84028b03ab276428c02a98539ade88402cc1d94a94ad8ebd888acd0608",
+    "disposable-community": "sha256:ba19d6735fc2224db58d3eaa9bb294de43437a488133c4271fb07d0ad4436fc7",
+    "forwarding-combined": "sha256:9c6ec8501e8f18aa7d23cd268859ad5cde027f3b572f779dfb4aeba883dae570"
+  },
+  "source_counts": {
+    "free-email-providers": 33228,
+    "castle-disposable": 1000,
+    "disposable-community": 98465,
+    "forwarding-combined": 98527
+  },
+  "sources": {
+    "free-email-providers": {
+      "url": "https://www.validemailchecker.com/free-email-provider-domains.txt",
+      "repository": "https://github.com/Validemailchecker/free-email-provider-domains",
+      "licence": "MIT, Copyright (c) 2026 Valid Email Checker; aggregates Kikobeats/free-email-domains (MIT) and willwhite/freemail (MIT)"
+    },
+    "castle-disposable": {
+      "url": "https://raw.githubusercontent.com/castle/disposable-email-domains/master/disposable-email-domains.txt",
+      "repository": "https://github.com/castle/disposable-email-domains",
+      "licence": "MIT, Copyright (c) 2026 Castle"
+    },
+    "disposable-community": {
+      "url": "https://disposable.github.io/disposable-email-domains/domains.txt",
+      "repository": "https://github.com/disposable/disposable-email-domains",
+      "licence": "MIT, Copyright (c) 2017 Andrei Simionescu, Copyright (c) 2017 Stefan Meinecke, greenSec GmbH"
+    },
+    "forwarding-combined": {
+      "url": "https://disposable.github.io/disposable-email-domains/domains_forwarding.txt",
+      "repository": "https://github.com/disposable/disposable-email-domains",
+      "licence": "MIT, Copyright (c) 2017 Andrei Simionescu, Copyright (c) 2017 Stefan Meinecke, greenSec GmbH"
+    }
+  },
+  "conflicts": {
+    "free-provider-and-disposable": 28362,
+    "free-provider-and-alias": 18,
+    "castle-not-in-community": 42,
+    "override-differs-from-feeds": 1,
+    "excluded": 0
+  }
+}

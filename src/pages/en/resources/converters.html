@@ -21,7 +21,7 @@ nav: resources
 
     <h2 id="sap">A converter for SAP</h2>
     <p>Time sheets reach SAP in a different way at almost every company, so we build a converter for SAP together with a company that needs one. Tell us which SAP system you run and how many people would use TIMEperative with it.</p>
-    <form class="request-form" method="post" action="/converter-request" data-ok="Thank you. We will write to you about your converter for SAP." data-invalid="Please fill in every field and check your email address." data-personal="Please use your work email address." data-error="That did not work. Please try again later, or write to {{support.email}}.">
+    <form class="request-form" method="post" action="/converter-request" data-ok="Thank you. We will write to you about your converter for SAP." data-invalid="Please fill in every field and check your email address." data-personal="Please use your work email address. If your business has no domain of its own, write to us at {{support.email}}." data-error="That did not work. Please try again later, or write to {{support.email}}.">
       <input type="hidden" name="lang" value="en">
       <input type="hidden" name="page" value="/resources/converters/">
       <div class="request-grid">
@@ -73,7 +73,7 @@ nav: resources
       <p class="waitlist-status" role="status" aria-live="polite"></p>
       <p class="waitlist-done" id="sap-request-ok">Thank you. We will write to you about your converter for SAP.</p>
       <p class="waitlist-done" id="sap-request-invalid">Please fill in every field and check your email address.</p>
-      <p class="waitlist-done" id="sap-request-personal">Please use your work email address.</p>
+      <p class="waitlist-done" id="sap-request-personal">Please use your work email address. If your business has no domain of its own, write to us at {{support.email}}.</p>
       <p class="waitlist-done" id="sap-request-error">That did not work. Please try again later, or write to {{support.email}}.</p>
     </form>
   </div>

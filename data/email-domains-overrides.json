@@ -1,0 +1,10 @@
+[
+  { "domain": "bluewin.ch", "type": "ISP_PERSONAL", "reason": "Swiss consumer ISP", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
+  { "domain": "duck.com", "type": "ALIAS", "reason": "DuckDuckGo forwarding", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
+  { "domain": "gmail.com", "type": "WEBMAIL", "reason": "Public mailbox", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
+  { "domain": "hispeed.ch", "type": "ISP_PERSONAL", "reason": "Swiss consumer ISP", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
+  { "domain": "privaterelay.appleid.com", "type": "ALIAS", "reason": "Apple private relay", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
+  { "domain": "proton.me", "type": "WEBMAIL", "reason": "Privacy mailbox is included in WEBMAIL", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
+  { "domain": "protonmail.com", "type": "WEBMAIL", "reason": "Privacy mailbox is included in WEBMAIL", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
+  { "domain": "tuta.com", "type": "WEBMAIL", "reason": "Privacy mailbox is included in WEBMAIL", "reviewed_by": "owner", "reviewed_at": "2026-10-23" }
+]
