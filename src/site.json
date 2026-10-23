@@ -20,6 +20,6 @@
   ],
   "stores": ["TIMEperative/timeperative", "Acunomic/timeperative"],
   "releasePage": "https://github.com/Acunomic/timeperative/releases",
-  "workerRoutes": ["/download/windows", "/download/android", "/waitlist"],
+  "workerRoutes": ["/download/windows", "/download/android", "/waitlist", "/converter-request"],
   "supportEmail": "support@timeperative.com"
 }

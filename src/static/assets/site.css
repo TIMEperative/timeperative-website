@@ -318,6 +318,30 @@ a.platform:hover, summary.platform:hover { border-color: var(--ty-cc1-link); col
 .waitlist-done { display: none; }
 .waitlist-done:target { display: block; }
 
+/* ------------------------------------------------------------ requests */
+
+/* The request for a converter: the fields two by two on a wide screen, one
+   under the other on a phone; the messages are the waitlist's. */
+.request-form { margin-top: 1.25rem; max-width: 40rem; }
+.request-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1rem; }
+.request-wide { grid-column: 1 / -1; }
+.request-field label { display: block; font-weight: 600; margin-bottom: 0.35rem; color: var(--ty-cc1-heading); }
+.request-field input, .request-field select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 0.85rem;
+  border: 1px solid var(--ty-cc1-text);
+  border-radius: 10px;
+  background: var(--ty-cc1-bg);
+  color: var(--ty-cc1-text);
+  font: inherit;
+}
+.request-form .fine { font-size: 0.92rem; }
+@media (max-width: 640px) {
+  .request-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
 /* ------------------------------------------------------------ cards */
 
 .cards { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr)); list-style: none; padding: 0; margin: 1.5rem 0 0; }

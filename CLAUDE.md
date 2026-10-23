@@ -28,9 +28,12 @@ Cloudflare Workers. Read [README.md](README.md) first.
    `/download/android`): they follow the stores' update manifests, so a
    release needs no new build. `src/site.json` names the stores and the
    Worker routes.
-7. **The macOS and iOS waitlist** posts to the Worker (`/waitlist`), which
-   creates a lead in the CRM through the JSON-2 API with the secrets
-   `ODOO_URL`, `ODOO_DB` and `ODOO_API_KEY`. The privacy policy describes it.
+7. **The macOS and iOS waitlist** posts to the Worker (`/waitlist`), and so
+   does the request for a converter for SAP (`/converter-request`, on
+   Resources > Converters: a work address, first and last name, the SAP
+   system, the number of people); each creates a lead in the CRM through the
+   JSON-2 API with the secrets `ODOO_URL`, `ODOO_DB` and `ODOO_API_KEY`. The
+   privacy policy describes both.
 8. **Only what the app does today.** The privacy policy and the features
    page describe shipped behaviour, checked against the app's code and docs
    (youserpath/timely-you `docs/PRIVACY.md`); a change in the app that

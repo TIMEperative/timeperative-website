@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import worker, { latestInstaller, readSignup, addToWaitlist, waitlist } from "../src/worker.js";
+import worker, { latestInstaller, readSignup, addToWaitlist, waitlist, readConverterRequest, addConverterRequest, converterRequest } from "../src/worker.js";
 
 const json = (body, ok = true) => ({ ok, json: async () => body });
 const stores = ["New/store", "Old/store"];
@@ -128,4 +128,62 @@ test("a robot gets the same answer as a person and adds nothing", async () => {
   const res = await waitlist(post({ email: "ana@example.ch", platform: "ios", website: "x" }, { accept: "application/json" }), ENV, fetcher);
   assert.deepEqual(await res.json(), { ok: true });
   assert.equal(calls.length, 0);
+});
+
+// ------------------------------------------------------------ converter requests
+
+const REQUEST = { email: " ana@firma.ch ", first_name: "Ana", last_name: "Muster", system: "ecc-ehp6-8", users: "11-50", lang: "de" };
+
+test("a converter request needs a work address, both names and a choice in both lists; the hidden field marks a robot", () => {
+  assert.deepEqual(readConverterRequest(form(REQUEST)), { email: "ana@firma.ch", firstName: "Ana", lastName: "Muster", system: "ecc-ehp6-8", users: "11-50", lang: "de" });
+  assert.deepEqual(readConverterRequest(form({ ...REQUEST, email: "ana@Gmail.com" })), { error: "personal" });
+  assert.deepEqual(readConverterRequest(form({ ...REQUEST, email: "ana@firma" })), { error: "invalid" });
+  assert.deepEqual(readConverterRequest(form({ ...REQUEST, first_name: "" })), { error: "invalid" });
+  assert.deepEqual(readConverterRequest(form({ ...REQUEST, last_name: "<script>" })), { error: "invalid" });
+  assert.deepEqual(readConverterRequest(form({ ...REQUEST, system: "s5" })), { error: "invalid" });
+  assert.deepEqual(readConverterRequest(form({ ...REQUEST, users: "" })), { error: "invalid" });
+  assert.equal(readConverterRequest(form({ ...REQUEST, lang: "xx" })).lang, "en");
+  assert.deepEqual(readConverterRequest(form({ ...REQUEST, website: "http://spam" })), { robot: true });
+});
+
+test("a converter request becomes one lead with the contact, the system and the number of people", async () => {
+  const { calls, fetcher } = odoo();
+  const request = readConverterRequest(form(REQUEST));
+  assert.deepEqual(await addConverterRequest(request, ENV, fetcher), { ok: true });
+  assert.deepEqual(calls.map((c) => c.url), ["https://erp.example.com/json/2/crm.lead/search_count", "https://erp.example.com/json/2/crm.lead/create"]);
+  const [lead] = calls[1].body.vals_list;
+  assert.equal(lead.name, "TIMEperative converter for SAP: request");
+  assert.equal(lead.contact_name, "Ana Muster");
+  assert.equal(lead.email_from, "ana@firma.ch");
+  assert.equal(lead.team_id, 3);
+  assert.match(lead.description, /SAP system: SAP ERP 6\.0 \(ECC\), enhancement package 6 to 8\. People who would use it: 11 to 50\. Language of the page: de\./);
+  const again = odoo(1);
+  assert.deepEqual(await addConverterRequest(request, ENV, again.fetcher), { ok: true, known: true });
+  assert.equal(again.calls.length, 1);
+});
+
+const postRequest = (fields, headers = {}) => new Request("https://www.timeperative.com/converter-request", { method: "POST", body: form(fields), headers });
+
+test("the converter request answers script with JSON and a plain form with a redirect to its own message", async () => {
+  const { fetcher } = odoo();
+  const json = await converterRequest(postRequest(REQUEST, { accept: "application/json", origin: "https://www.timeperative.com" }), ENV, fetcher);
+  assert.equal(json.status, 200);
+  assert.deepEqual(await json.json(), { ok: true });
+  const personal = await converterRequest(postRequest({ ...REQUEST, email: "ana@gmail.com" }, { accept: "application/json" }), ENV, fetcher);
+  assert.equal(personal.status, 400);
+  assert.deepEqual(await personal.json(), { ok: false, error: "personal" });
+  const plain = await converterRequest(postRequest({ ...REQUEST, page: "/de/resources/converters/" }), ENV, fetcher);
+  assert.equal(plain.status, 303);
+  assert.equal(plain.headers.get("location"), "https://www.timeperative.com/de/resources/converters/#sap-request-ok");
+  const invalid = await converterRequest(postRequest({ ...REQUEST, system: "", page: "//evil.example/" }), ENV, fetcher);
+  assert.equal(invalid.headers.get("location"), "https://www.timeperative.com/#sap-request-invalid");
+});
+
+test("the converter request refuses another site's form and anything but POST; the Worker routes it", async () => {
+  const { calls, fetcher } = odoo();
+  assert.equal((await converterRequest(postRequest(REQUEST, { origin: "https://evil.example" }), ENV, fetcher)).status, 403);
+  assert.equal((await converterRequest(new Request("https://www.timeperative.com/converter-request"), ENV, fetcher)).status, 405);
+  assert.equal(calls.length, 0);
+  const res = await worker.fetch(new Request("https://www.timeperative.com/converter-request"), { ASSETS: { fetch: async () => new Response("asset") } });
+  assert.equal(res.status, 405);
 });

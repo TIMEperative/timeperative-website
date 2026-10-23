@@ -1,0 +1,80 @@
+<!--
+title: Convertidores: tus entradas para la importación de tu ERP
+description: Los convertidores pasarán tus entradas de TIMEperative al archivo de importación de tu ERP o sistema de RR. HH. Pídenos un convertidor para SAP.
+nav: resources
+-->
+<div class="container page-head">
+  <h1>Convertidores</h1>
+  <p class="lead">Un convertidor transforma las entradas que elijas en el archivo de importación que espera tu ERP o sistema de RR. HH.: sus columnas, sus formatos de fecha y número, sus listas y los valores que necesita. Ahora estamos desarrollando los primeros convertidores.</p>
+</div>
+
+<section class="section">
+  <div class="container prose">
+    <h2>Qué hará un convertidor</h2>
+    <ul>
+      <li>Escribe el archivo que acepta la importación de tu sistema, con los nombres de columna, los formatos y los valores de lista de tu instalación y su idioma.</li>
+      <li>Comprueba cada entrada antes de escribir el archivo y te indica cuáles necesitan tu atención.</li>
+      <li>Añade un identificador a cada entrada, en el campo que elijas, para que TIMEperative pueda emparejar los registros que crea tu sistema cuando vuelvas a leer su exportación.</li>
+      <li>Funciona en la aplicación, en tu dispositivo. Tus entradas solo llegan a tu sistema cuando tú mismo importas allí el archivo.</li>
+    </ul>
+    <p>Los convertidores aún no están en la aplicación. Empezamos con Microsoft Dynamics 365 Project Operations y después Oracle NetSuite y Microsoft Dynamics 365 Finance and Supply Chain Management. Las <a href="/news/">noticias</a> dirán cuándo está listo cada uno.</p>
+
+    <h2 id="sap">Un convertidor para SAP</h2>
+    <p>En casi cada empresa, las hojas de horas llegan a SAP por un camino distinto, así que desarrollamos un convertidor para SAP junto con una empresa que lo necesite. Dinos qué sistema SAP usas y cuántas personas usarían TIMEperative con él.</p>
+    <form class="request-form" method="post" action="/converter-request" data-ok="Gracias. Te escribiremos sobre tu convertidor para SAP." data-invalid="Rellena todos los campos y comprueba tu dirección de correo electrónico." data-personal="Usa tu dirección de correo electrónico del trabajo." data-error="No ha funcionado. Inténtalo de nuevo más tarde o escribe a {{support.email}}.">
+      <input type="hidden" name="lang" value="es">
+      <input type="hidden" name="page" value="/es/resources/converters/">
+      <div class="request-grid">
+        <p class="request-field request-wide">
+          <label for="sap-email">Tu dirección de correo electrónico del trabajo</label>
+          <input id="sap-email" type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email">
+        </p>
+        <p class="request-field">
+          <label for="sap-first-name">Nombre</label>
+          <input id="sap-first-name" type="text" name="first_name" required maxlength="80" autocomplete="given-name">
+        </p>
+        <p class="request-field">
+          <label for="sap-last-name">Apellidos</label>
+          <input id="sap-last-name" type="text" name="last_name" required maxlength="80" autocomplete="family-name">
+        </p>
+        <p class="request-field">
+          <label for="sap-system">Tu sistema SAP</label>
+          <select id="sap-system" name="system" required>
+            <option value="">Elige tu sistema</option>
+            <option value="r3">SAP R/3 4.x o anterior</option>
+            <option value="ecc-ehp0-5">SAP ERP 6.0 (ECC), enhancement package 0 a 5</option>
+            <option value="ecc-ehp6-8">SAP ERP 6.0 (ECC), enhancement package 6 a 8</option>
+            <option value="s4-on-premise">SAP S/4HANA, en local</option>
+            <option value="s4-private">SAP S/4HANA Cloud Private Edition</option>
+            <option value="s4-public">SAP S/4HANA Cloud Public Edition</option>
+            <option value="successfactors">SAP SuccessFactors Employee Central Time Tracking</option>
+            <option value="business-one">SAP Business One</option>
+            <option value="bydesign">SAP Business ByDesign</option>
+            <option value="other">Otro sistema SAP, o no lo sé</option>
+          </select>
+        </p>
+        <p class="request-field">
+          <label for="sap-users">Personas que lo usarían</label>
+          <select id="sap-users" name="users" required>
+            <option value="">Elige un número</option>
+            <option value="1-10">1 a 10</option>
+            <option value="11-50">11 a 50</option>
+            <option value="51-250">51 a 250</option>
+            <option value="251-1000">251 a 1000</option>
+            <option value="1000+">más de 1000</option>
+          </select>
+        </p>
+      </div>
+      <p class="waitlist-trap" aria-hidden="true"><label>Deja este campo vacío <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>
+      <div class="actions">
+        <button class="button button-primary" type="submit">Pedir un convertidor para SAP</button>
+      </div>
+      <p class="fine">Usamos tus datos solo para responder a tu solicitud. <a href="/privacy/#converter-requests">Política de privacidad</a></p>
+      <p class="waitlist-status" role="status" aria-live="polite"></p>
+      <p class="waitlist-done" id="sap-request-ok">Gracias. Te escribiremos sobre tu convertidor para SAP.</p>
+      <p class="waitlist-done" id="sap-request-invalid">Rellena todos los campos y comprueba tu dirección de correo electrónico.</p>
+      <p class="waitlist-done" id="sap-request-personal">Usa tu dirección de correo electrónico del trabajo.</p>
+      <p class="waitlist-done" id="sap-request-error">No ha funcionado. Inténtalo de nuevo más tarde o escribe a {{support.email}}.</p>
+    </form>
+  </div>
+</section>
