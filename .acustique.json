@@ -16,7 +16,7 @@
     "files": ["src/static/assets/tokens.css"]
   },
   "probe": {
-    "urls": ["https://www.timeperative.com/", "https://www.timeperative.com/download/", "https://www.timeperative.com/resources/features/", "https://www.timeperative.com/support/", "https://www.timeperative.com/privacy/", "https://www.timeperative.com/de/", "https://www.timeperative.com/fr/", "https://www.timeperative.com/es/"],
+    "urls": ["https://www.timeperative.com/", "https://www.timeperative.com/download/", "https://www.timeperative.com/resources/features/", "https://www.timeperative.com/resources/converters/", "https://www.timeperative.com/support/", "https://www.timeperative.com/privacy/", "https://www.timeperative.com/de/", "https://www.timeperative.com/fr/", "https://www.timeperative.com/es/"],
     "widths": [1280, 360],
     "theme": { "storageKey": "ty-scheme", "attribute": "data-bs-theme", "toggle": "[data-scheme-cycle]", "default": "dark" }
   }

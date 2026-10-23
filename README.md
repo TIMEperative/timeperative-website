@@ -5,10 +5,11 @@ Acunomic GmbH. It replaces www.timely.you. The site answers on
 www.timeperative.com; timeperative.com redirects there.
 
 - **Pages:** Home (with News and releases), Download, Resources (with
-  Features), Support; Privacy policy and Imprint in the footer. English at
+  Features and Converters), Support; Privacy policy and Imprint in the footer. English at
   `/`, German at `/de/`, French at `/fr/`, Spanish at `/es/`.
 - **Hosting:** Cloudflare Workers static assets, with a small Worker in front:
-  the redirect to www, the download links and the macOS and iOS waitlist. Cloudflare recommends Workers over Pages for new sites
+  the redirect to www, the download links, the macOS and iOS waitlist and the
+  requests for a converter for SAP. Cloudflare recommends Workers over Pages for new sites
   (developers.cloudflare.com/workers/best-practices/workers-best-practices/,
   read 2026-10-18).
 - **News:** written in Notion (TIMEperative > TIMEperative.com website >
@@ -23,7 +24,7 @@ www.timeperative.com; timeperative.com redirects there.
 | `src/layout.html`, `src/i18n/*.json` | Header, footer and the strings around the pages |
 | `src/static/` | Copied as is: stylesheets, the tokens from acustique, the fonts, the mark |
 | `src/site.json` | Languages, menu, the release stores, the Worker routes, the support address |
-| `src/worker.js` | timeperative.com to www; `/download/windows` and `/download/android`: a redirect to the newest installer the stores' update manifests name; `/waitlist`: a lead in the CRM |
+| `src/worker.js` | timeperative.com to www; `/download/windows` and `/download/android`: a redirect to the newest installer the stores' update manifests name; `/waitlist` and `/converter-request`: a lead in the CRM |
 | `scripts/build.mjs` | Builds `dist/` and checks every page (one h1, headings in order, meta lengths, alt text, internal links) |
 | `scripts/notion-news.mjs` | News and release articles from Notion into `content/news/notion/` |
 | `.github/workflows/site.yml` | Build on every push; deploy from `main`, every three hours and on demand |

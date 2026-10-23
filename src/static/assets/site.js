@@ -60,11 +60,12 @@
   });
 })();
 
-// Waitlist for macOS and iOS: sends the form without leaving the page and
-// says what happened under the button. Without script the form posts itself,
-// and the Worker brings the visitor back to the same message.
+// The forms the Worker takes (the macOS and iOS waitlist, the request for a
+// converter for SAP): sent without leaving the page, with what happened said
+// under the button. Without script the form posts itself, and the Worker
+// brings the visitor back to the same message.
 (function () {
-  var forms = document.querySelectorAll(".waitlist-form");
+  var forms = document.querySelectorAll(".waitlist-form, .request-form");
   for (var i = 0; i < forms.length; i++) {
     forms[i].addEventListener("submit", function (event) {
       var form = event.currentTarget;
@@ -81,8 +82,8 @@
       }).then(function (res) {
         return res.json().catch(function () { return { ok: false }; });
       }).then(function (result) {
-        status.textContent = result.ok ? form.dataset.ok : result.error === "invalid" ? form.dataset.invalid : form.dataset.error;
-        if (result.ok) form.querySelector("input[type=email]").value = "";
+        status.textContent = result.ok ? form.dataset.ok : (result.error && form.dataset[result.error]) || form.dataset.error;
+        if (result.ok) form.reset();
       }).catch(function () {
         status.textContent = form.dataset.error;
       }).then(function () {
