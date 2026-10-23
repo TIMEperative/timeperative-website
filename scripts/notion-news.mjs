@@ -167,7 +167,7 @@ const COPY = [
   [/—/, "a long dash (COPY-001)"],
   [/–/, "an en dash (COPY-002)"],
   // acustique brands/timely-you not_public: the site never names Odoo; host names and paths are not copy.
-  [/(?<![/\\.@_\w])[Oo][Dd][Oo][Oo]s?(?![/\\_\w]|\.\w)/u, "Odoo; write TIMEperative Cloud Hub (COPY-NEW-CLOUD-HUB)"],
+  [/(?<![/\\.@_\w])[Oo][Dd][Oo][Oo]s?(?![/\\_\w]|\.\w)/u, "Odoo; write TIMEperative Cloud Sync (COPY-016)"],
 ];
 
 /** The rules a row must meet; returns what is wrong. */

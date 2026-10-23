@@ -44,9 +44,9 @@ test("the Worker runs first on every request, on www and on the host it redirect
   assert.deepEqual(domains.sort(), [new URL(site.origin).host, ...site.redirectHosts].sort());
 });
 
-test("news in Notion that names Odoo is left out (COPY-NEW-CLOUD-HUB); a host or a path is not copy", async () => {
+test("news in Notion that names Odoo is left out (COPY-016); a host or a path is not copy", async () => {
   const { problemsOf } = await import("../scripts/notion-news.mjs");
   const item = (body) => ({ slug: "a-b", published: "2026-10-19", title: { en: "T", de: "T" }, subtitle: { en: "S", de: "S" }, metaTitle: { en: "", de: "" }, metaDescription: { en: "", de: "" }, body: { en: body, de: "<p>Text</p>" } });
-  assert.ok(problemsOf(item("<p>Send it to Odoo.</p>")).some((p) => p.includes("COPY-NEW-CLOUD-HUB")));
-  assert.deepEqual(problemsOf(item('<p>Your <a href="https://erp.example.com/odoo">TIMEperative Cloud Hub</a>.</p>')), []);
+  assert.ok(problemsOf(item("<p>Send it to Odoo.</p>")).some((p) => p.includes("COPY-016")));
+  assert.deepEqual(problemsOf(item('<p>Your <a href="https://erp.example.com/odoo">TIMEperative Cloud Sync</a>.</p>')), []);
 });

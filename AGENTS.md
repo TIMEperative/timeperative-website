@@ -21,8 +21,8 @@ Cloudflare Workers. Read [README.md](README.md) first.
    first on every request and sends timeperative.com to www with a 301
    (`site.json` `origin` and `redirectHosts`, `wrangler.jsonc` routes).
 5. **Never name Odoo** where people read without signing in: say
-   TIMEperative Cloud Hub, which needs the separate TIMEperative.sync app
-   (acustique COPY-NEW-CLOUD-HUB; the product check fails on it, and the news
+   TIMEperative Cloud Sync, a separate add-on installed and configured on the
+   organisation's side (acustique COPY-016 as revised 2026-10-23; the product check fails on it, and the news
    pull leaves out a Notion row that names it).
 6. **The download links are the Worker's** (`/download/windows`,
    `/download/android`): they follow the stores' update manifests, so a

@@ -12,7 +12,7 @@ nav: resources
   <div class="container prose">
     <h2>Über diese Referenz</h2>
     <p>Diese Seite ist für alle, die Exporte von TIMEperative lesen, in ein anderes System laden oder in einer Prüfung kontrollieren. Sie beschreibt die Daten so, wie die App sie heute speichert, Version 0.1.0-alpha.16, abgeglichen mit dem Code der App am 21. Oktober 2026. TIMEperative ist im Early Access, deshalb können Felder dazukommen; diese Seite ändert sich mit ihnen.</p>
-    <p>Jede Installation speichert ihre Daten in einer Datenbank auf dem Gerät, unter Windows oder Android. Es gibt keinen Server von TIMEperative. Daten verlassen das Gerät nur, wenn Du sie exportierst oder Einträge an Deinen TIMEperative Cloud Hub sendest, der die separate App TIMEperative.sync braucht. Die <a href="/privacy/">Datenschutzerklärung</a> nennt jede Verbindung.</p>
+    <p>Jede Installation speichert ihre Daten in einer Datenbank auf dem Gerät, unter Windows oder Android. Es gibt keinen Server von TIMEperative. Daten verlassen das Gerät nur, wenn Du sie exportierst oder Einträge über TIMEperative Cloud Sync sendest, ein separates Add-on, das Deine Organisation installiert und einrichtet. Die <a href="/privacy/">Datenschutzerklärung</a> nennt jede Verbindung.</p>
 
     <h2>Konventionen</h2>
     <table>
@@ -41,7 +41,7 @@ nav: resources
         <tr><td>Geplanter Eintrag</td><td>Ein Ist-Eintrag kann auf den geplanten Eintrag verweisen, den er umsetzt; ein Plan kann von mehreren Ist-Einträgen umgesetzt werden.</td></tr>
         <tr><td>Verrechenbarer Eintrag</td><td>Entsteht aus genehmigten Einträgen; ein verrechenbarer Eintrag umfasst einen oder mehrere Einträge, und jeder Eintrag gehört zu höchstens einem verrechenbaren Eintrag.</td></tr>
         <tr><td>Protokolleintrag</td><td>Anlegen, Ändern, Löschen, Wiederherstellen und Statuswechsel eines Eintrags schreiben je einen Protokolleintrag.</td></tr>
-        <tr><td>Verknüpfung zum Cloud Hub</td><td>Wird ein Eintrag an den Cloud Hub gesendet, hält eine Verknüpfung fest, ob er angekommen ist.</td></tr>
+        <tr><td>Verknüpfung mit Cloud Sync</td><td>Wird ein Eintrag über Cloud Sync gesendet, hält eine Verknüpfung fest, ob er angekommen ist.</td></tr>
       </tbody>
     </table>
 
@@ -80,7 +80,7 @@ nav: resources
 
     <h2>Eintragstypen</h2>
     <ul>
-      <li><code>actual</code>: geleistete Zeit. Nur Ist-Einträge zählen als geleistete Zeit, gehen in die Verrechnung und werden an den Cloud Hub gesendet.</li>
+      <li><code>actual</code>: geleistete Zeit. Nur Ist-Einträge zählen als geleistete Zeit, gehen in die Verrechnung und werden über Cloud Sync gesendet.</li>
       <li><code>planned</code>: eingeplante Zeit, zum Beispiel aus der Planung oder aus einem Kalender.</li>
       <li><code>requested</code>: angefragte, aber nicht zugesagte Zeit, zum Beispiel eine noch nicht angenommene Einladung zu einer Sitzung.</li>
     </ul>
@@ -152,8 +152,8 @@ nav: resources
       <li><code>atUtc</code>: wann, als Zeitpunkt.</li>
     </ul>
 
-    <h2>Senden an den Cloud Hub</h2>
-    <p>An Deinen TIMEperative Cloud Hub gehen nur genehmigte Ist-Einträge, die nicht gelöscht sind. Für jeden Eintrag speichert die App, ob er wartet, angekommen oder fehlgeschlagen ist, mit dem Fehler. Angekommene Einträge werden nicht erneut gesendet, und wo der Cloud Hub es unterstützt, erkennt er einen Eintrag, den er schon hat, sodass erneutes Senden keine Kopie anlegt.</p>
+    <h2>Senden über Cloud Sync</h2>
+    <p>Über TIMEperative Cloud Sync gehen nur genehmigte Ist-Einträge, die nicht gelöscht sind. Für jeden Eintrag speichert die App, ob er wartet, angekommen oder fehlgeschlagen ist, mit dem Fehler. Angekommene Einträge werden nicht erneut gesendet, und wo der Cloud Sync es unterstützt, erkennt er einen Eintrag, den er schon hat, sodass erneutes Senden keine Kopie anlegt.</p>
 
     <h2>Exporte heute</h2>
     <ul>

@@ -12,7 +12,7 @@ nav: resources
   <div class="container prose">
     <h2>Acerca de esta referencia</h2>
     <p>Esta página es para quienes leen las exportaciones de TIMEperative, las cargan en otro sistema o las revisan en una auditoría. Describe los datos tal como la aplicación los guarda hoy, versión 0.1.0-alpha.16, contrastados con el código de la aplicación el 21 de octubre de 2026. TIMEperative está en acceso anticipado, así que pueden añadirse campos; esta página cambia con ellos.</p>
-    <p>Cada instalación guarda sus datos en una base de datos en el dispositivo, en Windows o en Android. No hay ningún servidor de TIMEperative. Los datos solo salen del dispositivo cuando los exportas o envías entradas a tu TIMEperative Cloud Hub, que necesita la aplicación independiente TIMEperative.sync. La <a href="/privacy/">política de privacidad</a> enumera cada conexión.</p>
+    <p>Cada instalación guarda sus datos en una base de datos en el dispositivo, en Windows o en Android. No hay ningún servidor de TIMEperative. Los datos solo salen del dispositivo cuando los exportas o envías entradas a través de TIMEperative Cloud Sync, un complemento independiente que tu organización instala y configura. La <a href="/privacy/">política de privacidad</a> enumera cada conexión.</p>
 
     <h2>Convenciones</h2>
     <table>
@@ -41,7 +41,7 @@ nav: resources
         <tr><td>Entrada planificada</td><td>Una entrada real puede apuntar a la entrada planificada que lleva a cabo; un plan puede llevarse a cabo con varias entradas reales.</td></tr>
         <tr><td>Entrada facturable</td><td>Se crea a partir de entradas aprobadas; una entrada facturable abarca una o varias entradas, y cada entrada pertenece como mucho a una entrada facturable.</td></tr>
         <tr><td>Registro de auditoría</td><td>Crear, modificar, eliminar, restaurar y cambiar el estado de una entrada escriben cada uno un registro de auditoría.</td></tr>
-        <tr><td>Vínculo con el Cloud Hub</td><td>Cuando una entrada se envía al Cloud Hub, un vínculo registra si ha llegado.</td></tr>
+        <tr><td>Vínculo con Cloud Sync</td><td>Cuando una entrada se envía a través de Cloud Sync, un vínculo registra si ha llegado.</td></tr>
       </tbody>
     </table>
 
@@ -80,7 +80,7 @@ nav: resources
 
     <h2>Tipos de entrada</h2>
     <ul>
-      <li><code>actual</code>: tiempo trabajado. Solo las entradas reales cuentan como tiempo trabajado, pasan a facturación y se envían al Cloud Hub.</li>
+      <li><code>actual</code>: tiempo trabajado. Solo las entradas reales cuentan como tiempo trabajado, pasan a facturación y se envían a través de Cloud Sync.</li>
       <li><code>planned</code>: tiempo programado, por ejemplo desde la planificación o desde un calendario.</li>
       <li><code>requested</code>: tiempo solicitado pero no confirmado, por ejemplo una invitación a una reunión aún no aceptada.</li>
     </ul>
@@ -152,8 +152,8 @@ nav: resources
       <li><code>atUtc</code>: cuándo, como instante.</li>
     </ul>
 
-    <h2>Envío al Cloud Hub</h2>
-    <p>A tu TIMEperative Cloud Hub solo se envían las entradas reales aprobadas que no estén eliminadas. Para cada entrada, la aplicación guarda si está en espera, si llegó o si falló, con el error. Las entradas que llegaron no se vuelven a enviar y, cuando el Cloud Hub lo admite, reconoce una entrada que ya tiene, así que volver a enviar no añade ninguna copia.</p>
+    <h2>Envío a través de Cloud Sync</h2>
+    <p>A través de TIMEperative Cloud Sync solo se envían las entradas reales aprobadas que no estén eliminadas. Para cada entrada, la aplicación guarda si está en espera, si llegó o si falló, con el error. Las entradas que llegaron no se vuelven a enviar y, cuando el Cloud Sync lo admite, reconoce una entrada que ya tiene, así que volver a enviar no añade ninguna copia.</p>
 
     <h2>Exportaciones hoy</h2>
     <ul>

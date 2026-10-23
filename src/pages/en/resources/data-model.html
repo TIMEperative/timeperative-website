@@ -12,7 +12,7 @@ nav: resources
   <div class="container prose">
     <h2>About this reference</h2>
     <p>This page is for people who read TIMEperative's exports, load them into another system, or check them in an audit. It describes the data as the app keeps it today, version 0.1.0-alpha.16, checked against the app's code on 21 October 2026. TIMEperative is in early access, so fields may be added; this page changes with them.</p>
-    <p>Each installation keeps its data in one database on the device, on Windows or on Android. There is no TIMEperative server. Data leaves the device only when you export it or send entries to your TIMEperative Cloud Hub, which needs the separate TIMEperative.sync app. The <a href="/privacy/">privacy policy</a> lists every connection.</p>
+    <p>Each installation keeps its data in one database on the device, on Windows or on Android. There is no TIMEperative server. Data leaves the device only when you export it or send entries to TIMEperative Cloud Sync, a separate add-on your organisation installs and configures. The <a href="/privacy/">privacy policy</a> lists every connection.</p>
 
     <h2>Conventions</h2>
     <table>
@@ -41,7 +41,7 @@ nav: resources
         <tr><td>Planned entry</td><td>An actual entry may point to the planned entry it carries out; one plan can be carried out by several actual entries.</td></tr>
         <tr><td>Billable entry</td><td>Made from approved entries; one billable entry covers one or more entries, and each entry belongs to at most one billable entry.</td></tr>
         <tr><td>Audit record</td><td>Creating, changing, deleting, restoring and changing the status of an entry each write an audit record.</td></tr>
-        <tr><td>Cloud Hub link</td><td>When an entry is sent to the Cloud Hub, one link records whether it arrived.</td></tr>
+        <tr><td>Cloud Sync link</td><td>When an entry is sent to Cloud Sync, one link records whether it arrived.</td></tr>
       </tbody>
     </table>
 
@@ -80,7 +80,7 @@ nav: resources
 
     <h2>Entry types</h2>
     <ul>
-      <li><code>actual</code>: time that was worked. Only actual entries count as worked time, go to billing and are sent to the Cloud Hub.</li>
+      <li><code>actual</code>: time that was worked. Only actual entries count as worked time, go to billing and are sent to Cloud Sync.</li>
       <li><code>planned</code>: time that is scheduled, for example from planning or from a calendar.</li>
       <li><code>requested</code>: time that was asked for but not committed, for example a meeting invitation not yet accepted.</li>
     </ul>
@@ -152,8 +152,8 @@ nav: resources
       <li><code>atUtc</code>: when, as a point in time.</li>
     </ul>
 
-    <h2>Sending to the Cloud Hub</h2>
-    <p>Only approved actual entries that are not deleted are sent to your TIMEperative Cloud Hub. For each entry the app keeps whether it is waiting, arrived or failed, with the error. Entries that arrived are not sent again, and where the Cloud Hub supports it, it recognises an entry it already has, so sending again adds no copy.</p>
+    <h2>Sending to Cloud Sync</h2>
+    <p>Only approved actual entries that are not deleted are sent to TIMEperative Cloud Sync. For each entry the app keeps whether it is waiting, arrived or failed, with the error. Entries that arrived are not sent again, and where the Cloud Sync supports it, it recognises an entry it already has, so sending again adds no copy.</p>
 
     <h2>Exports today</h2>
     <ul>
