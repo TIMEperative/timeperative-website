@@ -141,7 +141,7 @@ test("a robot gets the same answer as a person and adds nothing", async () => {
 // ------------------------------------------------------------ converter requests
 
 const REQUEST = { email: " ana@firma.ch ", first_name: "Ana", last_name: "Muster", system: "ecc-ehp6-8", users: "11-50", lang: "de" };
-const CUSTOM = { email_domain_type: "CUSTOM_DOMAIN", confidence: "LOW", registry_version: REGISTRY_VERSION };
+const CUSTOM = { email_domain_type: "CUSTOM_DOMAIN", confidence: "LOW", sources: [], registry_version: REGISTRY_VERSION };
 
 test("a converter request needs a work address, both names and a choice in both lists; the hidden field marks a robot", () => {
   assert.deepEqual(readConverterRequest(form(REQUEST)), { email: "ana@firma.ch", firstName: "Ana", lastName: "Muster", system: "ecc-ehp6-8", users: "11-50", lang: "de", domain: CUSTOM });
@@ -157,11 +157,12 @@ test("a converter request needs a work address, both names and a choice in both 
 
 // A registry with one domain of each kind, so the policy is tested apart from the feeds.
 const GROUPS = groupRows([
-  { domain: "alias.example", type: "ALIAS", confidence: "MEDIUM" },
-  { domain: "burn.example", type: "DISPOSABLE", confidence: "HIGH" },
-  { domain: "isp.example", type: "ISP_PERSONAL", confidence: "HIGH" },
-  { domain: "maybe-burn.example", type: "DISPOSABLE", confidence: "MEDIUM" },
-  { domain: "webmail.example", type: "WEBMAIL", confidence: "MEDIUM" },
+  { domain: "alias.example", type: "ALIAS", confidence: "MEDIUM", sources: ["forwarding-combined"] },
+  { domain: "burn.example", type: "DISPOSABLE", confidence: "HIGH", sources: ["castle-disposable"] },
+  { domain: "free-burn.example", type: "DISPOSABLE", confidence: "MEDIUM", sources: ["disposable-community", "free-email-providers"] },
+  { domain: "isp.example", type: "ISP_PERSONAL", confidence: "HIGH", sources: ["timeperative-curated"] },
+  { domain: "maybe-burn.example", type: "DISPOSABLE", confidence: "MEDIUM", sources: ["disposable-community"] },
+  { domain: "webmail.example", type: "WEBMAIL", confidence: "MEDIUM", sources: ["free-email-providers"] },
 ]);
 
 test("a converter request refuses public mailboxes at any confidence and throwaway addresses Castle confirms", () => {
@@ -169,9 +170,10 @@ test("a converter request refuses public mailboxes at any confidence and throwaw
   assert.deepEqual(read("ana@webmail.example"), { error: "personal" });
   assert.deepEqual(read("ana@ISP.example."), { error: "personal" });
   assert.deepEqual(read("ana@burn.example"), { error: "personal" });
-  assert.deepEqual(read("ana@maybe-burn.example").domain, { email_domain_type: "DISPOSABLE", confidence: "MEDIUM", registry_version: "test.1" });
-  assert.deepEqual(read("ana@alias.example").domain, { email_domain_type: "ALIAS", confidence: "MEDIUM", registry_version: "test.1" });
-  assert.deepEqual(read("ana@firma.ch").domain, { email_domain_type: "CUSTOM_DOMAIN", confidence: "LOW", registry_version: "test.1" });
+  assert.deepEqual(read("ana@free-burn.example"), { error: "personal" });
+  assert.deepEqual(read("ana@maybe-burn.example").domain, { email_domain_type: "DISPOSABLE", confidence: "MEDIUM", sources: ["disposable-community"], registry_version: "test.1" });
+  assert.deepEqual(read("ana@alias.example").domain, { email_domain_type: "ALIAS", confidence: "MEDIUM", sources: ["forwarding-combined"], registry_version: "test.1" });
+  assert.deepEqual(read("ana@firma.ch").domain, { email_domain_type: "CUSTOM_DOMAIN", confidence: "LOW", sources: [], registry_version: "test.1" });
   // Exact match only: a subdomain or a longer name of a listed domain is a domain of its own.
   assert.equal(read("ana@sub.webmail.example").domain.email_domain_type, "CUSTOM_DOMAIN");
   assert.equal(read("ana@webmail.example.firma.ch").domain.email_domain_type, "CUSTOM_DOMAIN");
@@ -186,8 +188,10 @@ test("with the committed registry, Gmail, Bluewin, Proton and Mailinator are ref
   assert.equal(read("ana@duck.com").domain.email_domain_type, "ALIAS");
   assert.equal(read("ana@sub.gmail.com").domain.email_domain_type, "CUSTOM_DOMAIN");
   assert.equal(read("ana@gmail.com.evil.test").domain.email_domain_type, "CUSTOM_DOMAIN");
-  // The community list only labels, so it stays out of the Worker: its domains are taken.
-  assert.equal(read("ana@0-00.usa.cc").domain.email_domain_type, "CUSTOM_DOMAIN");
+  // A domain both the free provider list and the community list name is refused (owner, 2026-10-24) ...
+  assert.deepEqual(read("ana@0-00.usa.cc"), { error: "personal" });
+  // ... one only the community list names just labels, stays out of the Worker, and is taken.
+  assert.equal(read("ana@0-attorney.com").domain.email_domain_type, "CUSTOM_DOMAIN");
   assert.equal(classifyEmail("ana@firma.ch").registry_version, REGISTRY_VERSION);
   assert.equal(decide("converter-request", { email_domain_type: "DISPOSABLE", confidence: "LOW" }), "review");
 });
@@ -203,10 +207,10 @@ test("a converter request becomes one lead with the contact, the system and the 
   assert.equal(lead.email_from, "ana@firma.ch");
   assert.equal(lead.team_id, 3);
   assert.match(lead.description, /SAP system: SAP ERP 6\.0 \(ECC\), enhancement package 6 to 8\. People who would use it: 11 to 50\. Language of the page: de\./);
-  assert.ok(lead.description.endsWith(`Email domain: email_domain_type CUSTOM_DOMAIN, confidence LOW, registry ${REGISTRY_VERSION} (the Worker leaves out DISPOSABLE below HIGH).`));
+  assert.ok(lead.description.endsWith(`Email domain: email_domain_type CUSTOM_DOMAIN, confidence LOW, sources none, registry ${REGISTRY_VERSION} (the Worker leaves out DISPOSABLE below HIGH that the free provider list does not name).`));
   const alias = odoo();
   await addConverterRequest(readConverterRequest(form({ ...REQUEST, email: "ana@maybe-burn.example" }), GROUPS, "test.1"), ENV, alias.fetcher);
-  assert.match(alias.calls[1].body.vals_list[0].description, /email_domain_type DISPOSABLE, confidence MEDIUM, registry test\.1 \(/);
+  assert.match(alias.calls[1].body.vals_list[0].description, /email_domain_type DISPOSABLE, confidence MEDIUM, sources disposable-community, registry test\.1 \(/);
   const again = odoo(1);
   assert.deepEqual(await addConverterRequest(request, ENV, again.fetcher), { ok: true, known: true });
   assert.equal(again.calls.length, 1);

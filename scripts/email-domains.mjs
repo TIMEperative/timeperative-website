@@ -206,7 +206,9 @@ export function checkHandList(name, list, schema) {
  * overrides and the exclusions: the specification's section 4, with the
  * precedence of 3.3. Sources name our overrides and the feeds that agree
  * with the result; feeds that disagree are reported, never counted as
- * evidence. Confidence never rises because several feeds list a domain:
+ * evidence, except that a community DISPOSABLE row names the free provider
+ * list too when it lists the domain, as the converter request refuses those
+ * (owner, 2026-10-24). Confidence never rises because several feeds list a domain:
  * the community list already includes Castle's.
  */
 export function buildRegistry(feeds, overrides, exclusions) {
@@ -232,7 +234,9 @@ export function buildRegistry(feeds, overrides, exclusions) {
   }
   for (const domain of disposable) {
     if (free.has(domain) && !castle.has(domain)) conflicts["free-provider-and-disposable"].push({ domain, feeds: listedBy(domain), resolved: "DISPOSABLE MEDIUM" });
-    registry.set(domain, { type: "DISPOSABLE", sources: ["disposable-community"], confidence: "MEDIUM" });
+    // The free provider list names it too: a source of its own, which the
+    // converter request refuses on (owner, 2026-10-24).
+    registry.set(domain, { type: "DISPOSABLE", sources: free.has(domain) ? ["disposable-community", "free-email-providers"] : ["disposable-community"], confidence: "MEDIUM" });
   }
   for (const domain of castle) {
     if (!disposable.has(domain)) conflicts["castle-not-in-community"].push({ domain, feeds: listedBy(domain), resolved: "DISPOSABLE HIGH" });
@@ -271,6 +275,8 @@ export function countRows(rows) {
   return { by_type: sorted(by_type), by_type_and_confidence: sorted(by_type_and_confidence) };
 }
 
+const describe = (row) => `${row.type} ${row.confidence} (${row.sources.join(", ")})`;
+
 /** What changed between two registries, by domain. */
 export function diffRows(before, after) {
   const old = new Map(before.map((r) => [r.domain, r]));
@@ -278,7 +284,7 @@ export function diffRows(before, after) {
   const added = after.filter((r) => !old.has(r.domain));
   const removed = before.filter((r) => !now.has(r.domain));
   const changed = after.filter((r) => old.has(r.domain) && JSON.stringify(old.get(r.domain)) !== JSON.stringify(r))
-    .map((r) => ({ domain: r.domain, from: `${old.get(r.domain).type} ${old.get(r.domain).confidence}`, to: `${r.type} ${r.confidence}` }));
+    .map((r) => ({ domain: r.domain, from: describe(old.get(r.domain)), to: describe(r) }));
   return { added, removed, changed };
 }
 

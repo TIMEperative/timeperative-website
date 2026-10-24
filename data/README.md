@@ -16,7 +16,7 @@ form only ever learns "please use your work address".
 | `email-domains-exclusions.json` | you, by hand | Reviewed false positives: domains the feeds list that the registry must not |
 | `email-domains.json` | the builder | The registry: `{ domain, type, sources, confidence }` per domain, sorted by domain |
 | `email-domains-manifest.json` | the builder | Version, build time, the feeds' hashes, counts and licences |
-| `../src/email-domains.generated.js` | the builder | The Worker's copy: every domain but DISPOSABLE below HIGH, grouped by type and confidence |
+| `../src/email-domains.generated.js` | the builder | The Worker's copy: every domain but the community list's DISPOSABLE below HIGH that the free provider list does not name, grouped by type, confidence and sources |
 | `*.schema.json` | rarely changes | JSON Schema of the three lists; Visual Studio Code checks the lists as you type (`.vscode/settings.json`) |
 
 The types are the specification's six: `WEBMAIL` (a public mailbox,
@@ -38,14 +38,15 @@ The waitlist takes every type, as a newsletter does. The converter request:
 |---|---|
 | `WEBMAIL`, `ISP_PERSONAL` (any confidence) | refused: "Please use your work email address. If your business has no domain of its own, write to us at support@timeperative.com." |
 | `DISPOSABLE` with `HIGH` (Castle lists it) | refused, same message |
-| `ALIAS` | taken; the lead's description names the type, the confidence and the registry version |
-| not listed (`CUSTOM_DOMAIN`), or `DISPOSABLE` with `MEDIUM` (only the community list) | taken, the same note in the lead |
+| `DISPOSABLE` with `MEDIUM` that the free provider list names too (`free-email-providers` in `sources`) | refused, same message: free or throwaway, it is no company's address (owner, 2026-10-24) |
+| `ALIAS` | taken; the lead's description names the type, the confidence, the sources and the registry version |
+| not listed (`CUSTOM_DOMAIN`), or `DISPOSABLE` with `MEDIUM` that only the community list names | taken, the same note in the lead |
 
 The Worker bundles only what its policies refuse on, plus `ALIAS` for the
-note: about 6,000 domains, 87 KiB. The community list's 97,000 domains only
-ever label and never refuse, so they stay out of the Worker, and its note
-reads `CUSTOM_DOMAIN` for them; the system that receives the lead can label
-it from the full registry (below).
+note: 33,363 domains, 528 KiB (185 KiB gzipped). The 70,055 domains only the
+community list names ever label and never refuse, so they stay out of the
+Worker, and its note reads `CUSTOM_DOMAIN` for them; the system that
+receives the lead can label it from the full registry (below).
 
 Matching is exact, after IDNA: `gmail.com` never matches `sub.gmail.com`
 or `gmail.com.evil.test`. List a subdomain on its own when it needs a type.
@@ -97,7 +98,9 @@ Precedence, strongest first (specification 3.3): your exclusions, your
 overrides, Castle, the community list, forwarding less the community list,
 free providers. `sources` names your override (`timeperative-curated`) and
 the feeds that agree with the result; a feed that disagrees goes into the
-conflicts report instead. Several feeds never raise the confidence: the
+conflicts report instead. One exception: a domain both the community list
+and the free provider list name is `DISPOSABLE` `MEDIUM` with both in
+`sources`, because the converter request refuses exactly those. Several feeds never raise the confidence: the
 community list already includes Castle's. The strict lists of the community
 project are never read; they also hold Outlook and Hotmail.
 
@@ -138,7 +141,7 @@ in the CRM, say) reads, from `main`:
   first, and only when its `registry_version` differs from the one imported
   last,
 - `https://raw.githubusercontent.com/TIMEperative/timeperative-website/main/data/email-domains.json`
-  (10.5 MiB, 665 KiB gzipped), checks its SHA-256 against the manifest's
+  (11.1 MiB, 688 KiB gzipped), checks its SHA-256 against the manifest's
   `registry_sha256`, and replaces its copy only when both match.
 
 It looks a domain up exactly as the Worker does (lowercase, IDNA, exact

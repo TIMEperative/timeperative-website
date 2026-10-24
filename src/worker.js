@@ -174,7 +174,7 @@ export async function addConverterRequest(request, env, fetcher = fetch) {
     name: "TIMEperative converter for SAP: request",
     contact_name: `${request.firstName} ${request.lastName}`,
     email_from: request.email,
-    description: `Asked on ${ORIGIN.host} for a converter for SAP. SAP system: ${SAP_SYSTEMS[request.system]}. People who would use it: ${USER_COUNTS[request.users]}. Language of the page: ${request.lang}. Email domain: email_domain_type ${domain.email_domain_type}, confidence ${domain.confidence}, registry ${domain.registry_version} (the Worker leaves out ${OUTSIDE_THE_WORKER}).`,
+    description: `Asked on ${ORIGIN.host} for a converter for SAP. SAP system: ${SAP_SYSTEMS[request.system]}. People who would use it: ${USER_COUNTS[request.users]}. Language of the page: ${request.lang}. Email domain: email_domain_type ${domain.email_domain_type}, confidence ${domain.confidence}, sources ${domain.sources?.join(", ") || "none"}, registry ${domain.registry_version} (the Worker leaves out ${OUTSIDE_THE_WORKER}).`,
   }, env, fetcher, "converter-request");
 }
 

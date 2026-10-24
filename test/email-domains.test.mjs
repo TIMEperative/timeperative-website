@@ -48,7 +48,7 @@ test("an address gives its domain; the local part is never changed or read", () 
 // ------------------------------------------------------------ classification (specification 11.1)
 
 test("the committed registry classifies the specification's table", () => {
-  const type = (d) => classifyDomain(d, GROUPS);
+  const type = (d) => { const { email_domain_type, confidence } = classifyDomain(d, GROUPS); return { email_domain_type, confidence }; };
   assert.deepEqual(type("gmail.com"), { email_domain_type: "WEBMAIL", confidence: "HIGH" });
   assert.deepEqual(type("proton.me"), { email_domain_type: "WEBMAIL", confidence: "HIGH" });
   assert.deepEqual(type("bluewin.ch"), { email_domain_type: "ISP_PERSONAL", confidence: "HIGH" });
@@ -68,21 +68,25 @@ test("the committed registry classifies the specification's table", () => {
 
 test("a lookup matches whole lines only, and explicitly listed subdomains", () => {
   const groups = groupRows([
-    { domain: "gmail.com", type: "WEBMAIL", confidence: "HIGH" },
-    { domain: "mx.throwaway.example", type: "DISPOSABLE", confidence: "MEDIUM" },
+    { domain: "gmail.com", type: "WEBMAIL", confidence: "HIGH", sources: ["timeperative-curated"] },
+    { domain: "mx.throwaway.example", type: "DISPOSABLE", confidence: "MEDIUM", sources: ["disposable-community", "free-email-providers"] },
   ]);
-  assert.equal(classifyDomain("mx.throwaway.example", groups).email_domain_type, "DISPOSABLE");
+  assert.deepEqual(classifyDomain("mx.throwaway.example", groups), { email_domain_type: "DISPOSABLE", confidence: "MEDIUM", sources: ["disposable-community", "free-email-providers"] });
+  assert.deepEqual(classifyDomain("unlisted.example", groups), { email_domain_type: "CUSTOM_DOMAIN", confidence: "LOW", sources: [] });
   assert.equal(classifyDomain("throwaway.example", groups).email_domain_type, "CUSTOM_DOMAIN");
   assert.equal(classifyDomain("mail.com", groups).email_domain_type, "CUSTOM_DOMAIN");
   assert.equal(classifyDomain("ail.com", groups).email_domain_type, "CUSTOM_DOMAIN");
 });
 
 test("one policy per entry point (specification 10): the converter request refuses, the waitlist takes everything", () => {
-  const c = (type, confidence = "MEDIUM") => ({ email_domain_type: type, confidence });
+  const c = (type, confidence = "MEDIUM", sources = []) => ({ email_domain_type: type, confidence, sources });
   assert.equal(decide("converter-request", c("WEBMAIL", "LOW")), "refuse");
   assert.equal(decide("converter-request", c("ISP_PERSONAL")), "refuse");
   assert.equal(decide("converter-request", c("DISPOSABLE", "HIGH")), "refuse");
-  assert.equal(decide("converter-request", c("DISPOSABLE")), "review");
+  assert.equal(decide("converter-request", c("DISPOSABLE", "MEDIUM", ["disposable-community"])), "review");
+  // Free or throwaway, a domain both lists name is no company's address (owner, 2026-10-24).
+  assert.equal(decide("converter-request", c("DISPOSABLE", "MEDIUM", ["disposable-community", "free-email-providers"])), "refuse");
+  assert.equal(decide("waitlist", c("DISPOSABLE", "MEDIUM", ["disposable-community", "free-email-providers"])), "accept");
   assert.equal(decide("converter-request", c("ALIAS", "HIGH")), "review");
   assert.equal(decide("converter-request", c("CUSTOM_DOMAIN", "LOW")), "accept");
   assert.equal(decide("converter-request", c("UNKNOWN", "LOW")), "accept");
@@ -91,8 +95,8 @@ test("one policy per entry point (specification 10): the converter request refus
   // Every rule the policies refuse on is in the Worker's subset, so the Worker can apply it.
   for (const policy of Object.values(POLICIES)) {
     for (const rule of policy.refuse) {
-      const [type, confidence] = rule.split(" ");
-      for (const conf of confidence ? [confidence] : ["HIGH", "MEDIUM", "LOW"]) assert.ok(inWorker({ type, confidence: conf }), rule);
+      const [type, confidence, source] = rule.split(" ");
+      for (const conf of confidence ? [confidence] : ["HIGH", "MEDIUM", "LOW"]) assert.ok(inWorker({ type, confidence: conf, sources: source ? [source] : [] }), rule);
     }
   }
 });
@@ -111,10 +115,14 @@ test("the published files hold the specification's names and the overrides it re
   assert.doesNotMatch(registry, /"category"|PUBLIC_WEBMAIL|EMAIL_ALIAS/);
 });
 
-test("the Worker bundles every row but DISPOSABLE below HIGH, which the full registry keeps", () => {
+test("the Worker bundles every row but the community list's DISPOSABLE below HIGH that the free provider list does not name", () => {
   const rows = JSON.parse(readFileSync(join(ROOT, FILES.registry), "utf8"));
-  assert.ok(rows.some((r) => r.type === "DISPOSABLE" && r.confidence === "MEDIUM"));
-  assert.deepEqual(Object.keys(GROUPS).filter((k) => k.startsWith("DISPOSABLE")), ["DISPOSABLE HIGH"]);
+  assert.ok(rows.some((r) => r.type === "DISPOSABLE" && r.confidence === "MEDIUM" && !r.sources.includes("free-email-providers")));
+  assert.deepEqual(Object.keys(GROUPS).filter((k) => k.startsWith("DISPOSABLE")), [
+    "DISPOSABLE HIGH castle-disposable",
+    "DISPOSABLE HIGH castle-disposable,disposable-community",
+    "DISPOSABLE MEDIUM disposable-community,free-email-providers",
+  ]);
   const bundled = Object.values(GROUPS).reduce((n, list) => n + list.split("\n").filter(Boolean).length, 0);
   assert.equal(bundled, rows.filter(inWorker).length);
 });
@@ -147,7 +155,8 @@ test("precedence: overrides, then Castle, then the community list, then forwardi
   assert.deepEqual(by["gmail.com"], { domain: "gmail.com", type: "WEBMAIL", sources: ["timeperative-curated", "free-email-providers"], confidence: "HIGH" });
   assert.deepEqual(by["bluewin.ch"], { domain: "bluewin.ch", type: "ISP_PERSONAL", sources: ["timeperative-curated"], confidence: "HIGH" });
   assert.deepEqual(by["hot.example"], { domain: "hot.example", type: "DISPOSABLE", sources: ["castle-disposable", "disposable-community"], confidence: "HIGH" });
-  assert.deepEqual(by["spam.example"], { domain: "spam.example", type: "DISPOSABLE", sources: ["disposable-community"], confidence: "MEDIUM" });
+  // The community list and the free provider list both name it: both are its sources (owner, 2026-10-24).
+  assert.deepEqual(by["spam.example"], { domain: "spam.example", type: "DISPOSABLE", sources: ["disposable-community", "free-email-providers"], confidence: "MEDIUM" });
   assert.deepEqual(by["relay.example"], { domain: "relay.example", type: "ALIAS", sources: ["forwarding-combined"], confidence: "MEDIUM" });
   assert.deepEqual(by["duck.com"], { domain: "duck.com", type: "ALIAS", sources: ["forwarding-combined"], confidence: "MEDIUM" });
   // The forwarding list is not ALIAS as a whole: its disposable domains stay DISPOSABLE.

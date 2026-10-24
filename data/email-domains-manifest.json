@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "registry_version": "2026-10-23.1",
-  "built_at": "2026-10-23T08:36:21.245Z",
+  "registry_version": "2026-10-24.1",
+  "built_at": "2026-10-24T08:37:26.738Z",
   "ruleset_version": "converter-request-v1",
   "row_count": 103418,
   "counts": {
@@ -21,7 +21,7 @@
       "WEBMAIL MEDIUM": 4846
     }
   },
-  "registry_sha256": "sha256:51549c8bd0770aa611729b88705a07c21091750b6545313183f089eff498212e",
+  "registry_sha256": "sha256:020f39b00570e59bd31a2b2ac5e12846a4058aa8edb86c8065634a9ef9660309",
   "source_versions": {
     "free-email-providers": "sha256:cbd32ff0f6302921631b49e687cf58d22ab8a7fcc4885e606a5777994b93fdf6",
     "castle-disposable": "sha256:438a5a84028b03ab276428c02a98539ade88402cc1d94a94ad8ebd888acd0608",
