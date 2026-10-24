@@ -10,7 +10,8 @@
     "build": "node scripts/build.mjs",
     "build:offline": "node scripts/build.mjs --offline",
     "news": "node scripts/notion-news.mjs",
-    "test": "node --test \"test/*.test.mjs\"",
+    "test": "node scripts/email-domains.mjs --check && node --test \"test/*.test.mjs\"",
+    "email-domains": "node scripts/email-domains.mjs",
     "dev": "npm run site && wrangler dev",
     "deploy": "npm run site && wrangler deploy"
   },

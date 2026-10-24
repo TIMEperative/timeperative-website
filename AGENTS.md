@@ -37,6 +37,14 @@ Cloudflare Workers. Read [README.md](README.md) first.
    changes what leaves the device changes the privacy policy too.
 9. **Node built-ins only** for the build and the scripts; Wrangler is the
    one devDependency.
+10. **Free email addresses are refused** for the converter request, by the
+   email domain registry in `data/` (owner, 2026-10-23; `data/README.md`):
+   WEBMAIL and ISP_PERSONAL at any confidence, DISPOSABLE with HIGH
+   confidence, and DISPOSABLE that the free provider list names too
+   (owner, 2026-10-24). The owner edits only the overrides and exclusions; the
+   registry and `src/email-domains.generated.js` are generated
+   (`npm run email-domains`). Never a customer's domain in these public
+   files, never the registry or the reason for a refusal in the browser.
 
 ## Commands
 
@@ -45,6 +53,7 @@ npm ci
 npm test                 # the build's checks and the Worker
 npm run build            # dist/; --offline skips reading the stores
 npm run news             # needs NOTION_TOKEN
+npm run email-domains    # rebuilds the email domain registry from the feeds
 npx wrangler dev         # the built site and the Worker on http://localhost:8787
 ```
 
