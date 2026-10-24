@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import worker, { latestInstaller, readSignup, addToWaitlist, waitlist } from "../src/worker.js";
+import worker, { latestInstaller, readSignup, addToWaitlist, waitlist, readAccessRequest, requestSyncAccess, syncAccess } from "../src/worker.js";
 
 const json = (body, ok = true) => ({ ok, json: async () => body });
 const stores = ["New/store", "Old/store"];
@@ -128,4 +128,55 @@ test("a robot gets the same answer as a person and adds nothing", async () => {
   const res = await waitlist(post({ email: "ana@example.ch", platform: "ios", website: "x" }, { accept: "application/json" }), ENV, fetcher);
   assert.deepEqual(await res.json(), { ok: true });
   assert.equal(calls.length, 0);
+});
+
+// ------------------------------------------------------------ TIMEperative.sync
+
+const request = { email: "ana@example.ch", name: "Ana Muster", organisation: "Muster AG", lang: "de" };
+
+test("a request for TIMEperative.sync needs a name, an organisation and a plausible address; GitHub user names are checked", () => {
+  assert.deepEqual(readAccessRequest(form({ ...request, github: "@ana-m", server: " https://hub.muster.ch ", message: "Hi" })),
+    { ...request, github: "ana-m", server: "https://hub.muster.ch", message: "Hi" });
+  assert.deepEqual(readAccessRequest(form({ ...request, name: " " })), { error: "invalid" });
+  assert.deepEqual(readAccessRequest(form({ ...request, organisation: "" })), { error: "invalid" });
+  assert.deepEqual(readAccessRequest(form({ ...request, email: "ana" })), { error: "invalid" });
+  assert.deepEqual(readAccessRequest(form({ ...request, github: "-bad-" })), { error: "invalid" });
+  assert.deepEqual(readAccessRequest(form({ ...request, website: "x" })), { robot: true });
+  assert.equal(readAccessRequest(form({ ...request, lang: "xx" })).lang, "en");
+});
+
+test("a request becomes one lead with the contact, the organisation and escaped notes; a repeat adds none", async () => {
+  const { calls, fetcher } = odoo();
+  assert.deepEqual(await requestSyncAccess({ ...request, github: "", server: "", message: "<b>soon</b>\nplease" }, ENV, fetcher), { ok: true });
+  const [lead] = calls[1].body.vals_list;
+  assert.equal(lead.name, "TIMEperative.sync: access for Muster AG");
+  assert.equal(lead.contact_name, "Ana Muster");
+  assert.equal(lead.partner_name, "Muster AG");
+  assert.equal(lead.email_from, "ana@example.ch");
+  assert.equal(lead.team_id, 3);
+  assert.match(lead.description, /<p>GitHub user: \(not given\)<\/p>/);
+  assert.match(lead.description, /<p>&lt;b&gt;soon&lt;\/b&gt;<\/p><p>please<\/p>/);
+  const again = odoo(1);
+  assert.deepEqual(await requestSyncAccess({ ...request, github: "", server: "", message: "" }, ENV, again.fetcher), { ok: true, known: true });
+  assert.equal(again.calls.length, 1);
+});
+
+test("the request form answers script with JSON and a plain form with a redirect to its own message", async () => {
+  const { fetcher } = odoo();
+  const send = (fields, headers = {}) => syncAccess(new Request("https://www.timeperative.com/sync-access", { method: "POST", body: form(fields), headers }), ENV, fetcher);
+  const json = await send(request, { accept: "application/json", origin: "https://www.timeperative.com" });
+  assert.equal(json.status, 200);
+  assert.deepEqual(await json.json(), { ok: true });
+  const plain = await send({ ...request, email: "nope", page: "/de/download/sync/" });
+  assert.equal(plain.status, 303);
+  assert.equal(plain.headers.get("location"), "https://www.timeperative.com/de/download/sync/#sync-access-invalid");
+  const away = await send({ ...request, page: "//evil.example/" });
+  assert.equal(away.headers.get("location"), "https://www.timeperative.com/download/sync/#sync-access-ok");
+  const foreign = await send(request, { origin: "https://evil.example" });
+  assert.equal(foreign.status, 403);
+});
+
+test("the Worker routes /sync-access to the request form", async () => {
+  const res = await worker.fetch(new Request("https://www.timeperative.com/sync-access"), { ASSETS: { fetch: async () => new Response("asset") } });
+  assert.equal(res.status, 405);
 });

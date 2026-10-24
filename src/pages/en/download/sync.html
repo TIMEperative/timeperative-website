@@ -1,0 +1,65 @@
+<!--
+title: TIMEperative.sync for your TIMEperative Cloud Hub
+description: TIMEperative.sync connects the TIMEperative app to your organisation's TIMEperative Cloud Hub. Ask for access here.
+nav: download
+-->
+<div class="container page-head">
+  <h1>TIMEperative.sync</h1>
+  <p class="lead">TIMEperative.sync is installed once on your organisation's TIMEperative Cloud Hub. From then on, everyone's approved entries reach your projects, and your projects and tasks reach the app.</p>
+  <p><a class="button button-primary" href="#sync-access">Ask for access</a></p>
+</div>
+
+<section class="section">
+  <div class="container">
+    <ul class="cards">
+      <li class="card">
+        <h2>What it does</h2>
+        <ul class="facts">
+          <li>Receives the entries people send from the app, with their own login</li>
+          <li>Lets team leads approve them before they count</li>
+          <li>Gives the app your projects, tasks and organisation settings</li>
+        </ul>
+      </li>
+      <li class="card">
+        <h2>What you need</h2>
+        <ul class="facts">
+          <li>A TIMEperative Cloud Hub on series 20.0, run by your organisation</li>
+          <li>Someone who may install apps on it</li>
+          <li>A login on the Cloud Hub for each person who sends entries</li>
+        </ul>
+      </li>
+      <li class="card">
+        <h2>How you get it</h2>
+        <ul class="facts">
+          <li>Ask for access with the form below</li>
+          <li>We send you the licence agreement</li>
+          <li>Once it is signed, you get the release files and the installation guide</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="section section-tint" id="sync-access">
+  <div class="container prose">
+    <h2>Ask for access</h2>
+    <p>Tell us who you are and where your Cloud Hub runs. We answer by email.</p>
+    <form class="access-form waitlist-form" method="post" action="/sync-access" data-ok="Thank you. We will write to you about TIMEperative.sync." data-invalid="Please fill in your name, your organisation and a valid email address." data-error="That did not work. Please try again later, or write to {{support.email}}.">
+      <input type="hidden" name="lang" value="en">
+      <input type="hidden" name="page" value="/download/sync/">
+      <p><label for="sync-name">Your name</label><input id="sync-name" name="name" required maxlength="120" autocomplete="name"></p>
+      <p><label for="sync-email">Your email address</label><input id="sync-email" type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email"></p>
+      <p><label for="sync-organisation">Organisation</label><input id="sync-organisation" name="organisation" required maxlength="160" autocomplete="organization"></p>
+      <p><label for="sync-server">Address of your Cloud Hub <span class="optional">(optional)</span></label><input id="sync-server" type="url" name="server" maxlength="200" placeholder="https://" inputmode="url"></p>
+      <p><label for="sync-github">GitHub user name <span class="optional">(optional)</span></label><input id="sync-github" name="github" maxlength="39" autocomplete="off" spellcheck="false"><span class="hint">The release files are on GitHub; with your user name we can give you access straight away.</span></p>
+      <p><label for="sync-message">Anything else <span class="optional">(optional)</span></label><textarea id="sync-message" name="message" rows="4" maxlength="2000"></textarea></p>
+      <p class="waitlist-trap" aria-hidden="true"><label>Leave this field empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>
+      <p class="fine">We use what you send only to answer your request and to give you access. <a href="/privacy/#sync-access">Privacy policy</a></p>
+      <p><button class="button button-primary" type="submit">Ask for access</button></p>
+      <p class="waitlist-status" role="status" aria-live="polite"></p>
+      <p class="waitlist-done" id="sync-access-ok">Thank you. We will write to you about TIMEperative.sync.</p>
+      <p class="waitlist-done" id="sync-access-invalid">Please fill in your name, your organisation and a valid email address.</p>
+      <p class="waitlist-done" id="sync-access-error">That did not work. Please try again later, or write to {{support.email}}.</p>
+    </form>
+  </div>
+</section>

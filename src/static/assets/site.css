@@ -113,6 +113,48 @@ a.brand:hover .wordmark { color: var(--ty-app-brand-text-hover); }
   box-shadow: inset 0 -3px 0 var(--ty-cc1-link);
   border-radius: 8px 8px 0 0;
 }
+/* A nav group (Download): the summary looks like a nav link; its pages open in a
+   panel attached to the header's lower edge, with its own colours (NAV-002). */
+.nav-menu { position: relative; }
+.nav-menu summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  border-radius: 8px;
+  color: var(--ty-cc1-text);
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+.nav-menu summary::-webkit-details-marker { display: none; }
+.nav-menu summary::after { content: ""; width: 0.4em; height: 0.4em; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-0.15em) rotate(45deg); }
+.nav-menu[open] summary::after { transform: translateY(0.1em) rotate(225deg); }
+.nav-menu summary:hover, .nav-menu[open] summary { background: var(--ty-cc2-bg); color: var(--ty-cc2-heading); }
+.nav-menu summary.is-current {
+  color: var(--ty-cc1-heading);
+  font-weight: 650;
+  box-shadow: inset 0 -3px 0 var(--ty-cc1-link);
+  border-radius: 8px 8px 0 0;
+}
+.site-nav .nav-menu ul {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 0.5rem);
+  z-index: 20;
+  display: block;
+  min-width: 13rem;
+  margin: 0;
+  padding: 0.35rem;
+  background: var(--ty-cc1-bg);
+  color: var(--ty-cc1-text);
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+.site-nav .nav-menu li a { display: flex; width: 100%; white-space: nowrap; }
+.site-nav .nav-menu li a[aria-current="page"] { box-shadow: inset 3px 0 0 var(--ty-cc1-link); border-radius: 0 8px 8px 0; }
 /* Language menu: the current language's flag and code; the others open below. */
 /* Right-hand tools: the colour scheme, then the language (as on acunomic.com). */
 .header-tools { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; }
@@ -188,12 +230,12 @@ a.brand:hover .wordmark { color: var(--ty-app-brand-text-hover); }
   .header-inner { gap: 0.25rem 0.75rem; }
   .site-nav { order: 3; flex-basis: 100%; margin: 0 -0.4rem; }
   .site-nav ul { flex-wrap: nowrap; gap: 0; }
-  .site-nav a { padding: 0 0.35rem; font-size: clamp(0.84rem, 3.9vw, 0.97rem); }
+  .site-nav a, .nav-menu summary { padding: 0 0.35rem; font-size: clamp(0.84rem, 3.9vw, 0.97rem); }
   .header-tools { gap: 0.35rem; }
   .lang-menu summary { padding: 0 0.55rem; gap: 0.35rem; }
 }
 @media (max-width: 22rem) {
-  .site-nav a { padding: 0 0.22rem; }
+  .site-nav a, .nav-menu summary { padding: 0 0.22rem; }
 }
 
 /* ------------------------------------------------------------ sections */
@@ -319,6 +361,27 @@ a.platform:hover, summary.platform:hover { border-color: var(--ty-cc1-link); col
 .waitlist-done { display: none; }
 .waitlist-done:target { display: block; }
 
+/* The TIMEperative.sync request: one labelled field per row. */
+.access-form { max-width: 36rem; margin-top: 1.25rem; }
+.access-form p { margin-bottom: 1rem; }
+.access-form label { display: block; font-weight: 600; margin-bottom: 0.35rem; color: var(--ty-cc2-heading); }
+.access-form .optional { font-weight: 400; color: var(--ty-cc2-text); }
+.access-form .hint { display: block; margin-top: 0.3rem; font-size: 0.92rem; }
+.access-form input:not([type="hidden"]), .access-form textarea {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--ty-cc1-text);
+  border-radius: 10px;
+  background: var(--ty-cc1-bg);
+  color: var(--ty-cc1-text);
+  font: inherit;
+}
+.access-form textarea { resize: vertical; }
+.access-form .waitlist-trap input { width: 1px; }
+.access-form .fine { font-size: 0.92rem; }
+
 /* ------------------------------------------------------------ screenshots */
 
 /* Each screen exists in both schemes; the page shows the one of its own. */
@@ -384,5 +447,5 @@ a.platform:hover, summary.platform:hover { border-color: var(--ty-cc1-link); col
 .footer-nav a { display: inline-flex; align-items: center; min-height: 44px; }
 
 @media (prefers-reduced-motion: no-preference) {
-  a, .button, .site-nav a, .scheme-cycle, .platform, .lang-menu summary { transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease; }
+  a, .button, .site-nav a, .scheme-cycle, .platform, .lang-menu summary, .nav-menu summary { transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease; }
 }

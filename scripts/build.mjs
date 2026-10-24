@@ -276,7 +276,10 @@ function render(page, ctx) {
   const lang = site.languages.find((l) => l.code === page.lang);
   const nav = site.nav.map((n) => {
     const current = page.meta.nav === n.id;
-    return `<li><a href="${localPath(page.lang, n.path)}"${current ? ' aria-current="page"' : ""}>${escapeHtml(t.nav[n.id])}</a></li>`;
+    if (!n.items) return `<li><a href="${localPath(page.lang, n.path)}"${current ? ' aria-current="page"' : ""}>${escapeHtml(t.nav[n.id])}</a></li>`;
+    // A group opens a panel of its pages; without script it is a <details>.
+    const items = n.items.map((i) => `<li><a href="${localPath(page.lang, i.path)}"${page.path === i.path ? ' aria-current="page"' : ""}>${escapeHtml(t.nav[i.id])}</a></li>`).join("");
+    return `<li><details class="nav-menu"><summary${current ? ' class="is-current"' : ""}>${escapeHtml(t.nav[n.id])}</summary><ul>${items}</ul></details></li>`;
   }).join("");
   const footerLinks = site.footer.map((n) => `<li><a href="${localPath(page.lang, n.path)}">${escapeHtml(t.footer[n.id])}</a></li>`).join("");
   const isNotFound = page.path === "/404.html";

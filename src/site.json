@@ -10,7 +10,10 @@
   ],
   "nav": [
     { "id": "home", "path": "/" },
-    { "id": "download", "path": "/download/" },
+    { "id": "download", "path": "/download/", "items": [
+      { "id": "downloadApp", "path": "/download/" },
+      { "id": "downloadSync", "path": "/download/sync/" }
+    ] },
     { "id": "resources", "path": "/resources/" },
     { "id": "support", "path": "/support/" }
   ],
@@ -20,6 +23,6 @@
   ],
   "stores": ["TIMEperative/timeperative", "Acunomic/timeperative"],
   "releasePage": "https://github.com/Acunomic/timeperative/releases",
-  "workerRoutes": ["/download/windows", "/download/android", "/waitlist"],
+  "workerRoutes": ["/download/windows", "/download/android", "/waitlist", "/sync-access"],
   "supportEmail": "support@timeperative.com"
 }

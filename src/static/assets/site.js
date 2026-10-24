@@ -45,18 +45,29 @@
   apply(stored());
 })();
 
-// Language menu: closes on Escape and on a click outside it.
+// The language menu and the nav groups: one open at a time; each closes on
+// Escape and on a click outside it.
 (function () {
-  var menu = document.querySelector(".lang-menu");
-  if (!menu) return;
+  var menus = document.querySelectorAll(".lang-menu, .nav-menu");
+  if (!menus.length) return;
+  Array.prototype.forEach.call(menus, function (menu) {
+    menu.addEventListener("toggle", function () {
+      if (!menu.open) return;
+      Array.prototype.forEach.call(menus, function (other) { if (other !== menu) other.open = false; });
+    });
+  });
   document.addEventListener("click", function (event) {
-    if (menu.open && !menu.contains(event.target)) menu.open = false;
+    Array.prototype.forEach.call(menus, function (menu) {
+      if (menu.open && !menu.contains(event.target)) menu.open = false;
+    });
   });
   document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && menu.open) {
+    if (event.key !== "Escape") return;
+    Array.prototype.forEach.call(menus, function (menu) {
+      if (!menu.open) return;
       menu.open = false;
       menu.querySelector("summary").focus();
-    }
+    });
   });
 })();
 
@@ -105,7 +116,7 @@
         return res.json().catch(function () { return { ok: false }; });
       }).then(function (result) {
         status.textContent = result.ok ? form.dataset.ok : result.error === "invalid" ? form.dataset.invalid : form.dataset.error;
-        if (result.ok) form.querySelector("input[type=email]").value = "";
+        if (result.ok) form.reset();
       }).catch(function () {
         status.textContent = form.dataset.error;
       }).then(function () {

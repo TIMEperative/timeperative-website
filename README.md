@@ -23,7 +23,7 @@ www.timeperative.com; timeperative.com redirects there.
 | `src/layout.html`, `src/i18n/*.json` | Header, footer and the strings around the pages |
 | `src/static/` | Copied as is: stylesheets, the tokens from acustique, the fonts, the mark |
 | `src/site.json` | Languages, menu, the release stores, the Worker routes, the support address |
-| `src/worker.js` | timeperative.com to www; `/download/windows` and `/download/android`: a redirect to the newest installer the stores' update manifests name; `/waitlist`: a lead in the CRM |
+| `src/worker.js` | timeperative.com to www; `/download/windows` and `/download/android`: a redirect to the newest installer the stores' update manifests name; `/waitlist` and `/sync-access`: a lead in the CRM |
 | `scripts/build.mjs` | Builds `dist/` and checks every page (one h1, headings in order, meta lengths, alt text, internal links) |
 | `scripts/notion-news.mjs` | News and release articles from Notion into `content/news/notion/` |
 | `.github/workflows/site.yml` | Build on every push; deploy from `main`, every three hours and on demand |
@@ -78,9 +78,11 @@ npx wrangler login
 npm run deploy
 ```
 
-## The macOS and iOS waitlist
+## The macOS and iOS waitlist and the TIMEperative.sync request
 
-The macOS and iOS buttons open a waitlist form. The Worker creates a lead in
+The macOS and iOS buttons open a waitlist form, and `/download/sync/` holds
+the request for TIMEperative.sync (name, email, organisation; optionally the
+Cloud Hub address, a GitHub user name and a message). For each, the Worker creates a lead in
 the TIMEperative CRM through the JSON-2 API (`POST /json/2/crm.lead/create`).
 It needs three secrets on the Worker; without them the form says it did not
 work and asks people to write to support.

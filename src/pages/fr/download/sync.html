@@ -1,0 +1,65 @@
+<!--
+title: TIMEperative.sync pour votre TIMEperative Cloud Hub
+description: TIMEperative.sync relie l'application TIMEperative au TIMEperative Cloud Hub de votre organisation. Demandez l'accès ici.
+nav: download
+-->
+<div class="container page-head">
+  <h1>TIMEperative.sync</h1>
+  <p class="lead">TIMEperative.sync s&#x27;installe une seule fois sur le TIMEperative Cloud Hub de votre organisation. Ensuite, les saisies approuvées de chacun arrivent dans vos projets, et vos projets et tâches arrivent dans l&#x27;application.</p>
+  <p><a class="button button-primary" href="#sync-access">Demander l&#x27;accès</a></p>
+</div>
+
+<section class="section">
+  <div class="container">
+    <ul class="cards">
+      <li class="card">
+        <h2>Ce qu&#x27;il fait</h2>
+        <ul class="facts">
+          <li>Reçoit les saisies que chacun envoie depuis l&#x27;application, avec son propre identifiant</li>
+          <li>Permet aux responsables d&#x27;équipe de les approuver avant qu&#x27;elles ne comptent</li>
+          <li>Fournit à l&#x27;application vos projets, vos tâches et les paramètres de votre organisation</li>
+        </ul>
+      </li>
+      <li class="card">
+        <h2>Ce qu&#x27;il vous faut</h2>
+        <ul class="facts">
+          <li>Un TIMEperative Cloud Hub de la série 20.0, exploité par votre organisation</li>
+          <li>Une personne autorisée à y installer des applications</li>
+          <li>Un identifiant sur le Cloud Hub pour chaque personne qui envoie des saisies</li>
+        </ul>
+      </li>
+      <li class="card">
+        <h2>Comment l&#x27;obtenir</h2>
+        <ul class="facts">
+          <li>Demandez l&#x27;accès avec le formulaire ci-dessous</li>
+          <li>Nous vous envoyons le contrat de licence</li>
+          <li>Une fois le contrat signé, vous recevez les fichiers de la version et le guide d&#x27;installation</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="section section-tint" id="sync-access">
+  <div class="container prose">
+    <h2>Demander l&#x27;accès</h2>
+    <p>Dites-nous qui vous êtes et où tourne votre Cloud Hub. Nous vous répondons par e-mail.</p>
+    <form class="access-form waitlist-form" method="post" action="/sync-access" data-ok="Merci. Nous vous écrirons au sujet de TIMEperative.sync." data-invalid="Veuillez indiquer votre nom, votre organisation et une adresse e-mail valide." data-error="Cela n&#x27;a pas fonctionné. Réessayez plus tard ou écrivez à {{support.email}}.">
+      <input type="hidden" name="lang" value="fr">
+      <input type="hidden" name="page" value="/fr/download/sync/">
+      <p><label for="sync-name">Votre nom</label><input id="sync-name" name="name" required maxlength="120" autocomplete="name"></p>
+      <p><label for="sync-email">Votre adresse e-mail</label><input id="sync-email" type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email"></p>
+      <p><label for="sync-organisation">Organisation</label><input id="sync-organisation" name="organisation" required maxlength="160" autocomplete="organization"></p>
+      <p><label for="sync-server">Adresse de votre Cloud Hub <span class="optional">(facultatif)</span></label><input id="sync-server" type="url" name="server" maxlength="200" placeholder="https://" inputmode="url"></p>
+      <p><label for="sync-github">Nom d&#x27;utilisateur GitHub <span class="optional">(facultatif)</span></label><input id="sync-github" name="github" maxlength="39" autocomplete="off" spellcheck="false"><span class="hint">Les fichiers de la version sont sur GitHub ; avec votre nom d&#x27;utilisateur, nous pouvons vous donner l&#x27;accès tout de suite.</span></p>
+      <p><label for="sync-message">Autre chose <span class="optional">(facultatif)</span></label><textarea id="sync-message" name="message" rows="4" maxlength="2000"></textarea></p>
+      <p class="waitlist-trap" aria-hidden="true"><label>Laissez ce champ vide <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>
+      <p class="fine">Nous utilisons ce que vous envoyez uniquement pour répondre à votre demande et vous donner l&#x27;accès. <a href="/privacy/#sync-access">Politique de confidentialité</a></p>
+      <p><button class="button button-primary" type="submit">Demander l&#x27;accès</button></p>
+      <p class="waitlist-status" role="status" aria-live="polite"></p>
+      <p class="waitlist-done" id="sync-access-ok">Merci. Nous vous écrirons au sujet de TIMEperative.sync.</p>
+      <p class="waitlist-done" id="sync-access-invalid">Veuillez indiquer votre nom, votre organisation et une adresse e-mail valide.</p>
+      <p class="waitlist-done" id="sync-access-error">Cela n&#x27;a pas fonctionné. Réessayez plus tard ou écrivez à {{support.email}}.</p>
+    </form>
+  </div>
+</section>

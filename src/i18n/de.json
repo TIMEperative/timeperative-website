@@ -4,6 +4,8 @@
   "nav": {
     "home": "Start",
     "download": "Download",
+    "downloadApp": "TIMEperative",
+    "downloadSync": "TIMEperative.sync",
     "resources": "Ressourcen",
     "support": "Support"
   },
