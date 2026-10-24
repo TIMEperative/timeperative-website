@@ -1,7 +1,7 @@
 # www.timeperative.com
 
-The website of TIMEperative, the time tracker for Windows and Android by
-Acunomic GmbH. It replaces www.timely.you. The site answers on
+The website of TIMEperative, the time tracker for Windows and Android. It
+replaces www.timely.you. The site answers on
 www.timeperative.com; timeperative.com redirects there.
 
 - **Pages:** Home (with News and releases), Download, Resources (with

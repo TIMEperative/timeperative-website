@@ -61,5 +61,29 @@
     "ok": "Thank you. We will write to you when TIMEperative for {platform} is out.",
     "invalid": "Please check your email address.",
     "error": "That did not work. Please try again later, or write to {email}."
+  },
+  "shots": {
+    "title": "See TIMEperative",
+    "intro": "Screens from the Windows app and the Android app. The names and entries are examples.",
+    "week": {
+      "alt": "The week view of time entries: a week's work coloured by project, with the key figures panel beside it",
+      "caption": "Time entries by week, with the key figures for the week and the month."
+    },
+    "tracking": {
+      "alt": "Tracking: the apps, documents and calls of one day, each with its time",
+      "caption": "Tracking shows what filled your day, on your device only."
+    },
+    "planning": {
+      "alt": "Planning: a week of planned work by project",
+      "caption": "Plan your week against your projects."
+    },
+    "reports": {
+      "alt": "Reports: daily billable and non-billable hours, the week's fill-up and hours by project",
+      "caption": "Reports for the week or the month."
+    },
+    "phone": {
+      "alt": "The Android app: this week's time entries as cards",
+      "caption": "The same entries on Android."
+    }
   }
 }

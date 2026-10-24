@@ -61,5 +61,29 @@
     "ok": "Merci. Nous vous écrirons dès que TIMEperative pour {platform} sera disponible.",
     "invalid": "Veuillez vérifier votre adresse e-mail.",
     "error": "Cela n'a pas fonctionné. Réessayez plus tard ou écrivez à {email}."
+  },
+  "shots": {
+    "title": "TIMEperative en images",
+    "intro": "Écrans de l'application Windows et de l'application Android. Les noms et les entrées sont des exemples.",
+    "week": {
+      "alt": "La vue hebdomadaire des entrées de temps : le travail d'une semaine coloré par projet, avec le panneau des chiffres clés à côté",
+      "caption": "Les entrées de temps par semaine, avec les chiffres clés de la semaine et du mois."
+    },
+    "tracking": {
+      "alt": "Suivi : les applications, documents et appels d'une journée, chacun avec sa durée",
+      "caption": "Le suivi montre ce qui a rempli votre journée, uniquement sur votre appareil."
+    },
+    "planning": {
+      "alt": "Planification : une semaine de travail planifié par projet",
+      "caption": "Planifiez votre semaine selon vos projets."
+    },
+    "reports": {
+      "alt": "Rapports : heures facturables et non facturables par jour, le remplissage de la semaine et les heures par projet",
+      "caption": "Des rapports pour la semaine ou le mois."
+    },
+    "phone": {
+      "alt": "L'application Android : les entrées de temps de cette semaine sous forme de cartes",
+      "caption": "Les mêmes entrées sur Android."
+    }
   }
 }

@@ -61,5 +61,29 @@
     "ok": "Danke. Wir schreiben Dir, sobald TIMEperative für {platform} erscheint.",
     "invalid": "Bitte prüfe Deine E-Mail-Adresse.",
     "error": "Das hat nicht geklappt. Versuche es später noch einmal, oder schreib an {email}."
+  },
+  "shots": {
+    "title": "TIMEperative ansehen",
+    "intro": "Bildschirme aus der Windows-App und der Android-App. Die Namen und Einträge sind Beispiele.",
+    "week": {
+      "alt": "Die Wochenansicht der Zeiteinträge: die Arbeit einer Woche, nach Projekt eingefärbt, daneben die Kennzahlen",
+      "caption": "Zeiteinträge nach Woche, mit den Kennzahlen für Woche und Monat."
+    },
+    "tracking": {
+      "alt": "Tracking: die Apps, Dokumente und Anrufe eines Tages, jeweils mit ihrer Zeit",
+      "caption": "Das Tracking zeigt, womit Du Deinen Tag verbracht hast, nur auf Deinem Gerät."
+    },
+    "planning": {
+      "alt": "Planung: eine Woche geplanter Arbeit nach Projekt",
+      "caption": "Plane Deine Woche nach Deinen Projekten."
+    },
+    "reports": {
+      "alt": "Berichte: abrechenbare und nicht abrechenbare Stunden pro Tag, die Auffüllung der Woche und Stunden nach Projekt",
+      "caption": "Berichte für die Woche oder den Monat."
+    },
+    "phone": {
+      "alt": "Die Android-App: die Zeiteinträge dieser Woche als Karten",
+      "caption": "Dieselben Einträge auf Android."
+    }
   }
 }

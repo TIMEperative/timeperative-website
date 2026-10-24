@@ -60,6 +60,29 @@
   });
 })();
 
+// macOS and iOS: the button opens its waitlist under the row and closes the
+// other one; a second click closes it. Without script the button is a link
+// to the panel, which shows as the target.
+(function () {
+  var toggles = document.querySelectorAll("[data-waitlist-toggle]");
+  function set(toggle, open) {
+    var panel = document.getElementById(toggle.getAttribute("aria-controls"));
+    toggle.setAttribute("aria-expanded", String(open));
+    if (panel) panel.classList.toggle("is-open", open);
+    return panel;
+  }
+  for (var i = 0; i < toggles.length; i++) {
+    toggles[i].addEventListener("click", function (event) {
+      event.preventDefault();
+      var toggle = event.currentTarget;
+      var open = toggle.getAttribute("aria-expanded") !== "true";
+      for (var j = 0; j < toggles.length; j++) set(toggles[j], false);
+      var panel = set(toggle, open);
+      if (open && panel) { var input = panel.querySelector("input[type=email]"); if (input) input.focus({ preventScroll: true }); }
+    });
+  }
+})();
+
 // Waitlist for macOS and iOS: sends the form without leaving the page and
 // says what happened under the button. Without script the form posts itself,
 // and the Worker brings the visitor back to the same message.
