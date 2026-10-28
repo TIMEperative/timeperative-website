@@ -9,8 +9,9 @@ Cloudflare Workers. Read [README.md](README.md) first.
    paths for every language in `src/site.json` (en, de, fr, es); the build
    fails when a language misses a page. English is the source; German is
    Swiss German with Du (COPY-003, COPY-012); French says vous and Spanish tú,
-   translated with DeepL and corrected by hand (2026-10-19); a native review
-   is still open.
+   corrected by hand (2026-10-19); a native review is still open. No
+   translation service is set for them (timely-you D-206, 2026-10-23): ask
+   the owner before choosing one.
 2. **News comes from Notion.** Rows of "TIMEperative website content" with
    Status Publish and Kind News or Release become `/news/<slug>/`
    (`scripts/notion-news.mjs`). Never commit what the script writes
