@@ -383,10 +383,13 @@ export async function build() {
     releaseSummary: (lang) => {
       const t = strings[lang].release;
       if (!latest) return `<p class="release-summary">${t.unknown.replace("{link}", `<a href="${site.releasePage}">${escapeHtml(t.releasePage)}</a>`)}</p>`;
-      return `<p class="release-summary">${t.summary.replace("{version}", `<strong>${escapeHtml(latest.version)}</strong>`).replace("{date}", `<time datetime="${latest.date.slice(0, 10)}">${formatDate(latest.date, lang)}</time>`)}</p>`;
+      // data-release marks what the Worker brings up to date when a release
+      // is newer than this build (src/worker.js, releaseRewriter).
+      const locale = site.languages.find((l) => l.code === lang).locale;
+      return `<p class="release-summary" data-release="${escapeHtml(latest.version)}" data-locale="${locale}">${t.summary.replace("{version}", `<strong data-release-version>${escapeHtml(latest.version)}</strong>`).replace("{date}", `<time data-release-date datetime="${latest.date.slice(0, 10)}">${formatDate(latest.date, lang)}</time>`)}</p>`;
     },
     releaseNotesLink: (lang) => latest
-      ? `<a href="${localPath(lang, `/news/${releaseSlug(latest.version)}/`)}">${escapeHtml(strings[lang].release.notesLink)}</a>`
+      ? `<a data-release-notes href="${localPath(lang, `/news/${releaseSlug(latest.version)}/`)}">${escapeHtml(strings[lang].release.notesLink)}</a>`
       : `<a href="${site.releasePage}">${escapeHtml(strings[lang].release.releasePage)}</a>`,
   };
 
