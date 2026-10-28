@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import worker, { latestInstaller, readSignup, addToWaitlist, waitlist, readAccessRequest, requestSyncAccess, syncAccess } from "../src/worker.js";
+import worker, { latestInstaller, newestRelease, latestRelease, page, readSignup, addToWaitlist, waitlist, readAccessRequest, requestSyncAccess, syncAccess } from "../src/worker.js";
 
 const json = (body, ok = true) => ({ ok, json: async () => body });
 const stores = ["New/store", "Old/store"];
@@ -30,6 +30,41 @@ test("a store that cannot be read does not stop the others", async () => {
     return json({ pubDate: "2026-10-16T21:32:57Z", url: "https://github.com/Old/store/releases/download/v1/app.apk" });
   };
   assert.equal(await latestInstaller("android", stores, fetcher), "https://github.com/Old/store/releases/download/v1/app.apk");
+});
+
+test("the newest release names its version and its own page in the store", async () => {
+  const fetcher = async () => json({ version: "0.1.0-alpha.18", pub_date: "2026-10-28T14:29:19Z", platforms: { "windows-x86_64": { url: "https://github.com/Old/store/releases/download/v0.1.0-alpha.18/setup.exe" } } });
+  assert.deepEqual(await newestRelease("windows", ["Old/store"], fetcher), {
+    url: "https://github.com/Old/store/releases/download/v0.1.0-alpha.18/setup.exe",
+    date: Date.parse("2026-10-28T14:29:19Z"),
+    version: "0.1.0-alpha.18",
+    page: "https://github.com/Old/store/releases/tag/v0.1.0-alpha.18",
+  });
+});
+
+test("the pages name the Windows release, or Android's when Windows has none", async () => {
+  const fetcher = async (url) => url.endsWith("latest.json")
+    ? json({}, false)
+    : json({ version: "0.1.0-alpha.18", pubDate: "2026-10-28T14:33:09Z", url: "https://github.com/Old/store/releases/download/v0.1.0-alpha.18/app.apk" });
+  assert.equal((await latestRelease(["Old/store"], fetcher)).version, "0.1.0-alpha.18");
+});
+
+test("a page goes through the rewriter without its ETag and is never a 304; a file is passed on as it is", async () => {
+  const seen = [];
+  const env = { ASSETS: { fetch: async (request) => {
+    seen.push([new URL(request.url).pathname, request.headers.get("if-none-match")]);
+    return new URL(request.url).pathname.endsWith(".css")
+      ? new Response("css", { headers: { etag: '"c"', "content-type": "text/css" } })
+      : new Response("<p>page</p>", { headers: { etag: '"p"', "content-type": "text/html; charset=utf-8" } });
+  } } };
+  const rewriter = () => ({ transform: (res) => new Response(res.body, res) });
+  const html = await page(new Request("https://www.timeperative.com/de/download/", { headers: { "if-none-match": '"p"' } }), env, rewriter);
+  assert.equal(await html.text(), "<p>page</p>");
+  assert.equal(html.headers.get("etag"), null);
+  assert.equal(html.headers.get("cache-control"), "no-cache");
+  const css = await page(new Request("https://www.timeperative.com/assets/site.css", { headers: { "if-none-match": '"c"' } }), env, rewriter);
+  assert.equal(css.headers.get("etag"), '"c"');
+  assert.deepEqual(seen, [["/de/download/", null], ["/assets/site.css", '"c"']]);
 });
 
 test("every other path is a static asset", async () => {

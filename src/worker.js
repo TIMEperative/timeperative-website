@@ -7,6 +7,9 @@
 //     installer the stores' update manifests name, so the website never needs
 //     a new build for a new release, and the move of the store (site.json
 //     "stores") needs no new code;
+//   - brings the version a page names ("Latest version: ...") up to the
+//     newest release when that is newer than the build, from the same
+//     manifests, so a release shows on the site within minutes;
 //   - takes the macOS and iOS waitlist sign-ups (POST /waitlist) and the
 //     requests for TIMEperative.sync (POST /sync-access) into the CRM, as
 //     leads created through the external JSON-2 API;
@@ -21,8 +24,12 @@ export const PLATFORMS = {
   android: { file: "latest-android.json", url: (m) => m.url, date: (m) => m.pubDate },
 };
 
-/** The newest installer URL for a platform, or null when no store answers. */
-export async function latestInstaller(platform, stores = site.stores, fetcher = fetch) {
+/**
+ * The newest release of a platform across the stores, as { url, date,
+ * version, page }, or null when no store answers. page is that release's
+ * own page in its store.
+ */
+export async function newestRelease(platform, stores = site.stores, fetcher = fetch) {
   const p = PLATFORMS[platform];
   let best = null;
   for (const store of stores) {
@@ -33,13 +40,81 @@ export async function latestInstaller(platform, stores = site.stores, fetcher = 
       const url = p.url(manifest);
       const date = Date.parse(p.date(manifest) ?? "");
       // Only an installer published in that store's own releases is followed.
-      if (typeof url !== "string" || !url.startsWith(`https://github.com/${store}/releases/download/`) || Number.isNaN(date)) continue;
-      if (!best || date > best.date) best = { url, date };
+      const own = `https://github.com/${store}/releases/download/`;
+      if (typeof url !== "string" || !url.startsWith(own) || Number.isNaN(date)) continue;
+      const tag = url.slice(own.length).split("/")[0];
+      if (!best || date > best.date) best = { url, date, version: String(manifest.version ?? ""), page: `https://github.com/${store}/releases/tag/${tag}` };
     } catch {
       // A store that cannot be read is skipped; the next one may answer.
     }
   }
-  return best?.url ?? null;
+  return best;
+}
+
+/** The newest installer URL for a platform, or null when no store answers. */
+export async function latestInstaller(platform, stores = site.stores, fetcher = fetch) {
+  return (await newestRelease(platform, stores, fetcher))?.url ?? null;
+}
+
+// ------------------------------------------------------------ the version on the pages
+
+/** The release the pages name: Windows first, as the build picks it (scripts/build.mjs). */
+export async function latestRelease(stores = site.stores, fetcher = fetch) {
+  return (await newestRelease("windows", stores, fetcher)) ?? (await newestRelease("android", stores, fetcher));
+}
+
+/**
+ * Rewrites what the build marked with data-release when a newer release is
+ * out: the version, its date in the page's locale, and the release notes
+ * link, which goes to the release's own page until the next build writes its
+ * article. The stores are read only when a page has the mark.
+ */
+export function releaseRewriter(release = () => latestRelease()) {
+  let pending = null;
+  let newer = null;
+  let locale = "en-GB";
+  return new HTMLRewriter()
+    .on("[data-release]", {
+      async element(el) {
+        pending ??= release().catch(() => null);
+        const r = await pending;
+        if (!r?.version || r.version === el.getAttribute("data-release")) return;
+        newer = r;
+        locale = el.getAttribute("data-locale") || locale;
+        el.setAttribute("data-release", r.version);
+      },
+    })
+    .on("[data-release-version]", { element(el) { if (newer) el.setInnerContent(newer.version); } })
+    .on("[data-release-date]", {
+      element(el) {
+        if (!newer) return;
+        const date = new Date(newer.date);
+        el.setAttribute("datetime", date.toISOString().slice(0, 10));
+        el.setInnerContent(new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(date));
+      },
+    })
+    .on("[data-release-notes]", { element(el) { if (newer) el.setAttribute("href", newer.page); } });
+}
+
+/**
+ * A page from the static assets, with the version brought up to date. Pages
+ * go out without the assets' ETag and are never answered with a 304, so a
+ * browser never keeps a page that named an older release.
+ */
+export async function page(request, env, rewriter = releaseRewriter) {
+  const path = new URL(request.url).pathname;
+  const html = (request.method === "GET" || request.method === "HEAD") && !/\.[a-z0-9]+$/i.test(path.replace(/\.html$/i, ""));
+  if (!html) return env.ASSETS.fetch(request);
+  const headers = new Headers(request.headers);
+  headers.delete("if-none-match");
+  headers.delete("if-modified-since");
+  const res = await env.ASSETS.fetch(new Request(request, { headers }));
+  if (res.status !== 200 || !(res.headers.get("content-type") ?? "").includes("text/html")) return res;
+  const out = rewriter().transform(res);
+  const fresh = new Response(out.body, out);
+  fresh.headers.delete("etag");
+  fresh.headers.set("cache-control", "no-cache");
+  return fresh;
 }
 
 // ------------------------------------------------------------ the waitlist
@@ -201,7 +276,7 @@ export default {
     if (url.pathname === "/waitlist") return waitlist(request, env);
     if (url.pathname === "/sync-access") return syncAccess(request, env);
     const match = /^\/download\/(windows|android)\/?$/.exec(url.pathname);
-    if (!match) return env.ASSETS.fetch(request);
+    if (!match) return page(request, env);
     const location = (await latestInstaller(match[1])) ?? site.releasePage;
     return new Response(null, { status: 302, headers: { location, "cache-control": "no-store" } });
   },
