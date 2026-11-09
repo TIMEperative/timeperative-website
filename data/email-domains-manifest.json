@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "registry_version": "2026-10-24.1",
-  "built_at": "2026-10-24T08:37:26.738Z",
+  "registry_version": "2026-11-09.1",
+  "built_at": "2026-11-09T08:38:03.358Z",
   "ruleset_version": "converter-request-v1",
-  "row_count": 103418,
+  "row_count": 103420,
   "counts": {
     "by_type": {
       "ALIAS": 59,
       "DISPOSABLE": 98507,
-      "ISP_PERSONAL": 2,
+      "ISP_PERSONAL": 4,
       "WEBMAIL": 4850
     },
     "by_type_and_confidence": {
@@ -16,12 +16,12 @@
       "ALIAS MEDIUM": 57,
       "DISPOSABLE HIGH": 1000,
       "DISPOSABLE MEDIUM": 97507,
-      "ISP_PERSONAL HIGH": 2,
-      "WEBMAIL HIGH": 4,
-      "WEBMAIL MEDIUM": 4846
+      "ISP_PERSONAL HIGH": 4,
+      "WEBMAIL HIGH": 7,
+      "WEBMAIL MEDIUM": 4843
     }
   },
-  "registry_sha256": "sha256:020f39b00570e59bd31a2b2ac5e12846a4058aa8edb86c8065634a9ef9660309",
+  "registry_sha256": "sha256:915930e4b815d4ae587ef001b5fdfb826b23121f0307e98941252431b0c2f95d",
   "source_versions": {
     "free-email-providers": "sha256:cbd32ff0f6302921631b49e687cf58d22ab8a7fcc4885e606a5777994b93fdf6",
     "castle-disposable": "sha256:438a5a84028b03ab276428c02a98539ade88402cc1d94a94ad8ebd888acd0608",

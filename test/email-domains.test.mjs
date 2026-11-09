@@ -78,7 +78,7 @@ test("a lookup matches whole lines only, and explicitly listed subdomains", () =
   assert.equal(classifyDomain("ail.com", groups).email_domain_type, "CUSTOM_DOMAIN");
 });
 
-test("one policy per entry point (specification 10): the converter request refuses, the waitlist takes everything", () => {
+test("one policy per entry point (specification 10): the converter request refuses free and throwaway addresses, the waitlist confirmed throwaway ones", () => {
   const c = (type, confidence = "MEDIUM", sources = []) => ({ email_domain_type: type, confidence, sources });
   assert.equal(decide("converter-request", c("WEBMAIL", "LOW")), "refuse");
   assert.equal(decide("converter-request", c("ISP_PERSONAL")), "refuse");
@@ -90,7 +90,9 @@ test("one policy per entry point (specification 10): the converter request refus
   assert.equal(decide("converter-request", c("ALIAS", "HIGH")), "review");
   assert.equal(decide("converter-request", c("CUSTOM_DOMAIN", "LOW")), "accept");
   assert.equal(decide("converter-request", c("UNKNOWN", "LOW")), "accept");
-  for (const type of ["WEBMAIL", "ISP_PERSONAL", "ALIAS", "DISPOSABLE", "CUSTOM_DOMAIN"]) assert.equal(decide("waitlist", c(type, "HIGH")), "accept");
+  for (const type of ["WEBMAIL", "ISP_PERSONAL", "ALIAS", "CUSTOM_DOMAIN"]) assert.equal(decide("waitlist", c(type, "HIGH")), "accept");
+  // A confirmed throwaway address is refused on the waitlist too (owner, 2026-11-09).
+  assert.equal(decide("waitlist", c("DISPOSABLE", "HIGH")), "refuse");
   assert.throws(() => decide("corporate-signup", c("WEBMAIL")), /no email domain policy/);
   // Every rule the policies refuse on is in the Worker's subset, so the Worker can apply it.
   for (const policy of Object.values(POLICIES)) {
@@ -109,7 +111,8 @@ test("the committed registry, manifest, overrides, exclusions and the Worker's c
 
 test("the published files hold the specification's names and the overrides it requires", () => {
   const overrides = JSON.parse(readFileSync(join(ROOT, FILES.overrides), "utf8"));
-  const want = { "bluewin.ch": "ISP_PERSONAL", "hispeed.ch": "ISP_PERSONAL", "gmail.com": "WEBMAIL", "proton.me": "WEBMAIL", "protonmail.com": "WEBMAIL", "tuta.com": "WEBMAIL", "duck.com": "ALIAS", "privaterelay.appleid.com": "ALIAS" };
+  const want = { "bluewin.ch": "ISP_PERSONAL", "hispeed.ch": "ISP_PERSONAL", "sunrise.ch": "ISP_PERSONAL", "salt.ch": "ISP_PERSONAL",
+    "gmx.ch": "WEBMAIL", "gmx.net": "WEBMAIL", "gmx.de": "WEBMAIL", "burnermail.io": "DISPOSABLE", "opayq.com": "DISPOSABLE", "spamgourmet.com": "DISPOSABLE", "gmail.com": "WEBMAIL", "proton.me": "WEBMAIL", "protonmail.com": "WEBMAIL", "tuta.com": "WEBMAIL", "duck.com": "ALIAS", "privaterelay.appleid.com": "ALIAS" };
   for (const [domain, type] of Object.entries(want)) assert.equal(overrides.find((o) => o.domain === domain)?.type, type, domain);
   const registry = readFileSync(join(ROOT, FILES.registry), "utf8");
   assert.doesNotMatch(registry, /"category"|PUBLIC_WEBMAIL|EMAIL_ALIAS/);
@@ -121,6 +124,7 @@ test("the Worker bundles every row but the community list's DISPOSABLE below HIG
   assert.deepEqual(Object.keys(GROUPS).filter((k) => k.startsWith("DISPOSABLE")), [
     "DISPOSABLE HIGH castle-disposable",
     "DISPOSABLE HIGH castle-disposable,disposable-community",
+    "DISPOSABLE HIGH timeperative-curated,castle-disposable",
     "DISPOSABLE MEDIUM disposable-community,free-email-providers",
   ]);
   const bundled = Object.values(GROUPS).reduce((n, list) => n + list.split("\n").filter(Boolean).length, 0);

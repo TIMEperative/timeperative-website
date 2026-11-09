@@ -60,6 +60,7 @@
     "privacy": "Privacy policy",
     "ok": "Thank you. We will write to you when TIMEperative for {platform} is out.",
     "invalid": "Please check your email address.",
+    "personal": "Please use a permanent email address. Temporary addresses cannot join the waitlist.",
     "error": "That did not work. Please try again later, or write to {email}."
   }
 }

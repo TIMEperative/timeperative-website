@@ -32,7 +32,11 @@ classification is (`HIGH`, `MEDIUM`, `LOW`), not how likely fraud is.
 Each form has its policy in `src/email-domains.js` (`POLICIES`, one entry
 per entry point of the specification's section 10, and `decide()`); a
 corporate sign-up on the website, once it is defined, adds its entry there.
-The waitlist takes every type, as a newsletter does. The converter request:
+The waitlist takes public mailboxes and forwarding addresses, as a
+newsletter does, but refuses a confirmed throwaway address (`DISPOSABLE`
+with `HIGH`: Castle's list or your override) with "Please use a permanent
+email address. Temporary addresses cannot join the waitlist." (owner,
+2026-11-09). The converter request:
 
 | Type of the address's domain | The request |
 |---|---|

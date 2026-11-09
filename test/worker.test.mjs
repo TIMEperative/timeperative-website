@@ -62,10 +62,24 @@ test("a sign-up needs a platform without a release and a plausible address; the 
   assert.deepEqual(readSignup(form({ email: "ana@example.ch", platform: "ios", website: "http://spam" })), { robot: true });
 });
 
-test("the waitlist takes any plausible address, a public mailbox and a throwaway one too, as a newsletter does", () => {
-  for (const email of ["ana@gmail.com", "ana@bluewin.ch", "ana@duck.com", "ana@mailinator.com", "ana@bücher.ch"]) {
+test("the waitlist takes a public mailbox and a forwarding address, as a newsletter does, but no confirmed throwaway address", () => {
+  for (const email of ["ana@gmail.com", "ana@bluewin.ch", "ana@gmx.ch", "ana@duck.com", "ana@0-00.usa.cc", "ana@bücher.ch"]) {
     assert.equal(readSignup(form({ email, platform: "ios" })).email, email);
   }
+  // Castle's list and the owner's overrides (2026-11-09) confirm these: refused, with the waitlist's own message.
+  for (const email of ["ana@mailinator.com", "ana@yopmail.com", "ana@burnermail.io", "ana@opayq.com", "ana@spamgourmet.com"]) {
+    assert.deepEqual(readSignup(form({ email, platform: "ios" })), { error: "personal" }, email);
+  }
+});
+
+test("a refused waitlist address gets its own message, in JSON and without script", async () => {
+  const { calls, fetcher } = odoo();
+  const json = await waitlist(post({ email: "ana@mailinator.com", platform: "ios" }, { accept: "application/json" }), ENV, fetcher);
+  assert.equal(json.status, 400);
+  assert.deepEqual(await json.json(), { ok: false, error: "personal" });
+  const plain = await waitlist(post({ email: "ana@mailinator.com", platform: "macos", page: "/download/" }), ENV, fetcher);
+  assert.equal(plain.headers.get("location"), "https://www.timeperative.com/download/#waitlist-macos-personal");
+  assert.equal(calls.length, 0);
 });
 
 const ENV = { ODOO_URL: "https://erp.example.com/", ODOO_DB: "erp", ODOO_API_KEY: "key", ODOO_TEAM_ID: "3", ODOO_TAG_IDS: "7, 8" };
@@ -181,7 +195,8 @@ test("a converter request refuses public mailboxes at any confidence and throwaw
 
 test("with the committed registry, Gmail, Bluewin, Proton and Mailinator are refused; Apple's relay and a company's own domain are taken", () => {
   const read = (email) => readConverterRequest(form({ ...REQUEST, email }));
-  for (const email of ["ana@gmail.com", "ana@Gmail.com", "ana@bluewin.ch", "ana@hispeed.ch", "ana@proton.me", "ana@tuta.com", "ana@mailinator.com", "ana@yopmail.com"]) {
+  for (const email of ["ana@sunrise.ch", "ana@salt.ch", "ana@gmx.ch", "ana@gmx.net", "ana@gmx.de", "ana@burnermail.io", "ana@opayq.com", "ana@spamgourmet.com",
+    "ana@gmail.com", "ana@Gmail.com", "ana@bluewin.ch", "ana@hispeed.ch", "ana@proton.me", "ana@tuta.com", "ana@mailinator.com", "ana@yopmail.com"]) {
     assert.deepEqual(read(email), { error: "personal" }, email);
   }
   assert.equal(read("ana@privaterelay.appleid.com").domain.email_domain_type, "ALIAS");

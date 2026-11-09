@@ -87,9 +87,10 @@ export const POLICIES = {
     refuse: ["WEBMAIL", "ISP_PERSONAL", "DISPOSABLE HIGH", "DISPOSABLE MEDIUM free-email-providers"],
     review: ["ALIAS", "DISPOSABLE"],
   },
-  // Like a newsletter (section 10): public mailboxes are what people use.
-  // Refusing DISPOSABLE HIGH here is proposed to the owner, not decided.
-  "waitlist": { refuse: [], review: [] },
+  // Like a newsletter (section 10): public mailboxes are what people use,
+  // but a throwaway address that is confirmed (Castle, or our override) is
+  // refused (owner, 2026-11-09).
+  "waitlist": { refuse: ["DISPOSABLE HIGH"], review: [] },
 };
 
 /** "refuse", "review" or "accept": what an entry point does with a classification. */

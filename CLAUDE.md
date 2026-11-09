@@ -44,7 +44,8 @@ Cloudflare Workers. Read [README.md](README.md) first.
    email domain registry in `data/` (owner, 2026-10-23; `data/README.md`):
    WEBMAIL and ISP_PERSONAL at any confidence, DISPOSABLE with HIGH
    confidence, and DISPOSABLE that the free provider list names too
-   (owner, 2026-10-24). The owner edits only the overrides and exclusions; the
+   (owner, 2026-10-24). The waitlist refuses DISPOSABLE with HIGH confidence
+   only (owner, 2026-11-09). The owner edits only the overrides and exclusions; the
    registry and `src/email-domains.generated.js` are generated
    (`npm run email-domains`). Never a customer's domain in these public
    files, never the registry or the reason for a refusal in the browser.

@@ -1,10 +1,18 @@
 [
   { "domain": "bluewin.ch", "type": "ISP_PERSONAL", "reason": "Swiss consumer ISP", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
+  { "domain": "burnermail.io", "type": "DISPOSABLE", "reason": "Not acceptable for registration", "reviewed_by": "owner", "reviewed_at": "2026-11-09" },
   { "domain": "duck.com", "type": "ALIAS", "reason": "DuckDuckGo forwarding", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
   { "domain": "gmail.com", "type": "WEBMAIL", "reason": "Public mailbox", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
+  { "domain": "gmx.ch", "type": "WEBMAIL", "reason": "Consumer mailbox", "reviewed_by": "owner", "reviewed_at": "2026-11-09" },
+  { "domain": "gmx.de", "type": "WEBMAIL", "reason": "Consumer mailbox", "reviewed_by": "owner", "reviewed_at": "2026-11-09" },
+  { "domain": "gmx.net", "type": "WEBMAIL", "reason": "Consumer mailbox", "reviewed_by": "owner", "reviewed_at": "2026-11-09" },
   { "domain": "hispeed.ch", "type": "ISP_PERSONAL", "reason": "Swiss consumer ISP", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
+  { "domain": "opayq.com", "type": "DISPOSABLE", "reason": "Not acceptable for registration", "reviewed_by": "owner", "reviewed_at": "2026-11-09" },
   { "domain": "privaterelay.appleid.com", "type": "ALIAS", "reason": "Apple private relay", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
   { "domain": "proton.me", "type": "WEBMAIL", "reason": "Privacy mailbox is included in WEBMAIL", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
   { "domain": "protonmail.com", "type": "WEBMAIL", "reason": "Privacy mailbox is included in WEBMAIL", "reviewed_by": "owner", "reviewed_at": "2026-10-23" },
+  { "domain": "salt.ch", "type": "ISP_PERSONAL", "reason": "Swiss consumer ISP", "reviewed_by": "owner", "reviewed_at": "2026-11-09" },
+  { "domain": "spamgourmet.com", "type": "DISPOSABLE", "reason": "Not acceptable for registration", "reviewed_by": "owner", "reviewed_at": "2026-11-09" },
+  { "domain": "sunrise.ch", "type": "ISP_PERSONAL", "reason": "Swiss consumer ISP", "reviewed_by": "owner", "reviewed_at": "2026-11-09" },
   { "domain": "tuta.com", "type": "WEBMAIL", "reason": "Privacy mailbox is included in WEBMAIL", "reviewed_by": "owner", "reviewed_at": "2026-10-23" }
 ]
