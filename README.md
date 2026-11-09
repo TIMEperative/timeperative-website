@@ -25,9 +25,11 @@ www.timeperative.com; timeperative.com redirects there.
 | `src/static/` | Copied as is: stylesheets, the tokens from acustique, the fonts, the mark |
 | `src/site.json` | Languages, menu, the release stores, the Worker routes, the support address |
 | `src/worker.js` | timeperative.com to www; `/download/windows` and `/download/android`: a redirect to the newest installer the stores' update manifests name; `/waitlist` and `/converter-request`: a lead in the CRM |
+| `data/`, `scripts/email-domains.mjs` | The email domain registry, which tells a work address from a public mailbox for `/converter-request`; you maintain `data/email-domains-overrides.json` and `data/email-domains-exclusions.json` ([data/README.md](data/README.md)) |
 | `scripts/build.mjs` | Builds `dist/` and checks every page (one h1, headings in order, meta lengths, alt text, internal links) |
 | `scripts/notion-news.mjs` | News and release articles from Notion into `content/news/notion/` |
 | `.github/workflows/site.yml` | Build on every push; deploy from `main`, every three hours and on demand |
+| `.github/workflows/email-domains.yml` | Refreshes the email domain registry every day and proposes the change as a pull request |
 
 The download links never need a new build: the Worker reads `latest.json`
 and `latest-android.json` from each store in `src/site.json` and sends the

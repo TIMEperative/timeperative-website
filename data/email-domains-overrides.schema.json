@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.timeperative.com/schemas/email-domains-overrides.schema.json",
+  "title": "TIMEperative email domain overrides",
+  "description": "Reviewed classifications that win over every feed. Edited by hand: one object per line, sorted by domain. Public mail providers only, never a customer's domain (specification 2.3, rule 8).",
+  "type": "array",
+  "uniqueItems": true,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["domain", "type", "reason", "reviewed_by", "reviewed_at"],
+    "properties": {
+      "domain": { "type": "string", "minLength": 3, "maxLength": 253, "pattern": "^[a-z0-9.-]+$", "description": "Lowercase ASCII; an international domain in its xn-- form." },
+      "type": { "type": "string", "enum": ["WEBMAIL", "ISP_PERSONAL", "ALIAS", "DISPOSABLE"], "description": "CUSTOM_DOMAIN and UNKNOWN are results at run time, never stored. To take a domain out of the registry, add it to email-domains-exclusions.json." },
+      "reason": { "type": "string", "minLength": 3, "maxLength": 200 },
+      "reviewed_by": { "type": "string", "minLength": 2, "maxLength": 80 },
+      "reviewed_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+    }
+  }
+}

@@ -60,6 +60,7 @@
     "privacy": "Politique de confidentialité",
     "ok": "Merci. Nous vous écrirons dès que TIMEperative pour {platform} sera disponible.",
     "invalid": "Veuillez vérifier votre adresse e-mail.",
+    "personal": "Veuillez utiliser une adresse e-mail permanente. Une adresse temporaire ne permet pas de s'inscrire sur la liste d'attente.",
     "error": "Cela n'a pas fonctionné. Réessayez plus tard ou écrivez à {email}."
   }
 }
