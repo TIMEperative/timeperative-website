@@ -6,7 +6,7 @@ nav: none
 <div class="container page-head">
   <h1>Privacy policy</h1>
   <p class="lead">TIMEperative keeps your data on your device. This page explains what the app and this website do with personal data, what leaves your device and when, and what you control.</p>
-  <p class="updated">Last updated on 24 October 2026.</p>
+  <p class="updated">Last updated on 13 November 2026.</p>
 </div>
 
 <section class="section">
@@ -17,7 +17,7 @@ nav: none
     <h2>In short</h2>
     <ul>
       <li>TIMEperative has no account, and we run no server for the app. We receive none of your entries, nothing that tracking records, and no usage statistics, crash reports or analytics.</li>
-      <li>Your data stays in a database on your computer or phone. Apart from the update check, it leaves your device only when you connect a service or send entries, and then it goes to that service, not to us.</li>
+      <li>Your data stays in a database on your computer or phone. Apart from the update check, it leaves your device only when you connect a service, send entries or sync your devices, and then it goes to that service or to your organisation's TIMEperative Cloud Hub, not to us.</li>
       <li>This website sets no cookies and uses no analytics. If you join the waitlist for macOS or iOS, we keep your email address until we can tell you that version is out; if you ask for access to TIMEperative.sync, we keep what you entered in the form to answer you.</li>
     </ul>
 
@@ -25,6 +25,7 @@ nav: none
 
     <h3>Where your data is stored</h3>
     <p>Everything you record lives in one database on your device: on Windows in the app's folder in your user's local application data (%LOCALAPPDATA%), which does not roam with your profile; on Android in the app's private storage. TIMEperative does not encrypt this database itself, so protect your device with its own encryption, such as BitLocker on Windows.</p>
+    <p>If you sync this device with your organisation's TIMEperative Cloud Hub, a copy of what you sync is also kept there, on the server your organisation runs. Your organisation decides where that server is, who may read it and how long the data is kept; we receive none of it.</p>
     <p>Passwords, keys and sign-in tokens are kept in the system's secure store: the Windows Credential Manager, or on Android under a key in the Android Keystore. Two kinds of settings are kept in the database instead: the client ID and secret of your own Google registration, and calendar links you paste in.</p>
     <p>Before an update changes the database, the app keeps a copy of it on your device; it keeps the last five. On Android, the app is excluded from cloud backups, so its data is not copied to your Google account. If you delete the app's data, nobody can restore it, not even we.</p>
 
@@ -48,6 +49,8 @@ nav: none
         <tr><td>A calendar link, such as Proton</td><td>A request for the link you pasted.</td><td>Only after you add it</td></tr>
         <tr><td>DeepL</td><td>The text you translate, with your own DeepL key.</td><td>Only when you translate</td></tr>
         <tr><td>TIMEperative Cloud Hub, your organisation's</td><td>The entries you send: employee, project, description, start, duration, time zone and a reference. With your own login the app also reads projects, tasks and your organisation's settings.</td><td>When you send entries or import projects, and settings when the connection is set up</td></tr>
+        <tr><td>Syncing your devices, through your organisation's TIMEperative Cloud Hub</td><td>Your own entries in every state, drafts included: description, type, date, start and end, duration, time zone, and the project, activity, tags, plan and work location they use; also when you submit an entry, withdraw it, delete a draft, or approve one where your organisation allows approval on the device. Your own places, such as your home, with their address, coordinates and time zone, and your personal set-up: travel means and their rates, trip types, entry detail types and tracking rules. Not an entry's internal comment, and nothing of a project or entry you switched off. In the Cloud Hub, your approvers and controllers can read your drafts and comment on them; your own places and set-up are shown only to you, but your organisation runs that server and can read its database. The app reads your entries there and the projects, activities, tags and work locations of your organisation that you may see.</td><td>Only once the connection is set up: when you start a sync, and while automatic sync is on (it is off until you switch it on): shortly after the app starts, every 15 minutes, and when you come back to the app after 5 minutes</td></tr>
+        <tr><td>Bringing your projects, activities and work locations to your organisation's TIMEperative Cloud Hub</td><td>Only the projects, activities and work locations you choose to add as new, for review: their name, the project of an activity, the kind, address, coordinates and time zone of a work location, and whether you propose yourself as a project's manager; and the withdrawal of a request still waiting. Matching a record with one in the Cloud Hub, or keeping it on your device, sends nothing. Your organisation's project managers and controllers review what you send.</td><td>When you send them or withdraw a request</td></tr>
       </tbody>
     </table>
 
@@ -57,6 +60,9 @@ nav: none
       <li>Dismiss or delete what tracking found. Deleting keeps only a short fingerprint and the time span, so the same item is not suggested again.</li>
       <li>Clear tracking per period, delete and restore entries, and purge them for good.</li>
       <li>Export your entries as CSV, and the configuration as a file without entries and without secrets.</li>
+      <li>Choose for each project whether it syncs, with an exception for a single entry, and switch automatic sync on or off; it is off until you switch it on.</li>
+      <li>Choose for each of your projects, activities and work locations whether it is added to the Cloud Hub for review, matched with one there or kept on your device, and withdraw a request until it is decided.</li>
+      <li>When a record changed both on your device and in the Cloud Hub, choose which version to keep.</li>
     </ul>
 
     <h2>This website</h2>

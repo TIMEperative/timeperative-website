@@ -6,7 +6,7 @@ nav: none
 <div class="container page-head">
   <h1>Politique de confidentialité</h1>
   <p class="lead">TIMEperative conserve vos données sur votre appareil. Cette page explique ce que l'application et ce site web font des données personnelles, ce qui quitte votre appareil et quand, et ce que vous contrôlez.</p>
-  <p class="updated">Dernière mise à jour le 24 octobre 2026.</p>
+  <p class="updated">Dernière mise à jour le 13 novembre 2026.</p>
 </div>
 
 <section class="section">
@@ -17,7 +17,7 @@ nav: none
     <h2>En bref</h2>
     <ul>
       <li>TIMEperative n'a pas de compte, et nous n'exploitons aucun serveur pour l'application. Nous ne recevons aucune de vos entrées, rien de ce qu'enregistre le suivi, ni statistiques d'utilisation, ni rapports de plantage, ni données d'analyse.</li>
-      <li>Vos données restent dans une base de données sur votre ordinateur ou votre téléphone. Hormis la recherche de mises à jour, elles ne quittent votre appareil que lorsque vous connectez un service ou envoyez des entrées ; elles vont alors à ce service, et non à nous.</li>
+      <li>Vos données restent dans une base de données sur votre ordinateur ou votre téléphone. Hormis la recherche de mises à jour, elles ne quittent votre appareil que lorsque vous connectez un service, envoyez des entrées ou synchronisez vos appareils ; elles vont alors à ce service ou au TIMEperative Cloud Hub de votre organisation, et non à nous.</li>
       <li>Ce site web ne dépose aucun cookie et n'utilise aucun outil d'analyse. Si vous vous inscrivez sur la liste d'attente pour macOS ou iOS, nous conservons votre adresse e-mail jusqu'à ce que nous puissions vous annoncer la sortie de cette version ; si vous demandez l'accès à TIMEperative.sync, nous conservons ce que vous avez saisi dans le formulaire pour vous répondre.</li>
     </ul>
 
@@ -25,6 +25,7 @@ nav: none
 
     <h3>Où vos données sont stockées</h3>
     <p>Tout ce que vous enregistrez se trouve dans une seule base de données sur votre appareil : sous Windows, dans le dossier de l'application parmi les données d'application locales de votre utilisateur (%LOCALAPPDATA%), qui ne suivent pas votre profil itinérant ; sous Android, dans le stockage privé de l'application. TIMEperative ne chiffre pas lui-même cette base de données : protégez donc votre appareil avec son propre chiffrement, comme BitLocker sous Windows.</p>
+    <p>Si vous synchronisez cet appareil avec le TIMEperative Cloud Hub de votre organisation, une copie de ce que vous synchronisez y est également conservée, sur le serveur que gère votre organisation. C'est votre organisation qui décide où se trouve ce serveur, qui peut le consulter et combien de temps les données sont conservées ; nous n'en recevons rien.</p>
     <p>Les mots de passe, clés et jetons de connexion sont conservés dans le magasin sécurisé du système : le Gestionnaire d'identification de Windows ou, sur Android, sous une clé du Keystore Android. Deux types de paramètres sont en revanche conservés dans la base de données : l'identifiant client et le secret de votre propre enregistrement Google, et les liens de calendrier que vous collez.</p>
     <p>Avant qu'une mise à jour ne modifie la base de données, l'application en conserve une copie sur votre appareil ; elle garde les cinq dernières. Sur Android, l'application est exclue des sauvegardes dans le cloud : ses données ne sont donc pas copiées sur votre compte Google. Si vous supprimez les données de l'application, personne ne peut les restaurer, pas même nous.</p>
 
@@ -48,6 +49,8 @@ nav: none
         <tr><td>Un lien de calendrier, comme Proton</td><td>Une requête vers le lien que vous avez collé.</td><td>Uniquement après l'avoir ajouté</td></tr>
         <tr><td>DeepL</td><td>Le texte que vous traduisez, avec votre propre clé DeepL.</td><td>Uniquement lorsque vous traduisez</td></tr>
         <tr><td>TIMEperative Cloud Hub, celui de votre organisation</td><td>Les entrées que vous envoyez : employé, projet, description, début, durée, fuseau horaire et une référence. Avec vos propres identifiants, l'application lit aussi les projets, les tâches et les paramètres de votre organisation.</td><td>Lorsque vous envoyez des entrées ou importez des projets, et les paramètres lorsque la connexion est configurée</td></tr>
+        <tr><td>Synchronisation de vos appareils, via le TIMEperative Cloud Hub de votre organisation</td><td>Vos propres entrées dans tous leurs états, brouillons compris : description, type, date, début et fin, durée, fuseau horaire, ainsi que le projet, l'activité, les étiquettes, le plan et le lieu de travail qu'elles utilisent ; également lorsque vous soumettez une entrée, la retirez, supprimez un brouillon ou en approuvez une là où votre organisation autorise l'approbation sur l'appareil. Vos propres lieux, comme votre domicile, avec leur adresse, leurs coordonnées et leur fuseau horaire, et vos réglages personnels : moyens de transport et leurs tarifs, types de trajets, types de détails des entrées et règles de suivi. Pas le commentaire interne d'une entrée, ni rien d'un projet ou d'une entrée que vous avez désactivé. Dans le Cloud Hub, vos approbateurs et contrôleurs peuvent lire vos brouillons et les commenter ; vos propres lieux et réglages ne sont affichés qu'à vous, mais votre organisation gère ce serveur et peut lire sa base de données. L'application y lit vos entrées ainsi que les projets, activités, étiquettes et lieux de travail de votre organisation que vous pouvez voir.</td><td>Uniquement une fois la connexion configurée : lorsque vous lancez une synchronisation, et tant que la synchronisation automatique est activée (elle est désactivée jusqu'à ce que vous l'activiez) : peu après le démarrage de l'application, toutes les 15 minutes, et lorsque vous revenez dans l'application après 5 minutes</td></tr>
+        <tr><td>Apport de vos projets, activités et lieux de travail au TIMEperative Cloud Hub de votre organisation</td><td>Uniquement les projets, activités et lieux de travail que vous choisissez d'ajouter comme nouveaux, pour examen : leur nom, le projet d'une activité, le type, l'adresse, les coordonnées et le fuseau horaire d'un lieu de travail, et si vous vous proposez comme responsable d'un projet ; ainsi que le retrait d'une demande encore en attente. Associer un élément à un élément du Cloud Hub, ou le conserver sur votre appareil, n'envoie rien. Les chefs de projet et les contrôleurs de votre organisation examinent ce que vous envoyez.</td><td>Lorsque vous les envoyez ou retirez une demande</td></tr>
       </tbody>
     </table>
 
@@ -57,6 +60,9 @@ nav: none
       <li>Ignorez ou supprimez ce que le suivi a trouvé. La suppression ne garde qu'une courte empreinte et la période, pour que le même élément ne soit pas proposé à nouveau.</li>
       <li>Effacez le suivi par période, supprimez et restaurez des entrées, et purgez-les définitivement.</li>
       <li>Exportez vos entrées au format CSV, et la configuration sous forme de fichier sans entrées et sans secrets.</li>
+      <li>Choisissez pour chaque projet s'il est synchronisé, avec une exception possible pour une seule entrée, et activez ou désactivez la synchronisation automatique ; elle reste désactivée tant que vous ne l'avez pas activée.</li>
+      <li>Pour chacun de vos projets, activités et lieux de travail, choisissez s'il est ajouté au Cloud Hub pour examen, associé à un élément qui s'y trouve ou conservé sur votre appareil, et retirez une demande tant qu'elle n'est pas décidée.</li>
+      <li>Lorsqu'un élément a été modifié à la fois sur votre appareil et dans le Cloud Hub, choisissez la version à conserver.</li>
     </ul>
 
     <h2>Ce site web</h2>
