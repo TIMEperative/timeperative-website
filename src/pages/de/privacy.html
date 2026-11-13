@@ -6,7 +6,7 @@ nav: none
 <div class="container page-head">
   <h1>Datenschutzerklärung</h1>
   <p class="lead">TIMEperative behält Deine Daten auf Deinem Gerät. Diese Seite erklärt, was die App und diese Website mit Personendaten tun, was Dein Gerät wann verlässt und was Du selbst steuerst.</p>
-  <p class="updated">Zuletzt geändert am 24. Oktober 2026.</p>
+  <p class="updated">Zuletzt geändert am 13. November 2026.</p>
 </div>
 
 <section class="section">
@@ -17,7 +17,7 @@ nav: none
     <h2>Kurz gesagt</h2>
     <ul>
       <li>TIMEperative hat kein Konto, und wir betreiben keinen Server für die App. Wir erhalten keine Deiner Einträge, nichts von dem, was das Tracking aufzeichnet, und keine Nutzungsstatistiken, Absturzberichte oder Analysen.</li>
-      <li>Deine Daten bleiben in einer Datenbank auf Deinem Computer oder Telefon. Abgesehen von der Suche nach Updates verlassen sie Dein Gerät nur, wenn Du einen Dienst verbindest oder Einträge sendest, und dann gehen sie an diesen Dienst, nicht an uns.</li>
+      <li>Deine Daten bleiben in einer Datenbank auf Deinem Computer oder Telefon. Abgesehen von der Suche nach Updates verlassen sie Dein Gerät nur, wenn Du einen Dienst verbindest, Einträge sendest oder Deine Geräte synchronisierst, und dann gehen sie an diesen Dienst oder an den TIMEperative Cloud Hub Deiner Organisation, nicht an uns.</li>
       <li>Diese Website setzt keine Cookies und verwendet keine Analysewerkzeuge. Trägst Du Dich auf die Warteliste für macOS oder iOS ein, behalten wir Deine E-Mail-Adresse, bis wir Dir sagen können, dass diese Version erschienen ist; beantragst Du Zugang zu TIMEperative.sync, behalten wir, was Du ins Formular eingegeben hast, um Dir zu antworten.</li>
     </ul>
 
@@ -25,6 +25,7 @@ nav: none
 
     <h3>Wo Deine Daten liegen</h3>
     <p>Alles, was Du erfasst, liegt in einer Datenbank auf Deinem Gerät: auf Windows im Ordner der App in den lokalen Anwendungsdaten Deines Benutzers (%LOCALAPPDATA%), die nicht mit Deinem Profil wandern; auf Android im privaten Speicher der App. TIMEperative verschlüsselt diese Datenbank nicht selbst; schütze Dein Gerät deshalb mit seiner eigenen Verschlüsselung, etwa BitLocker auf Windows.</p>
+    <p>Synchronisierst Du dieses Gerät mit dem TIMEperative Cloud Hub Deiner Organisation, liegt eine Kopie dessen, was Du synchronisierst, auch dort, auf dem Server, den Deine Organisation betreibt. Deine Organisation entscheidet, wo dieser Server steht, wer ihn lesen darf und wie lange die Daten bleiben; wir erhalten nichts davon.</p>
     <p>Passwörter, Schlüssel und Anmeldetoken liegen im sicheren Speicher des Systems: in der Windows-Anmeldeinformationsverwaltung oder auf Android unter einem Schlüssel im Android Keystore. Zwei Arten von Einstellungen liegen stattdessen in der Datenbank: Client-ID und Secret Deiner eigenen Google-Registrierung sowie Kalenderlinks, die Du einfügst.</p>
     <p>Bevor ein Update die Datenbank ändert, legt die App eine Kopie davon auf Deinem Gerät ab; sie behält die letzten fünf. Auf Android ist die App von Cloud-Sicherungen ausgenommen, ihre Daten werden also nicht in Dein Google-Konto kopiert. Löschst Du die Daten der App, kann sie niemand wiederherstellen, auch wir nicht.</p>
 
@@ -48,6 +49,8 @@ nav: none
         <tr><td>Ein Kalenderlink, etwa von Proton</td><td>Eine Anfrage an den Link, den Du eingefügt hast.</td><td>Erst, wenn Du ihn hinzufügst</td></tr>
         <tr><td>DeepL</td><td>Der Text, den Du übersetzt, mit Deinem eigenen DeepL-Schlüssel.</td><td>Nur, wenn Du übersetzt</td></tr>
         <tr><td>TIMEperative Cloud Hub, der Deiner Organisation</td><td>Die Einträge, die Du sendest: Mitarbeiter, Projekt, Beschreibung, Beginn, Dauer, Zeitzone und eine Referenz. Mit Deinem eigenen Login liest die App ausserdem Projekte, Aufgaben und die Einstellungen Deiner Organisation.</td><td>Wenn Du Einträge sendest oder Projekte importierst, die Einstellungen, sobald die Verbindung eingerichtet ist</td></tr>
+        <tr><td>Deine Geräte synchronisieren, über den TIMEperative Cloud Hub Deiner Organisation</td><td>Deine eigenen Einträge in jedem Status, Entwürfe eingeschlossen: Beschreibung, Art, Datum, Beginn und Ende, Dauer, Zeitzone sowie Projekt, Aktivität, Tags, Plan und Arbeitsort, die sie verwenden; ausserdem, wenn Du einen Eintrag einreichst oder zurückziehst, einen Entwurf löschst oder einen Eintrag genehmigst, wo Deine Organisation die Genehmigung auf dem Gerät zulässt. Deine eigenen Orte, etwa Dein Zuhause, mit Adresse, Koordinaten und Zeitzone, und Deine persönliche Einrichtung: Verkehrsmittel und ihre Tarife, Reisearten, Detailarten von Einträgen und Tracking-Regeln. Nicht der interne Kommentar eines Eintrags und nichts von einem Projekt oder Eintrag, den Du ausgeschaltet hast. Im Cloud Hub können Deine Genehmigenden und Controller Deine Entwürfe lesen und kommentieren; Deine eigenen Orte und Deine Einrichtung werden nur Dir angezeigt, aber Deine Organisation betreibt diesen Server und kann seine Datenbank lesen. Die App liest dort Deine Einträge und die Projekte, Aktivitäten, Tags und Arbeitsorte Deiner Organisation, die Du sehen darfst.</td><td>Erst, wenn die Verbindung eingerichtet ist: wenn Du eine Synchronisierung startest, und solange die automatische Synchronisierung eingeschaltet ist (sie ist aus, bis Du sie einschaltest): kurz nach dem Start der App, alle 15 Minuten und wenn Du nach 5 Minuten zur App zurückkehrst</td></tr>
+        <tr><td>Deine Projekte, Aktivitäten und Arbeitsorte in den TIMEperative Cloud Hub Deiner Organisation bringen</td><td>Nur die Projekte, Aktivitäten und Arbeitsorte, die Du als neu zur Prüfung hinzufügst: ihr Name, das Projekt einer Aktivität, Art, Adresse, Koordinaten und Zeitzone eines Arbeitsorts und ob Du Dich selbst als Projektleitung vorschlägst; und das Zurückziehen einer Anfrage, die noch wartet. Ordnest Du einen Datensatz einem im Cloud Hub zu oder behältst Du ihn auf Deinem Gerät, wird nichts gesendet. Die Projektleitungen und Controller Deiner Organisation prüfen, was Du sendest.</td><td>Wenn Du sie sendest oder eine Anfrage zurückziehst</td></tr>
       </tbody>
     </table>
 
@@ -57,6 +60,9 @@ nav: none
       <li>Verwirf oder lösche, was das Tracking gefunden hat. Beim Löschen bleiben nur ein kurzer Fingerabdruck und die Zeitspanne, damit derselbe Eintrag nicht noch einmal vorgeschlagen wird.</li>
       <li>Leere das Tracking pro Zeitraum, lösche Einträge und stelle sie wieder her, und entferne sie endgültig.</li>
       <li>Exportiere Deine Einträge als CSV und die Konfiguration als Datei ohne Einträge und ohne Geheimnisse.</li>
+      <li>Lege für jedes Projekt fest, ob es synchronisiert wird, mit einer Ausnahme für einen einzelnen Eintrag, und schalte die automatische Synchronisierung ein oder aus; sie ist aus, bis Du sie einschaltest.</li>
+      <li>Lege für jedes Deiner Projekte, jede Aktivität und jeden Arbeitsort fest, ob es zur Prüfung in den Cloud Hub kommt, dort einem bestehenden zugeordnet wird oder auf Deinem Gerät bleibt, und ziehe eine Anfrage zurück, solange sie nicht entschieden ist.</li>
+      <li>Wurde ein Datensatz auf Deinem Gerät und im Cloud Hub geändert, wähle, welche Version bleibt.</li>
     </ul>
 
     <h2>Diese Website</h2>
