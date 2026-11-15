@@ -124,6 +124,7 @@ test("the Worker bundles every row but the community list's DISPOSABLE below HIG
   assert.deepEqual(Object.keys(GROUPS).filter((k) => k.startsWith("DISPOSABLE")), [
     "DISPOSABLE HIGH castle-disposable",
     "DISPOSABLE HIGH castle-disposable,disposable-community",
+    "DISPOSABLE HIGH timeperative-curated",
     "DISPOSABLE HIGH timeperative-curated,castle-disposable",
     "DISPOSABLE MEDIUM disposable-community,free-email-providers",
   ]);

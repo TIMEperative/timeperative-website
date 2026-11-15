@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "registry_version": "2026-11-09.1",
-  "built_at": "2026-11-09T08:38:03.358Z",
+  "registry_version": "2026-11-15.1",
+  "built_at": "2026-11-15T18:51:51.848Z",
   "ruleset_version": "converter-request-v1",
   "row_count": 103420,
   "counts": {
     "by_type": {
-      "ALIAS": 59,
-      "DISPOSABLE": 98507,
+      "ALIAS": 57,
+      "DISPOSABLE": 98509,
       "ISP_PERSONAL": 4,
       "WEBMAIL": 4850
     },
     "by_type_and_confidence": {
       "ALIAS HIGH": 2,
-      "ALIAS MEDIUM": 57,
-      "DISPOSABLE HIGH": 1000,
+      "ALIAS MEDIUM": 55,
+      "DISPOSABLE HIGH": 1002,
       "DISPOSABLE MEDIUM": 97507,
       "ISP_PERSONAL HIGH": 4,
       "WEBMAIL HIGH": 7,
       "WEBMAIL MEDIUM": 4843
     }
   },
-  "registry_sha256": "sha256:915930e4b815d4ae587ef001b5fdfb826b23121f0307e98941252431b0c2f95d",
+  "registry_sha256": "sha256:49f706418dd701eda6e4210523c03e3741d671d3e1573303021a3191db172454",
   "source_versions": {
     "free-email-providers": "sha256:cbd32ff0f6302921631b49e687cf58d22ab8a7fcc4885e606a5777994b93fdf6",
     "castle-disposable": "sha256:438a5a84028b03ab276428c02a98539ade88402cc1d94a94ad8ebd888acd0608",
@@ -60,7 +60,7 @@
     "free-provider-and-disposable": 28362,
     "free-provider-and-alias": 18,
     "castle-not-in-community": 42,
-    "override-differs-from-feeds": 1,
+    "override-differs-from-feeds": 3,
     "excluded": 0
   }
 }

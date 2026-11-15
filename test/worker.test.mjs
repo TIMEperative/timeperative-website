@@ -67,7 +67,7 @@ test("the waitlist takes a public mailbox and a forwarding address, as a newslet
     assert.equal(readSignup(form({ email, platform: "ios" })).email, email);
   }
   // Castle's list and the owner's overrides (2026-11-09) confirm these: refused, with the waitlist's own message.
-  for (const email of ["ana@mailinator.com", "ana@yopmail.com", "ana@burnermail.io", "ana@opayq.com", "ana@spamgourmet.com"]) {
+  for (const email of ["ana@mailinator.com", "ana@yopmail.com", "ana@burnermail.io", "ana@opayq.com", "ana@spamgourmet.com", "ana@spamgourmet.net", "ana@spamgourmet.org"]) {
     assert.deepEqual(readSignup(form({ email, platform: "ios" })), { error: "personal" }, email);
   }
 });
@@ -195,7 +195,7 @@ test("a converter request refuses public mailboxes at any confidence and throwaw
 
 test("with the committed registry, Gmail, Bluewin, Proton and Mailinator are refused; Apple's relay and a company's own domain are taken", () => {
   const read = (email) => readConverterRequest(form({ ...REQUEST, email }));
-  for (const email of ["ana@sunrise.ch", "ana@salt.ch", "ana@gmx.ch", "ana@gmx.net", "ana@gmx.de", "ana@burnermail.io", "ana@opayq.com", "ana@spamgourmet.com",
+  for (const email of ["ana@sunrise.ch", "ana@salt.ch", "ana@gmx.ch", "ana@gmx.net", "ana@gmx.de", "ana@burnermail.io", "ana@opayq.com", "ana@spamgourmet.com", "ana@spamgourmet.net", "ana@spamgourmet.org",
     "ana@gmail.com", "ana@Gmail.com", "ana@bluewin.ch", "ana@hispeed.ch", "ana@proton.me", "ana@tuta.com", "ana@mailinator.com", "ana@yopmail.com"]) {
     assert.deepEqual(read(email), { error: "personal" }, email);
   }
