@@ -1,0 +1,72 @@
+<!--
+title: Télécharger TIMEperative pour Windows et Android
+description: Téléchargez TIMEperative pour Windows 11 ou Android 7.0 et versions ultérieures. L'application est gratuite et se met à jour automatiquement.
+nav: download
+-->
+<div class="container page-head">
+  <h1>Télécharger TIMEperative</h1>
+  <p class="lead">TIMEperative est gratuit. Choisissez votre plateforme ; l'application vous avertira ensuite dès qu'une nouvelle version sera disponible.</p>
+  {{platforms}}
+  {{release.summary}}
+  <p>{{release.notes}}</p>
+</div>
+
+<section class="section">
+  <div class="container">
+    <ul class="cards">
+      <li class="card platform-card" id="windows">
+        <h2>Windows</h2>
+        <ul class="facts">
+          <li>Windows 11, 64 bits</li>
+          <li>S'installe pour votre compte utilisateur Windows, sans droits d'administrateur</li>
+          <li>Vérifie la présence de mises à jour au démarrage et une fois par jour</li>
+        </ul>
+        <div class="actions">
+          <a class="button button-primary" href="/download/windows">Télécharger pour Windows</a>
+        </div>
+      </li>
+      <li class="card platform-card" id="android">
+        <h2>Android</h2>
+        <ul class="facts">
+          <li>Android 7.0 ou version ultérieure</li>
+          <li>Installé à partir du fichier APK</li>
+          <li>Vous informe de la sortie d'une nouvelle version et ouvre son téléchargement</li>
+        </ul>
+        <div class="actions">
+          <a class="button button-primary" href="/download/android">Télécharger pour Android</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="section section-tint">
+  <div class="container prose">
+    <h2>Avant l'installation</h2>
+    <p>TIMEperative n'est pas encore disponible sur le Microsoft Store ni sur Google Play, et le programme d'installation Windows n'est pas encore signé numériquement. Votre navigateur et votre appareil vérifient donc le fichier avant de l'installer. Voici ce qui s'affichera, et ce qu'il faut choisir.</p>
+    <h3>Windows</h3>
+    <ol>
+      <li>Microsoft Edge peut indiquer que le fichier n'est pas couramment téléchargé. Le téléchargement affiche alors 100 %, mais Edge retient le fichier jusqu'à ce que vous décidiez. Ouvrez les téléchargements avec Ctrl+J, sélectionnez « Autres actions » (…) à côté du fichier, puis « Garder », « Afficher plus » et « Garder quand même ».</li>
+      <li>Ouvrez le fichier. Windows peut afficher « Windows a protégé votre PC » : sélectionnez « Plus d'informations », puis « Exécuter quand même ».</li>
+      <li>Le programme d'installation configure TIMEperative pour votre compte utilisateur Windows, sans droits d'administrateur.</li>
+    </ol>
+    <p>Windows pose à nouveau la question pour chaque nouvelle version que vous téléchargez depuis cette page, car il ne connaît pas encore cette version. Lorsque le Contrôle intelligent des applications est activé ou que votre organisation bloque les applications non signées, Windows ne propose pas « Exécuter quand même » ; contactez votre service informatique ou attendez la version signée.</p>
+    <h3>Android</h3>
+    <ol>
+      <li>Chrome peut afficher « Fichier potentiellement dangereux ». Sélectionnez « Télécharger quand même ».</li>
+      <li>Ouvrez le fichier téléchargé. La première fois, Android indique que l'installation d'applis inconnues provenant de cette source n'est pas autorisée sur ce téléphone. Sélectionnez « Paramètres », activez « Autoriser depuis cette source », puis revenez en arrière. Sous Android 7, activez plutôt « Sources inconnues » dans les paramètres, sous « Sécurité ».</li>
+      <li>Play Protect peut recommander d'analyser l'application, car il ne connaît pas encore TIMEperative. Lancez l'analyse.</li>
+      <li>Android vous demande si vous voulez installer cette appli. Sélectionnez « Installer ».</li>
+    </ol>
+    <p>Si le téléchargement atteint 100 % mais que le fichier ne figure pas dans vos téléchargements, relancez-le depuis cette page. Une fois TIMEperative installé, vous pouvez désactiver à nouveau « Autoriser depuis cette source » dans les paramètres du téléphone.</p>
+    <h3>Accès anticipé</h3>
+    <p>TIMEperative est une version alpha. L'application stocke vos données dans une base de données sur votre appareil ; à chaque mise à jour, celles-ci sont migrées et des instantanés des dernières versions sont conservés. Exportez tout de même vos entrées de temps à autre tant que l'application est en version alpha.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container prose">
+    <h2>Toutes les versions</h2>
+    <p>Chaque version, accompagnée de ses notes et de ses fichiers, se trouve sur la <a href="{{release.page}}">page des versions</a>. Les liens ci-dessus renvoient toujours vers la version la plus récente.</p>
+  </div>
+</section>

@@ -7,11 +7,15 @@
 //     installer the stores' update manifests name, so the website never needs
 //     a new build for a new release, and the move of the store (site.json
 //     "stores") needs no new code;
-//   - takes the macOS and iOS waitlist sign-ups (POST /waitlist) and the
-//     requests for a converter for SAP (POST /converter-request) into the
-//     CRM, as leads created through the external JSON-2 API; a request for a
-//     converter needs a work address, which the email domain registry
-//     (data/README.md) tells from a public mail provider's;
+//   - brings the version a page names ("Latest version: ...") up to the
+//     newest release when that is newer than the build, from the same
+//     manifests, so a release shows on the site within minutes;
+//   - takes the macOS and iOS waitlist sign-ups (POST /waitlist), the
+//     requests for TIMEperative.sync (POST /sync-access) and the requests for
+//     a converter for SAP (POST /converter-request) into the CRM, as leads
+//     created through the external JSON-2 API; the email domain registry
+//     (data/README.md) tells a work address from a public mailbox and a
+//     throwaway one;
 //   - serves everything else from the static assets.
 
 import site from "./site.json" with { type: "json" };
@@ -25,8 +29,12 @@ export const PLATFORMS = {
   android: { file: "latest-android.json", url: (m) => m.url, date: (m) => m.pubDate },
 };
 
-/** The newest installer URL for a platform, or null when no store answers. */
-export async function latestInstaller(platform, stores = site.stores, fetcher = fetch) {
+/**
+ * The newest release of a platform across the stores, as { url, date,
+ * version, page }, or null when no store answers. page is that release's
+ * own page in its store.
+ */
+export async function newestRelease(platform, stores = site.stores, fetcher = fetch) {
   const p = PLATFORMS[platform];
   let best = null;
   for (const store of stores) {
@@ -37,18 +45,92 @@ export async function latestInstaller(platform, stores = site.stores, fetcher = 
       const url = p.url(manifest);
       const date = Date.parse(p.date(manifest) ?? "");
       // Only an installer published in that store's own releases is followed.
-      if (typeof url !== "string" || !url.startsWith(`https://github.com/${store}/releases/download/`) || Number.isNaN(date)) continue;
-      if (!best || date > best.date) best = { url, date };
+      const own = `https://github.com/${store}/releases/download/`;
+      if (typeof url !== "string" || !url.startsWith(own) || Number.isNaN(date)) continue;
+      const tag = url.slice(own.length).split("/")[0];
+      if (!best || date > best.date) best = { url, date, version: String(manifest.version ?? ""), page: `https://github.com/${store}/releases/tag/${tag}` };
     } catch {
       // A store that cannot be read is skipped; the next one may answer.
     }
   }
-  return best?.url ?? null;
+  return best;
+}
+
+/** The newest installer URL for a platform, or null when no store answers. */
+export async function latestInstaller(platform, stores = site.stores, fetcher = fetch) {
+  return (await newestRelease(platform, stores, fetcher))?.url ?? null;
+}
+
+// ------------------------------------------------------------ the version on the pages
+
+/** The release the pages name: Windows first, as the build picks it (scripts/build.mjs). */
+export async function latestRelease(stores = site.stores, fetcher = fetch) {
+  return (await newestRelease("windows", stores, fetcher)) ?? (await newestRelease("android", stores, fetcher));
+}
+
+/**
+ * Rewrites what the build marked with data-release when a newer release is
+ * out: the version, its date in the page's locale, and the release notes
+ * link, which goes to the release's own page until the next build writes its
+ * article. The stores are read only when a page has the mark.
+ */
+export function releaseRewriter(release = () => latestRelease()) {
+  let pending = null;
+  let newer = null;
+  let locale = "en-GB";
+  return new HTMLRewriter()
+    .on("[data-release]", {
+      async element(el) {
+        pending ??= release().catch(() => null);
+        const r = await pending;
+        if (!r?.version || r.version === el.getAttribute("data-release")) return;
+        newer = r;
+        locale = el.getAttribute("data-locale") || locale;
+        el.setAttribute("data-release", r.version);
+      },
+    })
+    .on("[data-release-version]", { element(el) { if (newer) el.setInnerContent(newer.version); } })
+    .on("[data-release-date]", {
+      element(el) {
+        if (!newer) return;
+        const date = new Date(newer.date);
+        el.setAttribute("datetime", date.toISOString().slice(0, 10));
+        el.setInnerContent(new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(date));
+      },
+    })
+    .on("[data-release-notes]", { element(el) { if (newer) el.setAttribute("href", newer.page); } });
+}
+
+/**
+ * A page from the static assets, with the version brought up to date. Pages
+ * go out without the assets' ETag and are never answered with a 304, so a
+ * browser never keeps a page that named an older release.
+ */
+export async function page(request, env, rewriter = releaseRewriter) {
+  const path = new URL(request.url).pathname;
+  const html = (request.method === "GET" || request.method === "HEAD") && !/\.[a-z0-9]+$/i.test(path.replace(/\.html$/i, ""));
+  if (!html) return env.ASSETS.fetch(request);
+  const headers = new Headers(request.headers);
+  headers.delete("if-none-match");
+  headers.delete("if-modified-since");
+  const res = await env.ASSETS.fetch(new Request(request, { headers }));
+  if (res.status !== 200 || !(res.headers.get("content-type") ?? "").includes("text/html")) return res;
+  const out = rewriter().transform(res);
+  const fresh = new Response(out.body, out);
+  fresh.headers.delete("etag");
+  fresh.headers.set("cache-control", "no-cache");
+  return fresh;
 }
 
 // ------------------------------------------------------------ the waitlist
 
 export const WAITLIST_PLATFORMS = { macos: "macOS", ios: "iOS" };
+const EMAIL = /^[^\s@<>()[\]\\,;:"]{1,64}@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
+
+/** The registry's view of an address's domain: its type, its confidence, its sources and the registry's version. */
+export function classifyEmail(email, groups = GROUPS, version = REGISTRY_VERSION) {
+  return { ...classifyDomain(emailDomain(email), groups), registry_version: version };
+}
 
 /** The sign-up a form sent, or the reason it cannot be taken. */
 export function readSignup(form) {
@@ -59,25 +141,26 @@ export function readSignup(form) {
   if (String(form.get("website") ?? "") !== "") return { robot: true };
   if (!WAITLIST_PLATFORMS[platform]) return { error: "invalid" };
   if (!emailDomain(email)) return { error: "invalid" };
+  // A confirmed throwaway address is refused (the "waitlist" policy in src/email-domains.js).
   if (decide("waitlist", classifyEmail(email)) === "refuse") return { error: "personal" };
   return { email, platform, lang: site.languages.some((l) => l.code === lang) ? lang : "en" };
 }
 
 /**
- * A call into the CRM through the external JSON-2 API (Odoo 19 and later:
- * POST /json/2/<model>/<method>, a bearer API key, X-Odoo-Database), or null
- * when the secrets are missing.
+ * Creates a lead in the CRM through the external JSON-2 API (Odoo 19 and
+ * later: POST /json/2/<model>/<method>, a bearer API key, X-Odoo-Database),
+ * unless a lead of the same name for the same address exists already.
  */
-function crm(env, fetcher, agent) {
+export async function createLead(lead, env, fetcher = fetch, what = "lead") {
   const base = String(env.ODOO_URL ?? "").replace(/\/+$/, "");
-  if (!base || !env.ODOO_API_KEY) return null;
-  return async (model, method, body) => {
+  if (!base || !env.ODOO_API_KEY) return { error: "unavailable" };
+  const call = async (model, method, body) => {
     const res = await fetcher(`${base}/json/2/${model}/${method}`, {
       method: "POST",
       headers: {
         authorization: `bearer ${env.ODOO_API_KEY}`,
         "content-type": "application/json; charset=utf-8",
-        "user-agent": `timeperative-website ${agent}`,
+        "user-agent": `timeperative-website ${what}`,
         ...(env.ODOO_DB ? { "x-odoo-database": env.ODOO_DB } : {}),
       },
       body: JSON.stringify(body),
@@ -85,34 +168,70 @@ function crm(env, fetcher, agent) {
     if (!res.ok) throw new Error(`${model}.${method}: HTTP ${res.status}`);
     return res.json();
   };
-}
-
-/** Creates the lead once: a second one with the same address and name adds nothing. */
-async function addLead(lead, env, fetcher, agent) {
-  const call = crm(env, fetcher, agent);
-  if (!call) return { error: "unavailable" };
   try {
     const seen = await call("crm.lead", "search_count", { domain: [["email_from", "=ilike", lead.email_from], ["name", "=", lead.name]] });
     if (seen > 0) return { ok: true, known: true };
-    if (env.ODOO_TEAM_ID) lead.team_id = Number(env.ODOO_TEAM_ID);
-    if (env.ODOO_COMPANY_ID) lead.company_id = Number(env.ODOO_COMPANY_ID);
-    if (env.ODOO_TAG_IDS) lead.tag_ids = String(env.ODOO_TAG_IDS).split(",").map((id) => [4, Number(id.trim())]);
-    await call("crm.lead", "create", { vals_list: [lead] });
+    const vals = { ...lead };
+    if (env.ODOO_TEAM_ID) vals.team_id = Number(env.ODOO_TEAM_ID);
+    if (env.ODOO_COMPANY_ID) vals.company_id = Number(env.ODOO_COMPANY_ID);
+    if (env.ODOO_TAG_IDS) vals.tag_ids = String(env.ODOO_TAG_IDS).split(",").map((id) => [4, Number(id.trim())]);
+    await call("crm.lead", "create", { vals_list: [vals] });
     return { ok: true };
   } catch (error) {
-    console.error(`${agent}: ${error.message}`);
+    console.error(`${what}: ${error.message}`);
     return { error: "unavailable" };
   }
 }
 
-/** The waitlist sign-up as a lead in the CRM. */
-export async function addToWaitlist(signup, env, fetcher = fetch) {
-  const platform = WAITLIST_PLATFORMS[signup.platform];
-  return addLead({
-    name: `TIMEperative for ${platform}: waitlist`,
+/** A waitlist sign-up becomes a lead; a second one for the same platform adds nothing. */
+export function addToWaitlist(signup, env, fetcher = fetch) {
+  return createLead({
+    name: `TIMEperative for ${WAITLIST_PLATFORMS[signup.platform]}: waitlist`,
     email_from: signup.email,
-    description: `Signed up on ${ORIGIN.host} to hear when TIMEperative for ${platform} is out. Language of the page: ${signup.lang}.`,
+    description: `Signed up on ${ORIGIN.host} to hear when TIMEperative for ${WAITLIST_PLATFORMS[signup.platform]} is out. Language of the page: ${signup.lang}.`,
   }, env, fetcher, "waitlist");
+}
+
+// ------------------------------------------------------------ TIMEperative.sync
+
+const field = (form, name, max) => String(form.get(name) ?? "").trim().slice(0, max);
+const GITHUB_USER = /^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$/;
+
+/** A request for TIMEperative.sync, or the reason it cannot be taken. */
+export function readAccessRequest(form) {
+  if (String(form.get("website") ?? "") !== "") return { robot: true };
+  const email = String(form.get("email") ?? "").trim();
+  const name = field(form, "name", 120);
+  const organisation = field(form, "organisation", 160);
+  const github = field(form, "github", 39).replace(/^@/, "");
+  const server = field(form, "server", 200);
+  const message = field(form, "message", 2000);
+  const lang = String(form.get("lang") ?? "");
+  if (email.length > 254 || !EMAIL.test(email) || !name || !organisation) return { error: "invalid" };
+  if (github && !GITHUB_USER.test(github)) return { error: "invalid" };
+  return { email, name, organisation, github, server, message, lang: site.languages.some((l) => l.code === lang) ? lang : "en" };
+}
+
+/** A request becomes a lead; a second one from the same address for the same organisation adds nothing. */
+export function requestSyncAccess(request, env, fetcher = fetch) {
+  const lines = [
+    `Asked on ${ORIGIN.host} for access to TIMEperative.sync.`,
+    `Name: ${request.name}`,
+    `Organisation: ${request.organisation}`,
+    `GitHub user: ${request.github || "(not given)"}`,
+    `Cloud Hub address: ${request.server || "(not given)"}`,
+    `Language of the page: ${request.lang}`,
+    ...(request.message ? ["", request.message] : []),
+  ];
+  // The notes are an HTML field: every line its own escaped paragraph.
+  const html = (text) => text.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  return createLead({
+    name: `TIMEperative.sync: access for ${request.organisation}`,
+    contact_name: request.name,
+    partner_name: request.organisation,
+    email_from: request.email,
+    description: lines.flatMap((line) => line.split(/\r?\n/)).map((line) => `<p>${html(line)}</p>`).join(""),
+  }, env, fetcher, "sync-access");
 }
 
 // ------------------------------------------------------------ converter requests
@@ -143,11 +262,6 @@ export const USER_COUNTS = { "1-10": "1 to 10", "11-50": "11 to 50", "51-250": "
 // the type in the lead for the owner to judge. The browser learns only
 // "personal", never the type or the list.
 
-/** The registry's view of an address's domain: its type, its confidence and the registry's version. */
-export function classifyEmail(email, groups = GROUPS, version = REGISTRY_VERSION) {
-  return { ...classifyDomain(emailDomain(email), groups), registry_version: version };
-}
-
 const NAME = /^[^<>{}\[\]\\/@:;"=]{1,80}$/u;
 
 /** The converter request a form sent, or the reason it cannot be taken. */
@@ -170,7 +284,7 @@ export function readConverterRequest(form, groups = GROUPS, version = REGISTRY_V
 /** The request as a lead in the CRM. */
 export async function addConverterRequest(request, env, fetcher = fetch) {
   const domain = request.domain ?? classifyEmail(request.email);
-  return addLead({
+  return createLead({
     name: "TIMEperative converter for SAP: request",
     contact_name: `${request.firstName} ${request.lastName}`,
     email_from: request.email,
@@ -181,18 +295,18 @@ export async function addConverterRequest(request, env, fetcher = fetch) {
 // ------------------------------------------------------------ the forms
 
 /** Where a form without script goes back to: the page it came from, at its own message. */
-function backTo(form, anchor) {
+function backTo(form, platform, outcome) {
   const page = String(form.get("page") ?? "/");
   const path = page.startsWith("/") && !page.startsWith("//") ? page : "/";
-  return `${ORIGIN.origin}${path}#${anchor}`;
+  return `${ORIGIN.origin}${path}#waitlist-${platform in WAITLIST_PLATFORMS ? platform : "macos"}-${outcome}`;
 }
 
 /**
- * A form posted to the Worker: only from the site's own pages, robots get the
- * same answer as people, script gets JSON, a plain form a redirect to its
- * own message.
+ * Takes a form posted by one of the site's own pages: read turns it into the
+ * data or a reason, act sends the data on, back names the anchor a form
+ * without script returns to.
  */
-async function takeForm(request, read, add, anchor, env, fetcher) {
+async function takeForm(request, read, act, back) {
   if (request.method !== "POST") return new Response(null, { status: 405, headers: { allow: "POST" } });
   const from = request.headers.get("origin");
   if (from && new URL(from).host !== ORIGIN.host) return new Response(null, { status: 403 });
@@ -202,25 +316,35 @@ async function takeForm(request, read, add, anchor, env, fetcher) {
   } catch {
     return new Response(null, { status: 400 });
   }
-  const entry = read(form);
-  const result = entry.robot ? { ok: true } : entry.error ? entry : await add(entry, env, fetcher);
+  const data = read(form);
+  const result = data.robot ? { ok: true } : data.error ? data : await act(data);
+  // "personal": the address is not one this form takes; the browser learns no more than that.
   const refused = result.error === "invalid" || result.error === "personal";
+  const outcome = result.ok ? "ok" : refused ? result.error : "error";
   if ((request.headers.get("accept") ?? "").includes("application/json")) {
     return Response.json({ ok: !!result.ok, error: result.error }, { status: result.ok ? 200 : refused ? 400 : 503, headers: { "cache-control": "no-store" } });
   }
-  const outcome = result.ok ? "ok" : refused ? result.error : "error";
-  return new Response(null, { status: 303, headers: { location: backTo(form, anchor(form, outcome)), "cache-control": "no-store" } });
+  return new Response(null, { status: 303, headers: { location: back(form, outcome), "cache-control": "no-store" } });
 }
 
 export function waitlist(request, env, fetcher = fetch) {
-  return takeForm(request, readSignup, addToWaitlist, (form, outcome) => {
-    const platform = String(form.get("platform") ?? "");
-    return `waitlist-${platform in WAITLIST_PLATFORMS ? platform : "macos"}-${outcome}`;
-  }, env, fetcher);
+  return takeForm(request, readSignup, (signup) => addToWaitlist(signup, env, fetcher), (form, outcome) => backTo(form, String(form.get("platform") ?? ""), outcome));
+}
+
+export function syncAccess(request, env, fetcher = fetch) {
+  return takeForm(request, readAccessRequest, (data) => requestSyncAccess(data, env, fetcher), (form, outcome) => {
+    const page = String(form.get("page") ?? "/download/sync/");
+    const path = page.startsWith("/") && !page.startsWith("//") ? page : "/download/sync/";
+    return `${ORIGIN.origin}${path}#sync-access-${outcome}`;
+  });
 }
 
 export function converterRequest(request, env, fetcher = fetch) {
-  return takeForm(request, readConverterRequest, addConverterRequest, (form, outcome) => `sap-request-${outcome}`, env, fetcher);
+  return takeForm(request, readConverterRequest, (data) => addConverterRequest(data, env, fetcher), (form, outcome) => {
+    const page = String(form.get("page") ?? "/resources/converters/");
+    const path = page.startsWith("/") && !page.startsWith("//") ? page : "/";
+    return `${ORIGIN.origin}${path}#sap-request-${outcome}`;
+  });
 }
 
 // ------------------------------------------------------------ routing
@@ -232,9 +356,10 @@ export default {
       return Response.redirect(`${ORIGIN.origin}${url.pathname}${url.search}`, 301);
     }
     if (url.pathname === "/waitlist") return waitlist(request, env);
+    if (url.pathname === "/sync-access") return syncAccess(request, env);
     if (url.pathname === "/converter-request") return converterRequest(request, env);
     const match = /^\/download\/(windows|android)\/?$/.exec(url.pathname);
-    if (!match) return env.ASSETS.fetch(request);
+    if (!match) return page(request, env);
     const location = (await latestInstaller(match[1])) ?? site.releasePage;
     return new Response(null, { status: 302, headers: { location, "cache-control": "no-store" } });
   },

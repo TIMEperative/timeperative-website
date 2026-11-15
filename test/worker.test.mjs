@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import worker, { latestInstaller, readSignup, addToWaitlist, waitlist, readConverterRequest, addConverterRequest, converterRequest, classifyEmail } from "../src/worker.js";
+import worker, { latestInstaller, newestRelease, latestRelease, page, readSignup, addToWaitlist, waitlist, readAccessRequest, requestSyncAccess, syncAccess, readConverterRequest, addConverterRequest, converterRequest, classifyEmail } from "../src/worker.js";
 import { decide, groupRows } from "../src/email-domains.js";
 import { REGISTRY_VERSION } from "../src/email-domains.generated.js";
 
@@ -32,6 +32,41 @@ test("a store that cannot be read does not stop the others", async () => {
     return json({ pubDate: "2026-10-16T21:32:57Z", url: "https://github.com/Old/store/releases/download/v1/app.apk" });
   };
   assert.equal(await latestInstaller("android", stores, fetcher), "https://github.com/Old/store/releases/download/v1/app.apk");
+});
+
+test("the newest release names its version and its own page in the store", async () => {
+  const fetcher = async () => json({ version: "0.1.0-alpha.18", pub_date: "2026-10-28T14:29:19Z", platforms: { "windows-x86_64": { url: "https://github.com/Old/store/releases/download/v0.1.0-alpha.18/setup.exe" } } });
+  assert.deepEqual(await newestRelease("windows", ["Old/store"], fetcher), {
+    url: "https://github.com/Old/store/releases/download/v0.1.0-alpha.18/setup.exe",
+    date: Date.parse("2026-10-28T14:29:19Z"),
+    version: "0.1.0-alpha.18",
+    page: "https://github.com/Old/store/releases/tag/v0.1.0-alpha.18",
+  });
+});
+
+test("the pages name the Windows release, or Android's when Windows has none", async () => {
+  const fetcher = async (url) => url.endsWith("latest.json")
+    ? json({}, false)
+    : json({ version: "0.1.0-alpha.18", pubDate: "2026-10-28T14:33:09Z", url: "https://github.com/Old/store/releases/download/v0.1.0-alpha.18/app.apk" });
+  assert.equal((await latestRelease(["Old/store"], fetcher)).version, "0.1.0-alpha.18");
+});
+
+test("a page goes through the rewriter without its ETag and is never a 304; a file is passed on as it is", async () => {
+  const seen = [];
+  const env = { ASSETS: { fetch: async (request) => {
+    seen.push([new URL(request.url).pathname, request.headers.get("if-none-match")]);
+    return new URL(request.url).pathname.endsWith(".css")
+      ? new Response("css", { headers: { etag: '"c"', "content-type": "text/css" } })
+      : new Response("<p>page</p>", { headers: { etag: '"p"', "content-type": "text/html; charset=utf-8" } });
+  } } };
+  const rewriter = () => ({ transform: (res) => new Response(res.body, res) });
+  const html = await page(new Request("https://www.timeperative.com/de/download/", { headers: { "if-none-match": '"p"' } }), env, rewriter);
+  assert.equal(await html.text(), "<p>page</p>");
+  assert.equal(html.headers.get("etag"), null);
+  assert.equal(html.headers.get("cache-control"), "no-cache");
+  const css = await page(new Request("https://www.timeperative.com/assets/site.css", { headers: { "if-none-match": '"c"' } }), env, rewriter);
+  assert.equal(css.headers.get("etag"), '"c"');
+  assert.deepEqual(seen, [["/de/download/", null], ["/assets/site.css", '"c"']]);
 });
 
 test("every other path is a static asset", async () => {
@@ -257,5 +292,56 @@ test("the converter request refuses another site's form and anything but POST; t
   assert.equal((await converterRequest(new Request("https://www.timeperative.com/converter-request"), ENV, fetcher)).status, 405);
   assert.equal(calls.length, 0);
   const res = await worker.fetch(new Request("https://www.timeperative.com/converter-request"), { ASSETS: { fetch: async () => new Response("asset") } });
+  assert.equal(res.status, 405);
+});
+
+// ------------------------------------------------------------ TIMEperative.sync
+
+const request = { email: "ana@example.ch", name: "Ana Muster", organisation: "Muster AG", lang: "de" };
+
+test("a request for TIMEperative.sync needs a name, an organisation and a plausible address; GitHub user names are checked", () => {
+  assert.deepEqual(readAccessRequest(form({ ...request, github: "@ana-m", server: " https://hub.muster.ch ", message: "Hi" })),
+    { ...request, github: "ana-m", server: "https://hub.muster.ch", message: "Hi" });
+  assert.deepEqual(readAccessRequest(form({ ...request, name: " " })), { error: "invalid" });
+  assert.deepEqual(readAccessRequest(form({ ...request, organisation: "" })), { error: "invalid" });
+  assert.deepEqual(readAccessRequest(form({ ...request, email: "ana" })), { error: "invalid" });
+  assert.deepEqual(readAccessRequest(form({ ...request, github: "-bad-" })), { error: "invalid" });
+  assert.deepEqual(readAccessRequest(form({ ...request, website: "x" })), { robot: true });
+  assert.equal(readAccessRequest(form({ ...request, lang: "xx" })).lang, "en");
+});
+
+test("a request becomes one lead with the contact, the organisation and escaped notes; a repeat adds none", async () => {
+  const { calls, fetcher } = odoo();
+  assert.deepEqual(await requestSyncAccess({ ...request, github: "", server: "", message: "<b>soon</b>\nplease" }, ENV, fetcher), { ok: true });
+  const [lead] = calls[1].body.vals_list;
+  assert.equal(lead.name, "TIMEperative.sync: access for Muster AG");
+  assert.equal(lead.contact_name, "Ana Muster");
+  assert.equal(lead.partner_name, "Muster AG");
+  assert.equal(lead.email_from, "ana@example.ch");
+  assert.equal(lead.team_id, 3);
+  assert.match(lead.description, /<p>GitHub user: \(not given\)<\/p>/);
+  assert.match(lead.description, /<p>&lt;b&gt;soon&lt;\/b&gt;<\/p><p>please<\/p>/);
+  const again = odoo(1);
+  assert.deepEqual(await requestSyncAccess({ ...request, github: "", server: "", message: "" }, ENV, again.fetcher), { ok: true, known: true });
+  assert.equal(again.calls.length, 1);
+});
+
+test("the request form answers script with JSON and a plain form with a redirect to its own message", async () => {
+  const { fetcher } = odoo();
+  const send = (fields, headers = {}) => syncAccess(new Request("https://www.timeperative.com/sync-access", { method: "POST", body: form(fields), headers }), ENV, fetcher);
+  const json = await send(request, { accept: "application/json", origin: "https://www.timeperative.com" });
+  assert.equal(json.status, 200);
+  assert.deepEqual(await json.json(), { ok: true });
+  const plain = await send({ ...request, email: "nope", page: "/de/download/sync/" });
+  assert.equal(plain.status, 303);
+  assert.equal(plain.headers.get("location"), "https://www.timeperative.com/de/download/sync/#sync-access-invalid");
+  const away = await send({ ...request, page: "//evil.example/" });
+  assert.equal(away.headers.get("location"), "https://www.timeperative.com/download/sync/#sync-access-ok");
+  const foreign = await send(request, { origin: "https://evil.example" });
+  assert.equal(foreign.status, 403);
+});
+
+test("the Worker routes /sync-access to the request form", async () => {
+  const res = await worker.fetch(new Request("https://www.timeperative.com/sync-access"), { ASSETS: { fetch: async () => new Response("asset") } });
   assert.equal(res.status, 405);
 });

@@ -170,9 +170,11 @@ MARKS.ios = MARKS.apple;
 const mark = (platform) => `<svg class="platform-mark" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="${MARKS[platform]}"/></svg>`;
 
 /**
- * The four platforms as buttons. Windows and Android download (on the
- * download page) or lead to it; macOS and iOS open, right under their
- * button, the message that the version does not exist yet and the waitlist.
+ * The four platforms as one row of buttons. Windows and Android download (on
+ * the download page) or lead to it; macOS and iOS open, under the row, the
+ * message that the version does not exist yet and the waitlist, so the row
+ * itself never breaks. Without script a button is a link to its panel, which
+ * shows as the target.
  */
 function platformsHtml(lang, pagePath) {
   const t = strings[lang].platforms;
@@ -183,30 +185,55 @@ function platformsHtml(lang, pagePath) {
     const label = onDownloadPage ? fill(t.download, p) : fill(t.about, p);
     return `<li><a class="platform" href="${href}" aria-label="${escapeHtml(label)}">${mark(p)}<span>${escapeHtml(t.names[p])}</span></a></li>`;
   });
-  const soon = ["macos", "ios"].map((p) => `<li><details class="platform-soon" id="waitlist-${p}">
-  <summary class="platform">${mark(p)}<span>${escapeHtml(t.names[p])}</span></summary>
-  <div class="waitlist">
-    <p>${escapeHtml(fill(t.soon, p))}</p>
-    <form class="waitlist-form" method="post" action="/waitlist" data-ok="${escapeHtml(fill(t.ok, p))}" data-invalid="${escapeHtml(t.invalid)}" data-personal="${escapeHtml(t.personal)}" data-error="${escapeHtml(t.error.replace("{email}", site.supportEmail))}">
-      <input type="hidden" name="platform" value="${p}">
-      <input type="hidden" name="lang" value="${lang}">
-      <input type="hidden" name="page" value="${localPath(lang, pagePath)}">
-      <label for="waitlist-${p}-email">${escapeHtml(t.email)}</label>
-      <div class="waitlist-row">
-        <input id="waitlist-${p}-email" type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email">
-        <button class="button button-primary" type="submit">${escapeHtml(t.submit)}</button>
-      </div>
-      <p class="waitlist-trap" aria-hidden="true"><label>${escapeHtml(t.trap)} <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>
-      <p class="fine">${escapeHtml(fill(t.use, p))} <a href="/privacy/#waitlist">${escapeHtml(t.privacy)}</a></p>
-      <p class="waitlist-status" role="status" aria-live="polite"></p>
-      <p class="waitlist-done" id="waitlist-${p}-ok">${escapeHtml(fill(t.ok, p))}</p>
-      <p class="waitlist-done" id="waitlist-${p}-invalid">${escapeHtml(t.invalid)}</p>
-      <p class="waitlist-done" id="waitlist-${p}-personal">${escapeHtml(t.personal)}</p>
-      <p class="waitlist-done" id="waitlist-${p}-error">${escapeHtml(t.error.replace("{email}", site.supportEmail))}</p>
-    </form>
+  const soon = ["macos", "ios"];
+  const toggles = soon.map((p) => `<li><a class="platform" href="#waitlist-${p}" data-waitlist-toggle aria-controls="waitlist-${p}" aria-expanded="false">${mark(p)}<span>${escapeHtml(t.names[p])}</span></a></li>`);
+  const panels = soon.map((p) => `<div class="waitlist" id="waitlist-${p}">
+  <p>${escapeHtml(fill(t.soon, p))}</p>
+  <form class="waitlist-form" method="post" action="/waitlist" data-ok="${escapeHtml(fill(t.ok, p))}" data-invalid="${escapeHtml(t.invalid)}" data-personal="${escapeHtml(t.personal)}" data-error="${escapeHtml(t.error.replace("{email}", site.supportEmail))}">
+    <input type="hidden" name="platform" value="${p}">
+    <input type="hidden" name="lang" value="${lang}">
+    <input type="hidden" name="page" value="${localPath(lang, pagePath)}">
+    <label for="waitlist-${p}-email">${escapeHtml(t.email)}</label>
+    <div class="waitlist-row">
+      <input id="waitlist-${p}-email" type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email">
+      <button class="button button-primary" type="submit">${escapeHtml(t.submit)}</button>
+    </div>
+    <p class="waitlist-trap" aria-hidden="true"><label>${escapeHtml(t.trap)} <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>
+    <p class="fine">${escapeHtml(fill(t.use, p))} <a href="/privacy/#waitlist">${escapeHtml(t.privacy)}</a></p>
+    <p class="waitlist-status" role="status" aria-live="polite"></p>
+    <p class="waitlist-done" id="waitlist-${p}-ok">${escapeHtml(fill(t.ok, p))}</p>
+    <p class="waitlist-done" id="waitlist-${p}-invalid">${escapeHtml(t.invalid)}</p>
+    <p class="waitlist-done" id="waitlist-${p}-personal">${escapeHtml(t.personal)}</p>
+    <p class="waitlist-done" id="waitlist-${p}-error">${escapeHtml(t.error.replace("{email}", site.supportEmail))}</p>
+  </form>
+</div>`);
+  return `<div class="platform-block">\n<ul class="platforms" aria-label="${escapeHtml(t.label)}">\n${[...available, ...toggles].join("\n")}\n</ul>\n${panels.join("\n")}\n</div>`;
+}
+
+// ------------------------------------------------------------ screenshots
+
+// Screens of the app itself, run in a browser with its demo backend and a
+// sample week (scripts/shots.md), one file per colour scheme. The page shows
+// the one that matches its own scheme.
+const SHOTS = { week: [1440, 900], tracking: [1440, 900], planning: [1440, 900], reports: [1440, 900], phone: [780, 1688] };
+
+function shotHtml(name, lang, { caption = true } = {}) {
+  const t = strings[lang].shots[name];
+  const [w, h] = SHOTS[name];
+  const img = (scheme) => `<img class="shot-img shot-${scheme}" src="/assets/shots/${name}-${scheme}.webp" alt="${escapeHtml(t.alt)}" width="${w}" height="${h}" loading="lazy" decoding="async">`;
+  return `<figure class="shot shot-${name}">${img("dark")}${img("light")}${caption ? `<figcaption>${escapeHtml(t.caption)}</figcaption>` : ""}</figure>`;
+}
+
+function shotsSection(lang) {
+  const t = strings[lang].shots;
+  return `<section class="section shots-section">
+  <div class="container">
+    <h2>${escapeHtml(t.title)}</h2>
+    <p class="note">${escapeHtml(t.intro)}</p>
+    <div class="shots-main">${shotHtml("week", lang)}${shotHtml("phone", lang)}</div>
+    <div class="shots-row">${shotHtml("tracking", lang)}${shotHtml("planning", lang)}${shotHtml("reports", lang)}</div>
   </div>
-</details></li>`);
-  return `<ul class="platforms" aria-label="${escapeHtml(t.label)}">\n${[...available, ...soon].join("\n")}\n</ul>`;
+</section>`;
 }
 
 // ------------------------------------------------------------ languages
@@ -250,7 +277,10 @@ function render(page, ctx) {
   const lang = site.languages.find((l) => l.code === page.lang);
   const nav = site.nav.map((n) => {
     const current = page.meta.nav === n.id;
-    return `<li><a href="${localPath(page.lang, n.path)}"${current ? ' aria-current="page"' : ""}>${escapeHtml(t.nav[n.id])}</a></li>`;
+    if (!n.items) return `<li><a href="${localPath(page.lang, n.path)}"${current ? ' aria-current="page"' : ""}>${escapeHtml(t.nav[n.id])}</a></li>`;
+    // A group opens a panel of its pages; without script it is a <details>.
+    const items = n.items.map((i) => `<li><a href="${localPath(page.lang, i.path)}"${page.path === i.path ? ' aria-current="page"' : ""}>${escapeHtml(t.nav[i.id])}</a></li>`).join("");
+    return `<li><details class="nav-menu"><summary${current ? ' class="is-current"' : ""}>${escapeHtml(t.nav[n.id])}</summary><ul>${items}</ul></details></li>`;
   }).join("");
   const footerLinks = site.footer.map((n) => `<li><a href="${localPath(page.lang, n.path)}">${escapeHtml(t.footer[n.id])}</a></li>`).join("");
   const isNotFound = page.path === "/404.html";
@@ -264,6 +294,8 @@ function render(page, ctx) {
     .replace(/\{\{news\.latest\}\}/g, newsList(ctx.news, page.lang, 3))
     .replace(/\{\{news\.all\}\}/g, newsList(ctx.news, page.lang, undefined, 2))
     .replace(/\{\{platforms\}\}/g, () => platformsHtml(page.lang, page.path))
+    .replace(/\{\{shots\}\}/g, () => shotsSection(page.lang))
+    .replace(/\{\{shot:(\w+)\}\}/g, (all, name) => shotHtml(name, page.lang))
     .replace(/\{\{support\.email\}\}/g, site.supportEmail)
     .replace(/\{\{year\}\}/g, String(new Date().getUTCFullYear()));
   const vars = {
@@ -352,10 +384,13 @@ export async function build() {
     releaseSummary: (lang) => {
       const t = strings[lang].release;
       if (!latest) return `<p class="release-summary">${t.unknown.replace("{link}", `<a href="${site.releasePage}">${escapeHtml(t.releasePage)}</a>`)}</p>`;
-      return `<p class="release-summary">${t.summary.replace("{version}", `<strong>${escapeHtml(latest.version)}</strong>`).replace("{date}", `<time datetime="${latest.date.slice(0, 10)}">${formatDate(latest.date, lang)}</time>`)}</p>`;
+      // data-release marks what the Worker brings up to date when a release
+      // is newer than this build (src/worker.js, releaseRewriter).
+      const locale = site.languages.find((l) => l.code === lang).locale;
+      return `<p class="release-summary" data-release="${escapeHtml(latest.version)}" data-locale="${locale}">${t.summary.replace("{version}", `<strong data-release-version>${escapeHtml(latest.version)}</strong>`).replace("{date}", `<time data-release-date datetime="${latest.date.slice(0, 10)}">${formatDate(latest.date, lang)}</time>`)}</p>`;
     },
     releaseNotesLink: (lang) => latest
-      ? `<a href="${localPath(lang, `/news/${releaseSlug(latest.version)}/`)}">${escapeHtml(strings[lang].release.notesLink)}</a>`
+      ? `<a data-release-notes href="${localPath(lang, `/news/${releaseSlug(latest.version)}/`)}">${escapeHtml(strings[lang].release.notesLink)}</a>`
       : `<a href="${site.releasePage}">${escapeHtml(strings[lang].release.releasePage)}</a>`,
   };
 

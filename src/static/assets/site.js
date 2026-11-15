@@ -45,25 +45,60 @@
   apply(stored());
 })();
 
-// Language menu: closes on Escape and on a click outside it.
+// The language menu and the nav groups: one open at a time; each closes on
+// Escape and on a click outside it.
 (function () {
-  var menu = document.querySelector(".lang-menu");
-  if (!menu) return;
+  var menus = document.querySelectorAll(".lang-menu, .nav-menu");
+  if (!menus.length) return;
+  Array.prototype.forEach.call(menus, function (menu) {
+    menu.addEventListener("toggle", function () {
+      if (!menu.open) return;
+      Array.prototype.forEach.call(menus, function (other) { if (other !== menu) other.open = false; });
+    });
+  });
   document.addEventListener("click", function (event) {
-    if (menu.open && !menu.contains(event.target)) menu.open = false;
+    Array.prototype.forEach.call(menus, function (menu) {
+      if (menu.open && !menu.contains(event.target)) menu.open = false;
+    });
   });
   document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && menu.open) {
+    if (event.key !== "Escape") return;
+    Array.prototype.forEach.call(menus, function (menu) {
+      if (!menu.open) return;
       menu.open = false;
       menu.querySelector("summary").focus();
-    }
+    });
   });
 })();
 
-// The forms the Worker takes (the macOS and iOS waitlist, the request for a
-// converter for SAP): sent without leaving the page, with what happened said
-// under the button. Without script the form posts itself, and the Worker
-// brings the visitor back to the same message.
+// macOS and iOS: the button opens its waitlist under the row and closes the
+// other one; a second click closes it. Without script the button is a link
+// to the panel, which shows as the target.
+(function () {
+  var toggles = document.querySelectorAll("[data-waitlist-toggle]");
+  function set(toggle, open) {
+    var panel = document.getElementById(toggle.getAttribute("aria-controls"));
+    toggle.setAttribute("aria-expanded", String(open));
+    if (panel) panel.classList.toggle("is-open", open);
+    return panel;
+  }
+  for (var i = 0; i < toggles.length; i++) {
+    toggles[i].addEventListener("click", function (event) {
+      event.preventDefault();
+      var toggle = event.currentTarget;
+      var open = toggle.getAttribute("aria-expanded") !== "true";
+      for (var j = 0; j < toggles.length; j++) set(toggles[j], false);
+      var panel = set(toggle, open);
+      if (open && panel) { var input = panel.querySelector("input[type=email]"); if (input) input.focus({ preventScroll: true }); }
+    });
+  }
+})();
+
+// The forms the Worker takes (the macOS and iOS waitlist, the request for
+// TIMEperative.sync, the request for a converter for SAP): sent without
+// leaving the page, with what happened said under the button. Without script
+// the form posts itself, and the Worker brings the visitor back to the same
+// message.
 (function () {
   var forms = document.querySelectorAll(".waitlist-form, .request-form");
   for (var i = 0; i < forms.length; i++) {

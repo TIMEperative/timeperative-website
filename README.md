@@ -1,7 +1,7 @@
 # www.timeperative.com
 
-The website of TIMEperative, the time tracker for Windows and Android by
-Acunomic GmbH. It replaces www.timely.you. The site answers on
+The website of TIMEperative, the time tracker for Windows and Android. It
+replaces www.timely.you. The site answers on
 www.timeperative.com; timeperative.com redirects there.
 
 - **Pages:** Home (with News and releases), Download, Resources (with
@@ -24,7 +24,7 @@ www.timeperative.com; timeperative.com redirects there.
 | `src/layout.html`, `src/i18n/*.json` | Header, footer and the strings around the pages |
 | `src/static/` | Copied as is: stylesheets, the tokens from acustique, the fonts, the mark |
 | `src/site.json` | Languages, menu, the release stores, the Worker routes, the support address |
-| `src/worker.js` | timeperative.com to www; `/download/windows` and `/download/android`: a redirect to the newest installer the stores' update manifests name; `/waitlist` and `/converter-request`: a lead in the CRM |
+| `src/worker.js` | timeperative.com to www; `/download/windows` and `/download/android`: a redirect to the newest installer the stores' update manifests name; `/waitlist`, `/sync-access` and `/converter-request`: a lead in the CRM |
 | `data/`, `scripts/email-domains.mjs` | The email domain registry, which tells a work address from a public mailbox for `/converter-request`; you maintain `data/email-domains-overrides.json` and `data/email-domains-exclusions.json` ([data/README.md](data/README.md)) |
 | `scripts/build.mjs` | Builds `dist/` and checks every page (one h1, headings in order, meta lengths, alt text, internal links) |
 | `scripts/notion-news.mjs` | News and release articles from Notion into `content/news/notion/` |
@@ -81,9 +81,11 @@ npx wrangler login
 npm run deploy
 ```
 
-## The macOS and iOS waitlist
+## The macOS and iOS waitlist and the TIMEperative.sync request
 
-The macOS and iOS buttons open a waitlist form. The Worker creates a lead in
+The macOS and iOS buttons open a waitlist form, and `/download/sync/` holds
+the request for TIMEperative.sync (name, email, organisation; optionally the
+Cloud Hub address, a GitHub user name and a message). For each, the Worker creates a lead in
 the TIMEperative CRM through the JSON-2 API (`POST /json/2/crm.lead/create`).
 It needs three secrets on the Worker; without them the form says it did not
 work and asks people to write to support.
