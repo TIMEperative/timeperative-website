@@ -58,4 +58,7 @@ The community list names these sources (its `README.md`, External Sources):
 - [jespernissen/disposable-maildomain-list](https://github.com/jespernissen/disposable-maildomain-list): MIT, Copyright (c) 2018 WNB A/S, Jesper Nissen.
 - [unkn0w/disposable-email-domain-list](https://github.com/unkn0w/disposable-email-domain-list): MIT, Copyright (c) 2022 Jakub 'unknow' Mrugalski.
 - [castle/disposable-email-domains](https://github.com/castle/disposable-email-domains): MIT, above.
-- [adamloving's gist 4401361](https://gist.github.com/adamloving/4401361) and [throwaway.cloud](https://throwaway.cloud/) (iocium/download.throwaway.cloud): no licence found on 2026-10-23. The community project publishes the combined list under MIT.
+- [throwaway.cloud](https://throwaway.cloud/) (iocium): no formal licence. Its home page, read 2026-11-15, offers the list for download and says: "100% Free. No API keys, no hidden costs, generous rate limits. Use it however you need, forever." and "© iocium. Open source and free forever." It is the only source of about a quarter of the community list (27,952 of 108,547 domains on 2026-11-15).
+- [adamloving's gist 4401361](https://gist.github.com/adamloving/4401361): no licence found on 2026-10-23. Every domain it contributes (459 on 2026-11-15) is also listed by one of the licensed sources above.
+
+The owner accepted both as they are on 2026-11-15: the community project publishes the combined list under MIT, and we take a domain out on its author's request (`data/email-domains-exclusions.json`).
