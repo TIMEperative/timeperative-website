@@ -25,6 +25,12 @@
   // (site.json "redirectHosts"). A custom domain creates its DNS record and
   // certificate; it needs the zone active on Cloudflare and no other record
   // on that name.
+  // Workers Builds runs `npx wrangler preview` for every branch but main,
+  // and it needs this block (developers.cloudflare.com/workers/previews/
+  // configuration/, read 2026-10-21). Empty: a Preview takes the top-level
+  // assets and settings. It does not inherit secrets, so the waitlist cannot
+  // create leads from a Preview, and routes and custom domains stay production.
+  "previews": {},
   "routes": [
     { "pattern": "www.timeperative.com", "custom_domain": true },
     { "pattern": "timeperative.com", "custom_domain": true }

@@ -28,10 +28,13 @@ Cloudflare Workers. Read [README.md](README.md) first.
    `/download/android`): they follow the stores' update manifests, so a
    release needs no new build. `src/site.json` names the stores and the
    Worker routes.
-7. **The macOS and iOS waitlist** posts to the Worker (`/waitlist`), and
-   the TIMEperative.sync request (`/download/sync/`) to `/sync-access`; each
-   creates a lead in the CRM through the JSON-2 API with the secrets
-   `ODOO_URL`, `ODOO_DB` and `ODOO_API_KEY`. The privacy policy describes both.
+7. **The macOS and iOS waitlist** posts to the Worker (`/waitlist`), the
+   TIMEperative.sync request (`/download/sync/`) to `/sync-access`, and the
+   request for a converter for SAP (Resources > Converters: a work address,
+   first and last name, the SAP system, the number of people) to
+   `/converter-request`; each creates a lead in the CRM through the JSON-2
+   API with the secrets `ODOO_URL`, `ODOO_DB` and `ODOO_API_KEY`. The privacy
+   policy describes all three.
    TIMEperative.sync is released to the private `TIMEperative/timeperative-sync`
    under OPL-1 (timely-you D-190): the site never links its files, only the
    request form.
@@ -41,6 +44,15 @@ Cloudflare Workers. Read [README.md](README.md) first.
    changes what leaves the device changes the privacy policy too.
 9. **Node built-ins only** for the build and the scripts; Wrangler is the
    one devDependency.
+10. **Free email addresses are refused** for the converter request, by the
+   email domain registry in `data/` (owner, 2026-10-23; `data/README.md`):
+   WEBMAIL and ISP_PERSONAL at any confidence, DISPOSABLE with HIGH
+   confidence, and DISPOSABLE that the free provider list names too
+   (owner, 2026-10-24). The waitlist refuses DISPOSABLE with HIGH confidence
+   only (owner, 2026-11-09). The owner edits only the overrides and exclusions; the
+   registry and `src/email-domains.generated.js` are generated
+   (`npm run email-domains`). Never a customer's domain in these public
+   files, never the registry or the reason for a refusal in the browser.
 
 ## Commands
 
@@ -49,6 +61,7 @@ npm ci
 npm test                 # the build's checks and the Worker
 npm run build            # dist/; --offline skips reading the stores
 npm run news             # needs NOTION_TOKEN
+npm run email-domains    # rebuilds the email domain registry from the feeds
 npx wrangler dev         # the built site and the Worker on http://localhost:8787
 ```
 

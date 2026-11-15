@@ -10,12 +10,17 @@
 //   - brings the version a page names ("Latest version: ...") up to the
 //     newest release when that is newer than the build, from the same
 //     manifests, so a release shows on the site within minutes;
-//   - takes the macOS and iOS waitlist sign-ups (POST /waitlist) and the
-//     requests for TIMEperative.sync (POST /sync-access) into the CRM, as
-//     leads created through the external JSON-2 API;
+//   - takes the macOS and iOS waitlist sign-ups (POST /waitlist), the
+//     requests for TIMEperative.sync (POST /sync-access) and the requests for
+//     a converter for SAP (POST /converter-request) into the CRM, as leads
+//     created through the external JSON-2 API; the email domain registry
+//     (data/README.md) tells a work address from a public mailbox and a
+//     throwaway one;
 //   - serves everything else from the static assets.
 
 import site from "./site.json" with { type: "json" };
+import { classifyDomain, decide, emailDomain, OUTSIDE_THE_WORKER } from "./email-domains.js";
+import { GROUPS, REGISTRY_VERSION } from "./email-domains.generated.js";
 
 const ORIGIN = new URL(site.origin);
 
@@ -122,6 +127,11 @@ export async function page(request, env, rewriter = releaseRewriter) {
 export const WAITLIST_PLATFORMS = { macos: "macOS", ios: "iOS" };
 const EMAIL = /^[^\s@<>()[\]\\,;:"]{1,64}@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
 
+/** The registry's view of an address's domain: its type, its confidence, its sources and the registry's version. */
+export function classifyEmail(email, groups = GROUPS, version = REGISTRY_VERSION) {
+  return { ...classifyDomain(emailDomain(email), groups), registry_version: version };
+}
+
 /** The sign-up a form sent, or the reason it cannot be taken. */
 export function readSignup(form) {
   const email = String(form.get("email") ?? "").trim();
@@ -130,7 +140,9 @@ export function readSignup(form) {
   // The hidden field people never see: a filled one is a robot.
   if (String(form.get("website") ?? "") !== "") return { robot: true };
   if (!WAITLIST_PLATFORMS[platform]) return { error: "invalid" };
-  if (email.length > 254 || !EMAIL.test(email)) return { error: "invalid" };
+  if (!emailDomain(email)) return { error: "invalid" };
+  // A confirmed throwaway address is refused (the "waitlist" policy in src/email-domains.js).
+  if (decide("waitlist", classifyEmail(email)) === "refuse") return { error: "personal" };
   return { email, platform, lang: site.languages.some((l) => l.code === lang) ? lang : "en" };
 }
 
@@ -222,6 +234,66 @@ export function requestSyncAccess(request, env, fetcher = fetch) {
   }, env, fetcher, "sync-access");
 }
 
+// ------------------------------------------------------------ converter requests
+
+// SAP reads time sheets differently at almost every company, so a converter
+// for SAP is built when a company asks for one (owner, 2026-10-23). The
+// request names the system and the number of people, so the owner can judge
+// how serious it is. The keys are the form's values; the labels go into the
+// lead.
+export const SAP_SYSTEMS = {
+  "r3": "SAP R/3 4.x or older",
+  "ecc-ehp0-5": "SAP ERP 6.0 (ECC), enhancement package 0 to 5",
+  "ecc-ehp6-8": "SAP ERP 6.0 (ECC), enhancement package 6 to 8",
+  "s4-on-premise": "SAP S/4HANA, on premise",
+  "s4-private": "SAP S/4HANA Cloud Private Edition",
+  "s4-public": "SAP S/4HANA Cloud Public Edition",
+  "successfactors": "SAP SuccessFactors Employee Central Time Tracking",
+  "business-one": "SAP Business One",
+  "bydesign": "SAP Business ByDesign",
+  "other": "Another SAP system, or not sure",
+};
+export const USER_COUNTS = { "1-10": "1 to 10", "11-50": "11 to 50", "51-250": "51 to 250", "251-1000": "251 to 1,000", "1000+": "more than 1,000" };
+
+// A request for a converter is a sales lead from a company, so it needs the
+// company's own address (owner, 2026-10-23): the policy "converter-request"
+// in src/email-domains.js refuses public mailboxes, internet providers'
+// mailboxes and throwaway addresses Castle confirms, and takes the rest with
+// the type in the lead for the owner to judge. The browser learns only
+// "personal", never the type or the list.
+
+const NAME = /^[^<>{}\[\]\\/@:;"=]{1,80}$/u;
+
+/** The converter request a form sent, or the reason it cannot be taken. */
+export function readConverterRequest(form, groups = GROUPS, version = REGISTRY_VERSION) {
+  const field = (name) => String(form.get(name) ?? "").trim();
+  if (field("website") !== "") return { robot: true };
+  const email = field("email");
+  const firstName = field("first_name");
+  const lastName = field("last_name");
+  const system = field("system");
+  const users = field("users");
+  const lang = field("lang");
+  if (!emailDomain(email)) return { error: "invalid" };
+  if (!NAME.test(firstName) || !NAME.test(lastName) || !SAP_SYSTEMS[system] || !USER_COUNTS[users]) return { error: "invalid" };
+  const domain = classifyEmail(email, groups, version);
+  if (decide("converter-request", domain) === "refuse") return { error: "personal" };
+  return { email, firstName, lastName, system, users, lang: site.languages.some((l) => l.code === lang) ? lang : "en", domain };
+}
+
+/** The request as a lead in the CRM. */
+export async function addConverterRequest(request, env, fetcher = fetch) {
+  const domain = request.domain ?? classifyEmail(request.email);
+  return createLead({
+    name: "TIMEperative converter for SAP: request",
+    contact_name: `${request.firstName} ${request.lastName}`,
+    email_from: request.email,
+    description: `Asked on ${ORIGIN.host} for a converter for SAP. SAP system: ${SAP_SYSTEMS[request.system]}. People who would use it: ${USER_COUNTS[request.users]}. Language of the page: ${request.lang}. Email domain: email_domain_type ${domain.email_domain_type}, confidence ${domain.confidence}, sources ${domain.sources?.join(", ") || "none"}, registry ${domain.registry_version} (the Worker leaves out ${OUTSIDE_THE_WORKER}).`,
+  }, env, fetcher, "converter-request");
+}
+
+// ------------------------------------------------------------ the forms
+
 /** Where a form without script goes back to: the page it came from, at its own message. */
 function backTo(form, platform, outcome) {
   const page = String(form.get("page") ?? "/");
@@ -246,9 +318,11 @@ async function takeForm(request, read, act, back) {
   }
   const data = read(form);
   const result = data.robot ? { ok: true } : data.error ? data : await act(data);
-  const outcome = result.ok ? "ok" : result.error === "invalid" ? "invalid" : "error";
+  // "personal": the address is not one this form takes; the browser learns no more than that.
+  const refused = result.error === "invalid" || result.error === "personal";
+  const outcome = result.ok ? "ok" : refused ? result.error : "error";
   if ((request.headers.get("accept") ?? "").includes("application/json")) {
-    return Response.json({ ok: !!result.ok, error: result.error }, { status: result.ok ? 200 : result.error === "invalid" ? 400 : 503, headers: { "cache-control": "no-store" } });
+    return Response.json({ ok: !!result.ok, error: result.error }, { status: result.ok ? 200 : refused ? 400 : 503, headers: { "cache-control": "no-store" } });
   }
   return new Response(null, { status: 303, headers: { location: back(form, outcome), "cache-control": "no-store" } });
 }
@@ -265,6 +339,14 @@ export function syncAccess(request, env, fetcher = fetch) {
   });
 }
 
+export function converterRequest(request, env, fetcher = fetch) {
+  return takeForm(request, readConverterRequest, (data) => addConverterRequest(data, env, fetcher), (form, outcome) => {
+    const page = String(form.get("page") ?? "/resources/converters/");
+    const path = page.startsWith("/") && !page.startsWith("//") ? page : "/";
+    return `${ORIGIN.origin}${path}#sap-request-${outcome}`;
+  });
+}
+
 // ------------------------------------------------------------ routing
 
 export default {
@@ -275,6 +357,7 @@ export default {
     }
     if (url.pathname === "/waitlist") return waitlist(request, env);
     if (url.pathname === "/sync-access") return syncAccess(request, env);
+    if (url.pathname === "/converter-request") return converterRequest(request, env);
     const match = /^\/download\/(windows|android)\/?$/.exec(url.pathname);
     if (!match) return page(request, env);
     const location = (await latestInstaller(match[1])) ?? site.releasePage;

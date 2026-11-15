@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.timeperative.com/schemas/email-domains-exclusions.schema.json",
+  "title": "TIMEperative email domain exclusions",
+  "description": "Reviewed false positives: domains a feed lists that the registry must not, so they are CUSTOM_DOMAIN at run time. Edited by hand: one object per line, sorted by domain. Public providers' domains only, never a customer's domain (specification 2.3, rule 8).",
+  "type": "array",
+  "uniqueItems": true,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["domain", "reason", "reviewed_by", "reviewed_at"],
+    "properties": {
+      "domain": { "type": "string", "minLength": 3, "maxLength": 253, "pattern": "^[a-z0-9.-]+$", "description": "Lowercase ASCII; an international domain in its xn-- form." },
+      "reason": { "type": "string", "minLength": 3, "maxLength": 200 },
+      "reviewed_by": { "type": "string", "minLength": 2, "maxLength": 80 },
+      "reviewed_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+    }
+  }
+}

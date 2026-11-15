@@ -1,0 +1,104 @@
+# Refreshes the email domain registry (data/README.md) every day and proposes
+# the change as a pull request into main for review; it never pushes to main.
+#
+# The builder fetches the four feeds, applies the overrides and exclusions,
+# and publishes only when every gate passes (scripts/email-domains.mjs). A
+# failed gate fails this run, and GitHub tells the people who watch the
+# repository; the registry in main stays as it was. When the change is
+# unusually large (a feed changing by more than 20 %, the registry shrinking
+# by more than 10 %), the run fails too: look at the feeds, then run this
+# workflow by hand with "Accept a large change" ticked. The pull request
+# then opens with a warning at the top of its description.
+#
+# The pull request comes from the branch email-domains-refresh, which this
+# workflow owns and rewrites on every run; one open pull request carries the
+# latest refresh. It needs the repository setting "Allow GitHub Actions to
+# create and approve pull requests" (Settings > Actions > General > Workflow
+# permissions; docs.github.com, Managing GitHub Actions settings for a
+# repository, read 2026-10-23). A pull request opened with GITHUB_TOKEN starts
+# its own workflow runs only after someone with write access approves them
+# (docs.github.com, GITHUB_TOKEN, read 2026-10-23), so this workflow runs the
+# tests itself before it opens the pull request.
+name: Email domains
+on:
+  schedule:
+    - cron: "41 4 * * *"
+  workflow_dispatch:
+    inputs:
+      allow_large_change:
+        description: "Accept a large change (the pull request says so at the top)"
+        type: boolean
+        default: false
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: email-domains
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BRANCH: email-domains-refresh
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Fetch the feeds, build and run the gates
+        run: node scripts/email-domains.mjs ${{ inputs.allow_large_change && '--allow-large-change' || '' }}
+      - name: The report of source conflicts, and the registry this run built
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: email-domains-report
+          # The report lives in .email-domains/, which the action skips unless told.
+          include-hidden-files: true
+          path: |
+            .email-domains/source-conflicts.json
+            .email-domains/summary.md
+            data/email-domains.json
+            data/email-domains-manifest.json
+          retention-days: 30
+          if-no-files-found: ignore
+      - name: Changed?
+        id: diff
+        run: |
+          if git diff --quiet -- data src/email-domains.generated.js; then
+            echo "changed=no" >> "$GITHUB_OUTPUT"
+            echo "The registry is unchanged." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=yes" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Test the refreshed registry
+        if: steps.diff.outputs.changed == 'yes'
+        run: npm test
+      - name: Propose the change
+        if: steps.diff.outputs.changed == 'yes'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(jq -r .registry_version data/email-domains-manifest.json)
+          {
+            echo "Daily refresh of the email domain registry from the feeds in \`data/README.md\`, by the workflow \`Email domains\` ([run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}))."
+            echo
+            cat .email-domains/summary.md
+            echo
+            echo "The tests passed in that run. Merge to deploy; close to skip this refresh (the next run proposes a new one)."
+          } > "$RUNNER_TEMP/body.md"
+          cat .email-domains/summary.md >> "$GITHUB_STEP_SUMMARY"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$BRANCH"
+          git add data src/email-domains.generated.js
+          git commit -m "Email domain registry $version"
+          git push --force origin "$BRANCH"
+          title="Email domain registry $version"
+          if [ "$(gh pr list --head "$BRANCH" --base main --state open --json number --jq length)" = "0" ]; then
+            gh pr create --base main --head "$BRANCH" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh pr edit "$BRANCH" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          fi

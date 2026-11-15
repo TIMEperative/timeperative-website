@@ -189,7 +189,7 @@ function platformsHtml(lang, pagePath) {
   const toggles = soon.map((p) => `<li><a class="platform" href="#waitlist-${p}" data-waitlist-toggle aria-controls="waitlist-${p}" aria-expanded="false">${mark(p)}<span>${escapeHtml(t.names[p])}</span></a></li>`);
   const panels = soon.map((p) => `<div class="waitlist" id="waitlist-${p}">
   <p>${escapeHtml(fill(t.soon, p))}</p>
-  <form class="waitlist-form" method="post" action="/waitlist" data-ok="${escapeHtml(fill(t.ok, p))}" data-invalid="${escapeHtml(t.invalid)}" data-error="${escapeHtml(t.error.replace("{email}", site.supportEmail))}">
+  <form class="waitlist-form" method="post" action="/waitlist" data-ok="${escapeHtml(fill(t.ok, p))}" data-invalid="${escapeHtml(t.invalid)}" data-personal="${escapeHtml(t.personal)}" data-error="${escapeHtml(t.error.replace("{email}", site.supportEmail))}">
     <input type="hidden" name="platform" value="${p}">
     <input type="hidden" name="lang" value="${lang}">
     <input type="hidden" name="page" value="${localPath(lang, pagePath)}">
@@ -203,6 +203,7 @@ function platformsHtml(lang, pagePath) {
     <p class="waitlist-status" role="status" aria-live="polite"></p>
     <p class="waitlist-done" id="waitlist-${p}-ok">${escapeHtml(fill(t.ok, p))}</p>
     <p class="waitlist-done" id="waitlist-${p}-invalid">${escapeHtml(t.invalid)}</p>
+    <p class="waitlist-done" id="waitlist-${p}-personal">${escapeHtml(t.personal)}</p>
     <p class="waitlist-done" id="waitlist-${p}-error">${escapeHtml(t.error.replace("{email}", site.supportEmail))}</p>
   </form>
 </div>`);
